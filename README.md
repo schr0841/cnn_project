@@ -158,7 +158,7 @@ The validation accuracy was originally not computed, but we added an appropriate
 ## Confusion Matrix of Results for Ensemble Model using Categorical cross entropy loss function
 ![image](https://github.com/schr0841/cnn_group_project/blob/main/cm_categorical.png)
 
-Above we see the confusion matrix of the ensemble model using the categorical cross entropy loss function as well as the accuracy of 88/% on the test set. On the validation set this accuracy increases further to be 97.5%, which is significantly better than each of the constituent pretrained models (84.4%, 75.9%, and 50.6% respectively) or the base CNN model at 29.2%. This is tangible evidence that shows the true benefit of ensembling applied to the unseen validation data. We also showed how using pre-trained models represents a significant boost in model performance over vanilla CNNs. 
+Above we see the confusion matrix of the ensemble model using the categorical cross entropy loss function as well as the accuracy of 88% on the test set. On the validation set this accuracy increases further to be 97.5%, which is significantly better than each of the constituent pretrained models (84.4%, 75.9%, and 50.6% respectively) or the base CNN model at 29.2%. This is tangible evidence that shows the true benefit of ensembling applied to the unseen validation data. We also showed how using pre-trained models represents a significant boost in model performance over vanilla CNNs, and how this strategy could be fruitful for a wide range of medical imaging problems.
 
 
 
