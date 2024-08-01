@@ -75,9 +75,9 @@ From the Kaggle notebook (2) we have some code to work with for pre-trained mode
 
 ## Sparse categorical vs categorical loss functions / sparse vs non-sparse class mode generators
 
-Use this crossentropy loss function when there are two or more label classes. We expect labels to be provided as integers. If you want to provide labels using one-hot representation, please use CategoricalCrossentropy loss. There should be # classes floating point values per feature for y_pred and a single floating point value per feature for y_true.
+Use the Sparse categorical crossentropy loss function when there are two or more label classes. We expect labels to be provided as integers. If you want to provide labels using one-hot representation, please use CategoricalCrossentropy loss. There should be # classes floating point values per feature for y_pred and a single floating point value per feature for y_true.
 
-class_mode: One of "categorical", "binary", "sparse", "input", or None. Default: "categorical". Determines the type of label arrays that are returned: - "categorical" gives 2D output (aka. list of numbers of length N), [0, 0, 1, 0], which is a one-hot encoding (only one number is 1/ "hot") representing the target variable. This is for mutually exclusive labels. A dog cannot be a cat, a human is not a dog. "binary" will be 1D binary labels, "sparse" will be 1D integer labels, - "input" will be images identical to input images (mainly used to work with autoencoders). - If None, no labels are returned (the generator will only yield batches of image data, which is useful to use with model.predict_generator()). Please note that in case of class_mode None, the data still needs to reside in a subdirectory of directory for it to work correctly. 
+**class_mode parameter**: One of "categorical", "binary", "sparse", "input", or None. Default: "categorical". Determines the type of label arrays that are returned: - "categorical" gives 2D output (aka. list of numbers of length N), [0, 0, 1, 0], which is a one-hot encoding (only one number is 1/ "hot") representing the target variable. This is for mutually exclusive labels. A dog cannot be a cat, a human is not a dog. "binary" will be 1D binary labels, "sparse" will be 1D integer labels, - "input" will be images identical to input images (mainly used to work with autoencoders). - If None, no labels are returned (the generator will only yield batches of image data, which is useful to use with model.predict_generator()). Please note that in case of class_mode None, the data still needs to reside in a subdirectory of directory for it to work correctly. 
 
 ## Pre-training a model
 
@@ -158,7 +158,7 @@ Ensemble methods are a powerful tool in machine learning, often used in practice
 
 ## Ensemble validation set - figure out why only 1 epoch / why validation accuracy not showing up
 
-The test_steps parameter in the call to model.evaluate is currently evaluating to 1, so that is why there is only 1 epoch. It seems to be related to the data generator function that we are using - when this parameter was manually increased to 10, a warning was obtained that said the input ran out of data.
+The **test_steps** parameter in the call to model.evaluate is currently evaluating to 1, so that is why there is only 1 epoch. It seems to be related to the data generator function that we are using - when this parameter was manually increased to 10, a warning was obtained that said the input ran out of data.
 
 The validation accuracy was originally not computed, but we added an appropriate line of code and printed these results to the console. We were then able to add the appropriate result to the table. As we expect, the validation accuracy is much higher than the individual accuracy of the three pre-trained models. 
 
@@ -170,7 +170,7 @@ The validation accuracy was originally not computed, but we added an appropriate
 ## Confusion Matrix of Results for Ensemble Model using Categorical cross entropy loss function
 ![image](https://github.com/schr0841/cnn_group_project/blob/main/cm_categorical.png)
 
-Above we see the confusion matrix of the ensemble model using the categorical cross entropy loss function as well as the accuracy of 88/% on the test set. On the validation set this accuracy increases further to be 97.5%, which is significantly better than each of the constituent pretrained models (84.4%, 75.9%, and 50.6% respectively) or the base CNN model at 29.2%. This is tangible evidence that shows the true benefit of ensembling applied to the unseen validation data.
+Above we see the confusion matrix of the ensemble model using the categorical cross entropy loss function as well as the accuracy of 88/% on the test set. On the validation set this accuracy increases further to be 97.5%, which is significantly better than each of the constituent pretrained models (84.4%, 75.9%, and 50.6% respectively) or the base CNN model at 29.2%. This is tangible evidence that shows the true benefit of ensembling applied to the unseen validation data. We also showed how using pre-trained models represents a significant boost in model performance over vanilla CNNs. 
 
 
 
