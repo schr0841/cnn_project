@@ -13,7 +13,24 @@ Optimization methods: image augmentation, dropout, early stopping
 
 # Overview and Purpose
 
-In this document, we train a convolutional neural network from scratch, and then investigate the added benefit of using pre-trained cnn models on the same dataset. Furthermore, we investigate model ensembling in general and its potential benefits and drawbacks.
+In this document, we train a convolutional neural network from scratch, and then investigate the added benefit of using pre-trained cnn models on the same dataset. Furthermore, we investigate model ensembling in general and its potential benefits and drawbacks. Here is a brief overview of the structure of Convolutional Neural Networks:
+
+
+1. Input Layer: The process starts with an image input, which is typically represented as a matrix of pixel values. For a color image, this matrix would have three channels (Red, Green, Blue).
+
+2. Convolutional Layers: These layers apply convolutional filters (or kernels) to the input image. Each filter scans through the image and performs a convolution operation, which involves element-wise multiplication and summing up the results. This process extracts features like edges, textures, and patterns. The result is a feature map that highlights the presence of specific features in different parts of the image.
+
+3. Activation Function: After convolution, an activation function (often ReLU, or Rectified Linear Unit) is applied to introduce non-linearity into the model. This helps the network learn more complex patterns.
+
+4. Pooling Layers: Pooling (often max pooling) is used to reduce the spatial dimensions of the feature maps. It involves taking the maximum or average value from a subset of the feature map, which reduces the number of parameters and computations, and helps the network become more robust to variations in the image.
+
+5. Flattening: The output from the convolutional and pooling layers is a multi-dimensional tensor. This tensor is flattened into a one-dimensional vector to feed into fully connected layers.
+
+6. Fully Connected Layers: These layers are similar to traditional neural networks where each neuron is connected to every neuron in the previous layer. They combine the features learned by the convolutional and pooling layers to make a final prediction.
+
+7. Output Layer: The final layer is a softmax (or sigmoid) function that outputs probabilities for each class, indicating the network's prediction for the image category.
+
+In summary, CNNs use convolutional and pooling layers to automatically and hierarchically learn features from images, followed by fully connected layers to classify those features into predefined categories. This process enables CNNs to effectively handle and classify complex visual data.
 
 
 
@@ -33,15 +50,7 @@ From the Kaggle notebook (2) we have some code to work with for pre-trained mode
 | InceptionV3 | 0.0439 | 0.9886 | 2.8829 | 0.5016 |
 | Ensemble | 0.3994 | 0.8750 | 0.2605 | 0.9750 |
 
-loss: 9.0188 - accuracy: 0.1876 - val_loss: 8.0590 - val_accuracy: 0.2917
 
-loss: 0.0544 - accuracy: 0.9804 - val_loss: 0.8051 - val_accuracy: 0.8444
-
-loss: 0.0118 - accuracy: 0.9951 - val_loss: 2.0054 - val_accuracy: 0.7587
-
-loss: 0.0439 - accuracy: 0.9886 - val_loss: 2.8829 - val_accuracy: 0.5016
-
-loss: 0.3994 - accuracy: 0.8750 - val_loss: 0.2605 - val_accuracy: 0.9750
 
 
 
@@ -54,16 +63,6 @@ loss: 0.3994 - accuracy: 0.8750 - val_loss: 0.2605 - val_accuracy: 0.9750
 | ResNet50 | 0.0682 | 0.9886 | 2.0240 | 0.7365 |
 | InceptionV3 | 0.0615 | 0.9902 | 2.9775 | 0.5111 |
 | Ensemble | 0.9132 | 0.8889 | 0.9594 | 0.8999 |
-
-loss: 0.0112 - accuracy: 0.9984 - val_loss: 2.0032 - val_accuracy: 0.6111
-
-loss: 0.0536 - accuracy: 0.9837 - val_loss: 0.6506 - val_accuracy: 0.8317
-
-loss: 0.0682 - accuracy: 0.9886 - val_loss: 2.0240 - val_accuracy: 0.7365
-
-loss: 0.0615 - accuracy: 0.9902 - val_loss: 2.9775 - val_accuracy: 0.5111
-
-loss: 0.9132 - accuracy: 0.8889 - val_loss: 0.9594 - val_accuracy: 0.8999
 
 ## Project topics:
 
@@ -146,7 +145,7 @@ The validation accuracy was originally not computed, but we added an appropriate
 ![error](https://github.com/schr0841/cnn_group_project/blob/main/github_error.png)
 
 
-## Confusion Matrix of Results for Categorical cross entropy loss function
+## Confusion Matrix of Results for Ensemble Model using Categorical cross entropy loss function
 ![image](https://github.com/schr0841/cnn_group_project/blob/main/cm_categorical.png)
 
 
