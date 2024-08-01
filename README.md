@@ -3,7 +3,7 @@
 
 # Overview and Purpose
 
-In this document, we train a convolutional neural network from scratch, and then investigate the added benefit of using pre-trained cnn models on the same dataset. Furthermore, we investigate model ensembling in general and its potential benefits and drawbacks. Here is a brief overview of the structure of Convolutional Neural Networks:
+In this document, we train a convolutional neural network from scratch to classify images as cancerous or normal, and then investigate the added benefit of using pre-trained cnn models on the same dataset. Furthermore, we investigate model ensembling in general and its potential benefits and drawbacks. Here is a brief overview of the structure of Convolutional Neural Networks:
 
 
 1. Input Layer: The process starts with an image input, which is typically represented as a matrix of pixel values. For a color image, this matrix would have three channels (Red, Green, Blue).
@@ -22,7 +22,7 @@ In this document, we train a convolutional neural network from scratch, and then
 
 In summary, CNNs use convolutional and pooling layers to automatically and hierarchically learn features from images, followed by fully connected layers to classify those features into predefined categories. This process enables CNNs to effectively handle and classify complex visual data.
 
-
+The data for this project was obtained here: https://www.kaggle.com/datasets/mohamedhanyyy/chest-ctscan-images
 
 
 
