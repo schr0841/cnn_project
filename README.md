@@ -1,15 +1,5 @@
 # Medical Image Classification with Convolutional Neural Networks
 
-Project outline: https://docs.google.com/document/d/1iy3c7ik2YjbI88vtGTbysj7AKmAjGtXfu4V3f6WxbHg/edit?usp=sharing
-
-
-Explore pre-trained models (Xception, VGG19, ResNet50, MobileNet) - not sure useful for this case
-
-Model (sort of) from scratch in tensorflow, get baseline accuracy
-
-Optimization methods: image augmentation, dropout, early stopping
-
-
 
 # Overview and Purpose
 
