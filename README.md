@@ -92,7 +92,7 @@ Benefits of Pre-Training:
 Pre-training is a powerful technique, especially in scenarios where data is scarce or where training a model from scratch would be impractical due to resource constraints.
 
 
-## Investigate ensemble models
+## Ensemble models
 
 
 Ensemble learning uses multiple machine learning models to try to make better predictions on a dataset. An ensemble model works by training different models on a dataset and having each model make predictions individually. The predictions of these models are then combined in the ensemble model to make a final prediction.
@@ -142,7 +142,7 @@ Ensemble models are a way to improve the performance of machine learning algorit
 - **Increased Complexity**: Ensembles can be more complex to implement and interpret compared to individual models.
 - **Computational Cost**: Training multiple models can be computationally expensive and require more resources.
 
-Ensemble methods are a powerful tool in machine learning, often used in practice to achieve higher performance and more reliable predictions.In our specific scenario, the ensemble model uses averaging to select the mode, or the most common predicted class, from the three pre-trained models. By doing this, it allows for further generalization accuracy improvements on the unseen validation data. 
+Ensemble methods are a powerful tool in machine learning, often used in practice to achieve higher performance and more reliable predictions. In our specific scenario, the ensemble model uses averaging to select the mode, or the most common predicted class, from the three pre-trained models. By doing this, it allows for further generalization accuracy improvements on the unseen validation data. 
 
 
 
