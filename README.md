@@ -3,7 +3,7 @@
 
 # Overview and Purpose
 
-In this document, we train a convolutional neural network from scratch to classify images as cancerous or normal, and then investigate the added benefit of using pre-trained cnn models on the same dataset. Furthermore, we investigate model ensembling in general and its potential benefits and drawbacks. Here is a brief overview of the structure of Convolutional Neural Networks:
+In this document, we train a convolutional neural network (cnn) model from scratch to classify images as either cancerous or normal, and then investigate the added benefit of using pre-trained cnn models on the same dataset. Furthermore, we investigate model ensembling in general and its potential benefits and drawbacks. Here is a brief overview of the general structure of Convolutional Neural Networks:
 
 
 1. Input Layer: The process starts with an image input, which is typically represented as a matrix of pixel values. For a color image, this matrix would have three channels (Red, Green, Blue).
@@ -65,7 +65,7 @@ From the Kaggle notebook (2) we have some code to work with for pre-trained mode
 
 ## Sparse categorical vs categorical loss functions / sparse vs non-sparse class mode generators
 
-Use the Sparse categorical crossentropy loss function when there are two or more label classes. We expect labels to be provided as integers. If you want to provide labels using one-hot representation, please use CategoricalCrossentropy loss. There should be # classes floating point values per feature for y_pred and a single floating point value per feature for y_true. In our instance above, we do not discern a noticable difference in the accuracies for the two approaches, though we do obtain the highest validation accuracy when using categorical cross entropy.
+Use the Sparse categorical crossentropy loss function when there are two or more label classes. In our data generating code, we can specify class_mode='sparse' to get the correct format. We expect labels to be provided as integers. If you want to provide labels using one-hot representation, please use CategoricalCrossentropy loss (with class_mode='categorical' instead). There should be # classes floating point values per feature for y_pred and a single floating point value per feature for y_true. In our instance above, we do not discern a noticable difference in the accuracies for the two approaches, though we do obtain the highest validation accuracy when using categorical cross entropy.
 
 ## Pre-training a model
 
