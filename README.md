@@ -67,6 +67,20 @@ From the Kaggle notebook (2) we have some code to work with for pre-trained mode
 
 Use the Sparse categorical crossentropy loss function when there are two or more label classes. In our data generating code, we can specify class_mode='sparse' to get the correct format in the generated data. We expect labels to be provided as integers. If one wants to provide labels using one-hot representation, please use CategoricalCrossentropy loss (with class_mode='categorical' in the data generating code instead). There should be # classes floating point values per feature for y_pred and a single floating point value per feature for y_true. In our instance above, we do not discern a noticable difference in the accuracies for the two approaches, though we do obtain the highest validation accuracy when using categorical cross entropy / categorical data generation.
 
+Unfortunately, there is no good way to tell whether we are dealing with sparse or categorical data generation just by looking at the vectors themselves. The two are basically indistinguishable:
+
+Sparse:
+
+![image](https://github.com/schr0841/cnn_project/blob/main/labels_sparse.png)
+
+
+
+Categorical:
+
+![image](https://github.com/schr0841/cnn_project/blob/main/labels_categorical.png)
+
+
+
 ## Pre-training a model: General Overview
 
 Pre-training a model in the context of neural networks involves training a model on a large dataset before fine-tuning it on a specific task. Here’s a breakdown of what pre-training means and why it’s beneficial:
