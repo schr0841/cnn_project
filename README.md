@@ -3,7 +3,7 @@
 
 # Overview and Purpose
 
-In this document, we train a convolutional neural network (cnn) model from scratch to classify images as either cancerous or normal, and then investigate the added benefit of using pre-trained cnn models on the same dataset. Furthermore, we investigate model ensembling in general and its potential benefits and drawbacks. Here is a brief overview of the general structure of Convolutional Neural Networks:
+In this document, we train a convolutional neural network (cnn) model from scratch to classify images as either cancerous or normal, and then investigate the added benefit of using pre-trained cnn models on the same dataset by using transfer learning. Furthermore, we investigate model ensembling in general and its potential benefits and drawbacks. Here is a brief overview of the general structure of Convolutional Neural Networks:
 
 
 1. Input Layer: The process starts with an image input, which is typically represented as a matrix of pixel values. For a color image, this matrix would have three channels (Red, Green, Blue).
@@ -65,9 +65,9 @@ From the Kaggle notebook (2) we have some code to work with for pre-trained mode
 
 ## Sparse categorical vs categorical loss functions / sparse vs non-sparse class mode generators
 
-Use the Sparse categorical crossentropy loss function when there are two or more label classes. In our data generating code, we can specify class_mode='sparse' to get the correct format. We expect labels to be provided as integers. If you want to provide labels using one-hot representation, please use CategoricalCrossentropy loss (with class_mode='categorical' instead). There should be # classes floating point values per feature for y_pred and a single floating point value per feature for y_true. In our instance above, we do not discern a noticable difference in the accuracies for the two approaches, though we do obtain the highest validation accuracy when using categorical cross entropy.
+Use the Sparse categorical crossentropy loss function when there are two or more label classes. In our data generating code, we can specify class_mode='sparse' to get the correct format in the generated data. We expect labels to be provided as integers. If one wants to provide labels using one-hot representation, please use CategoricalCrossentropy loss (with class_mode='categorical' in the data generating code instead). There should be # classes floating point values per feature for y_pred and a single floating point value per feature for y_true. In our instance above, we do not discern a noticable difference in the accuracies for the two approaches, though we do obtain the highest validation accuracy when using categorical cross entropy / categorical data generation.
 
-## Pre-training a model
+## Pre-training a model: General Overview
 
 Pre-training a model in the context of neural networks involves training a model on a large dataset before fine-tuning it on a specific task. Here’s a breakdown of what pre-training means and why it’s beneficial:
 
@@ -89,6 +89,7 @@ Benefits of Pre-Training:
 
 Pre-training is a powerful technique, especially in scenarios where data is scarce or where training a model from scratch would be impractical due to resource constraints.
 
+In our specific code, we use models that are pre-trained on the EfficientNetB3, ResNet50 and InceptionV3 datasets. The InceptionV3 model is trained to classify 1000 different images in a wide range of categories, so that may be why the accuracy suffers, but the ResNet50 model also does this and has good accuracy for us. 
 
 ## Ensemble models
 
@@ -179,3 +180,5 @@ Above we see the confusion matrix of the ensemble model using the categorical cr
 "Choosing between Cross Entropy and Sparse Cross Entropy — The Only Guide you Need!" (2023) Retrieved from https://medium.com/@shireenchand/choosing-between-cross-entropy-and-sparse-cross-entropy-the-only-guide-you-need-abea92c84662
 
 "Building an Ensemble Learning Model Using Scikit-learn" (Nov. 18 2018) Retrieved from https://towardsdatascience.com/ensemble-learning-using-scikit-learn-85c4531ff86a
+
+"Transfer Learning using EfficientNet PyTorch" (January 17, 2022) https://debuggercafe.com/transfer-learning-using-efficientnet-pytorch/
