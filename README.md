@@ -3,7 +3,10 @@
 
 # Overview and Purpose
 
-In this document, we train a convolutional neural network (cnn) model from scratch to classify images as either cancerous or normal, and then investigate the added benefit of using pre-trained cnn models on the same dataset by using transfer learning. Furthermore, we investigate model ensembling in general and its potential benefits and drawbacks. Here is a brief overview of the general structure of Convolutional Neural Networks:
+In this document, we train a convolutional neural network (CNN) model from scratch to classify images as either cancerous or normal, and then investigate the added benefit of using pre-trained CNN models on the same dataset by employing transfer learning. Furthermore, we investigate model ensembling in general and its potential benefits and drawbacks. 
+
+
+## Convolutional Neural Network: General Overview
 
 
 1. Input Layer: The process starts with an image input, which is typically represented as a matrix of pixel values. For a color image, this matrix would have three channels (Red, Green, Blue).
@@ -26,7 +29,7 @@ The data for this project was obtained here: https://www.kaggle.com/datasets/moh
 
 
 
-From the Kaggle notebook (2) we have some code to work with for pre-trained models. We evaluate each model on test loss, test accuracy, validation loss and validation accuracy. Below are two tables, each populated using a different type of loss function:
+From the Kaggle notebook available here: https://www.kaggle.com/code/prthmgoyl/ensemblemodel-ctscan  we have some code to work with for pre-trained models. We evaluate each model on test loss, test accuracy, validation loss and validation accuracy. Below are two tables, each populated using a different type of loss function:
 
 
 
@@ -67,29 +70,29 @@ From the Kaggle notebook (2) we have some code to work with for pre-trained mode
 
 Use the Sparse categorical crossentropy loss function when there are two or more label classes. In our data generating code, we can specify class_mode='sparse' to get the correct format in the generated data. We expect labels to be provided as integers. If one wants to provide labels using one-hot representation, please use CategoricalCrossentropy loss (with class_mode='categorical' in the data generating code instead). There should be # classes floating point values per feature for y_pred and a single floating point value per feature for y_true. In our instance above, we do not discern a noticable difference in the accuracies for the two approaches, though we do obtain the highest validation accuracy when using categorical cross entropy / categorical data generation.
 
-Unfortunately, there is no good way to tell whether we are dealing with sparse or categorical data generation just by looking at the vectors themselves. The two are basically indistinguishable:
+Unfortunately, there is no good way to tell whether we are dealing with sparse or categorical data generation just by looking at the data vectors themselves. The two are basically indistinguishable:
 
-Sparse:
+### Sparse:
 
 ![image](https://github.com/schr0841/cnn_project/blob/main/labels_sparse.png)
 
 
 
-Categorical:
+### Categorical:
 
 ![image](https://github.com/schr0841/cnn_project/blob/main/labels_categorical.png)
 
-
+Therefore, we must carefully specify whether we are using sparse or categorical in the data generating functions to ensure that everything matches up with the specified loss function.
 
 ## Pre-training a model: General Overview
 
-Pre-training a model in the context of neural networks involves training a model on a large dataset before fine-tuning it on a specific task. Here’s a breakdown of what pre-training means and why it’s beneficial:
+Pre-training a model in the context of neural networks involves training a model on a large dataset before fine-tuning it on a specific task (the end result is known as **transfer learning**). Here’s a breakdown of what pre-training means and why it’s beneficial:
 
 1. **Initial Training on a Large Dataset**: Pre-training typically involves training a neural network on a broad, general-purpose dataset. For example, in the case of image classification, a model might be pre-trained on a large and diverse dataset like ImageNet, which contains millions of labeled images across thousands of categories.
 
 2. **Learning General Features**: During pre-training, the model learns to identify and extract general features from the data, such as edges, textures, and shapes in images, or basic linguistic patterns in text. These features are broadly useful across different tasks and domains.
 
-3. **Transfer Learning**: After pre-training, the model is adapted to a specific task or dataset in a process known as transfer learning. Here, the model's weights, which have been optimized during pre-training, are used as the starting point for training on a new, often smaller, dataset. The model is fine-tuned to learn the specifics of the new task while leveraging the general features it has already learned.
+3. **Transfer Learning**: After pre-training, the model is adapted to a specific task or dataset in a process known as transfer learning. Here, the model's weights, which have been optimized during pre-training, are used as the starting point for training on a new, often smaller, dataset. The model is fine-tuned to learn the specifics of the new task while leveraging the general features it has already learned. In our specific case, the smaller dataset consists of CT-Scan images with different types of chest cancer.
 
 4. **Fine-Tuning**: Fine-tuning involves adjusting the pre-trained model's weights to better fit the new task. This can involve retraining some or all of the network's layers, depending on how similar the new task is to the original one.
 
@@ -103,9 +106,9 @@ Benefits of Pre-Training:
 
 Pre-training is a powerful technique, especially in scenarios where data is scarce or where training a model from scratch would be impractical due to resource constraints.
 
-In our specific code, we use models that are pre-trained on the EfficientNetB3, ResNet50 and InceptionV3 datasets. The InceptionV3 model is trained to classify 1000 different images in a wide range of categories, so that may be why the accuracy suffers, but the ResNet50 model also does this and has good accuracy for us. 
+In our specific case, we use models that are pre-trained on the EfficientNetB3, ResNet50 and InceptionV3 datasets. The InceptionV3 model is trained to classify 1000 different images in a wide range of categories, so that may be why the accuracy suffers, but the ResNet50 model also does this and has good accuracy for us. We need some further investigation as to why there are differences in these models.
 
-## Ensemble models
+## Ensemble models: General Overview
 
 
 Ensemble learning uses multiple machine learning models to try to make better predictions on a dataset. An ensemble model works by training different models on a dataset and having each model make predictions individually. The predictions of these models are then combined in the ensemble model to make a final prediction.
