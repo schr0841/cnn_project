@@ -3,7 +3,7 @@
 
 # Overview and Purpose
 
-In this document, we train a convolutional neural network (CNN) model from scratch to classify images as either cancerous or normal, and then investigate the added benefit of using pre-trained CNN models on the same dataset by employing transfer learning. Furthermore, we investigate model ensembling in general and its potential benefits and drawbacks. 
+In this document, we train a convolutional neural network (CNN) model from scratch to classify CT chest scan images as either cancerous or normal, and then investigate the added benefit of using pre-trained CNN models on the same dataset by employing transfer learning. Furthermore, we investigate model ensembling in general and its potential benefits and drawbacks. 
 
 
 ## Convolutional Neural Network: General Overview
