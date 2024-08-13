@@ -170,6 +170,17 @@ The validation accuracy was originally not computed, but we added an appropriate
 
 
 
+## Exploration of 2-step boosting ensemble procedure
+
+We attempt to train 2 models sequentially, where the second model learns from the errors of the first model. Since our best-performing models are EfficientNetB3 and ResNet50, we will use those models to form our boosted ensemble. We copy the code for these models into a new cell. 
+
+
+
+
+
+
+
+
 
 # Conclusions and Results
 
