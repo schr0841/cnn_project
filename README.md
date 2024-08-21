@@ -57,13 +57,6 @@ From the Kaggle notebook available here: https://www.kaggle.com/code/prthmgoyl/e
 | InceptionV3 | 0.0615 | 0.9902 | 2.9775 | 0.5111 |
 | Ensemble | 0.9132 | 0.8889 | 0.9594 | 0.8999 |
 
-## Project topics:
-
-* Investigate what pre-training means
-* Sparse categorical vs categorical loss functions / sparse vs non-sparse class mode generators
-* Investigate ensemble models
-* Ensemble validation set - figure out why only 1 epoch / why validation accuracy so low
-* Figure out what .h5 files are doing
 
 
 ## Sparse categorical vs categorical loss functions / sparse vs non-sparse class mode generators
