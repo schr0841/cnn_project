@@ -113,9 +113,20 @@ In our specific case, we use models that are pre-trained on the EfficientNetB3, 
 ![image](https://github.com/schr0841/cnn_project/blob/main/base2.png)
 
 
+## EfficientNet architecture:
+
+![image](https://github.com/schr0841/cnn_project/blob/main/EfficientNet.png)
 
 
 
+## ResNet50 architecture:
+
+![image](https://github.com/schr0841/cnn_project/blob/main/ResNet.png)
+
+
+## InceptionV3 architecture:
+
+![image](https://github.com/schr0841/cnn_project/blob/main/Inception.png)
 
 
 
