@@ -101,6 +101,25 @@ Pre-training is a powerful technique, especially in scenarios where data is scar
 
 In our specific case, we use models that are pre-trained on the EfficientNetB3, ResNet50 and InceptionV3 datasets. The InceptionV3 model is trained to classify 1000 different images in a wide range of categories, so that may be why the accuracy suffers, but the ResNet50 model also does this and has good accuracy for us. We need some further investigation as to why there are differences in these models. After pre-training, we then employ transfer learning by further training the models on our cancer image dataset.
 
+
+
+
+## Base CNN architecture:
+
+![image](https://github.com/schr0841/cnn_project/blob/main/base1.png)
+
+![image](https://github.com/schr0841/cnn_project/blob/main/base3.png)
+
+![image](https://github.com/schr0841/cnn_project/blob/main/base2.png)
+
+
+
+
+
+
+
+
+
 ## Ensemble models: General Overview
 
 
@@ -165,9 +184,9 @@ The validation accuracy was originally not computed, but we added an appropriate
 
 ## Exploration of 2-step boosting ensemble procedure
 
-We attempt to train 2 models sequentially, where the second model learns from the errors of the first model. Since our best-performing models are EfficientNetB3 and ResNet50, we will use those models to form our boosted ensemble. We copy the code for these models into a new cell. 
+We attempt to train 2 models sequentially, where the second model learns from the errors of the first model. Since our best-performing models are EfficientNetB3 and ResNet50, we will use those models to form our boosted ensemble. We copy the code for these models into a new cell. However we are unable to get it to work correctly, and are leaving this as a 'future improvement' that could be worked on. 
 
-We asked Claude AI if it could come up with an implementation of simple boosted ensemble models and it was able to do that, but the code it provided assumed we have a clear split among the features $X$ and target $y$, whereas here we do not. We have included it as an extra supplementary notebook titled "gemini_boosted_ensemble.ipynb"
+We asked Claude AI if it could come up with an implementation of simple boosted ensemble models and it was able to do that, but the code it provided assumed we have a clear split among the features $X$ and target $y$, whereas here we do not. We have included it as an extra supplementary notebook titled "gemini_boosted_ensemble.ipynb" to look at for further development.
 
 
 
