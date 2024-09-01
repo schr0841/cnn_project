@@ -185,6 +185,12 @@ Ensemble methods are a powerful tool in machine learning, often used in practice
 
 
 
+## Ensemble (basic mean/mode) architecture:
+
+![image](https://github.com/schr0841/cnn_project/blob/main/ensemble.png)
+
+
+
 ## Ensemble validation set - figure out why only 1 epoch / why validation accuracy not showing up
 
 The **test_steps** parameter in the call to model.evaluate is currently evaluating to 1, so that is why there is only 1 epoch. It seems to be related to the data generator function that we are using - when this parameter was manually increased to 10, a warning was obtained that said the input ran out of data.
