@@ -67,13 +67,13 @@ Unfortunately, there is no good way to tell whether we are dealing with sparse o
 
 ### Sparse:
 
-![image](https://github.com/schr0841/cnn_project/blob/main/labels_sparse.png)
+![image](https://github.com/schr0841/cnn_project/blob/main/images/labels_sparse.png)
 
 
 
 ### Categorical:
 
-![image](https://github.com/schr0841/cnn_project/blob/main/labels_categorical.png)
+![image](https://github.com/schr0841/cnn_project/blob/main/images/labels_categorical.png)
 
 Therefore, we must carefully specify whether we are using sparse or categorical in the data generating functions to ensure that everything matches up with the specified loss function.
 
@@ -106,27 +106,27 @@ In our specific case, we use models that are pre-trained on the EfficientNetB3, 
 
 ## Base CNN architecture:
 
-![image](https://github.com/schr0841/cnn_project/blob/main/base1.png)
+![image](https://github.com/schr0841/cnn_project/blob/main/images/base1.png)
 
-![image](https://github.com/schr0841/cnn_project/blob/main/base3.png)
+![image](https://github.com/schr0841/cnn_project/blob/main/images/base3.png)
 
-![image](https://github.com/schr0841/cnn_project/blob/main/base2.png)
+![image](https://github.com/schr0841/cnn_project/blob/main/images/base2.png)
 
 
 ## EfficientNet architecture:
 
-![image](https://github.com/schr0841/cnn_project/blob/main/EfficientNet.png)
+![image](https://github.com/schr0841/cnn_project/blob/main/images/EfficientNet.png)
 
 
 
 ## ResNet50 architecture:
 
-![image](https://github.com/schr0841/cnn_project/blob/main/ResNet.png)
+![image](https://github.com/schr0841/cnn_project/blob/main/images/ResNet.png)
 
 
 ## InceptionV3 architecture:
 
-![image](https://github.com/schr0841/cnn_project/blob/main/Inception.png)
+![image](https://github.com/schr0841/cnn_project/blob/main/images/Inception.png)
 
 
 
@@ -187,7 +187,7 @@ Ensemble methods are a powerful tool in machine learning, often used in practice
 
 ## Ensemble (basic mean/mode) architecture:
 
-![image](https://github.com/schr0841/cnn_project/blob/main/ensemble.png)
+![image](https://github.com/schr0841/cnn_project/blob/main/images/ensemble.png)
 
 
 
@@ -214,7 +214,8 @@ We asked Claude AI if it could come up with an implementation of simple boosted 
 # Conclusions and Results
 
 ## Confusion Matrix of Results for Ensemble Model using Categorical cross entropy loss function
-![image](https://github.com/schr0841/cnn_group_project/blob/main/cm_categorical.png)
+
+![image](https://github.com/schr0841/cnn_group_project/blob/main/images/cm_categorical.png)
 
 Above we see the confusion matrix of the ensemble model using the categorical cross entropy loss function as well as the accuracy of 88% on the test set. On the validation set this accuracy increases further to be 97.5%, which is significantly better than each of the constituent pretrained models (84.4%, 75.9%, and 50.6% respectively) or the base CNN model at 29.2%. This is tangible evidence that shows the true benefit of ensembling applied to the unseen validation data. We also showed how using pre-trained models represents a significant boost in model performance over vanilla CNNs, and how this strategy could be fruitful for a wide range of medical imaging problems.
 
