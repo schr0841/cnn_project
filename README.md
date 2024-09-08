@@ -227,7 +227,7 @@ ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7
 <img width="905" alt="Screenshot 2024-09-08 171613" src="https://github.com/user-attachments/assets/bc07814e-888f-4779-a562-1d874fa9ddef">
 <img width="772" alt="Screenshot 2024-09-08 171817" src="https://github.com/user-attachments/assets/e91235d6-b62d-407c-bd00-172ee7cf0181">
 
-Both the models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20.
+Both the models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20. When later ensembling models, data augmentation and rescaling can either be applied outside of the models or within both models. In this instance we applied augmentation and rescaling within ResNet50 and custom_cnn_model. 
 
 While the custom_cnn_model was initially defined and trained using the Sequential API, this caused issues when it came to ensemble and chain the model with the ResNet50, which was defined using the Functional API to accommodate the ResNet50's greater complexity. 
 
@@ -252,10 +252,25 @@ The model itself is relatively simple [ensemble_model = Model(inputs=ensemble_in
 <img width="875" alt="Screenshot 2024-09-08 173359" src="https://github.com/user-attachments/assets/457282e9-2418-41e3-afaf-6554c509089f">
 <img width="854" alt="Screenshot 2024-09-08 173504" src="https://github.com/user-attachments/assets/94c12058-bc1e-420e-a0f3-ed0e73dc0a18">
 
+When it comes to evaluating the three models, evaluate the first and second models (the submodels) on the unseen testing_set dataset to get unbiased performance metrics. 
+To evaluate the ensemble model, average the predictions from the first and second models on the testing_set. 
+Then extract the labels from the testing_set. Estimating ensemble loss and ensemble accuracy then becomes a matter of requesting ensemble_model.evaluate(ensemble_predictions, y_test).
 
 
-When CHAINING models, specify data augmentation and rescaling only in first model, not in second
-When ENSEMBLING model, either apply data augmentation and rescaling outside of the models or within both models
+
+
+
+
+# Chaining Models
+When chaining two models, specify data augmentation and rescaling only in first model, not the in second.
+
+
+
+
+
+
+
+
 
 # Conclusions and Results
 
