@@ -235,9 +235,21 @@ While the custom_cnn_model was initially defined and trained using the Sequentia
 
 # Ensembling Models
 
+The ouputs of the (modified) ResNet50 model and the custom_cnn_model become the inputs to the ensembled model. Unlike the original input data, which contained labels for the image files, the new inputs to the ensemble model do not contain labels. Thus, we need to extract the labels from the TensorFlow datasets and give them to the ensemble model. The ensemble models needs the labels in order to compute loss values, which entails comparing predictions to true labels. 
+
 <img width="838" alt="Screenshot 2024-09-08 173050" src="https://github.com/user-attachments/assets/94e63c16-57d6-44c1-ae0b-a7ba6ca833c2">
+
+The second step in ensembling our two models is to generate predictions from each of them. Because 
+we used both training_set and validation_set with the two submodels, we need predictions from both models using these datasets. 
+
 <img width="840" alt="Screenshot 2024-09-08 173153" src="https://github.com/user-attachments/assets/6277ae2c-a9e6-455f-bef1-b31a5d1fff3e">
-<img width="844" alt="Screenshot 2024-09-08 173247" src="https://github.com/user-attachments/assets/32f297f2-743d-4a63-9095-dcb8a8e39428">
+
+An initial step to building the ensemble model is averaging the predictions made frmo the training_set and averaging the predictions made from the validation_set. These averages become the input for the training and validation of the ensemble model. Because these inputs have shape (4,), we need to set the input shape of the ensemble_input to (4,). 
+
+The model itself is relatively simple [ensemble_model = Model(inputs=ensemble_input, outputs= final_output] since we have already averaged the fist and second model outputs. We compile and train the ensemble model in the same manner as its two submodels. Here, our x value becomes the averaged 
+training_set predictions from the first and second model, while our y values become the true labels corresponding to the averaged training predictions. Finally, the validation_data for the ensemble model is the averaged predictions from the two submodels on the validation dataset and the true labels for the validation dataset itself. 
+
+<img width="844" alt="Screenshot 2024-09-08 173247t" src="https://github.com/user-attachments/assets/32f297f2-743d-4a63-9095-dcb8a8e39428">
 <img width="875" alt="Screenshot 2024-09-08 173359" src="https://github.com/user-attachments/assets/457282e9-2418-41e3-afaf-6554c509089f">
 <img width="854" alt="Screenshot 2024-09-08 173504" src="https://github.com/user-attachments/assets/94c12058-bc1e-420e-a0f3-ed0e73dc0a18">
 
@@ -245,6 +257,7 @@ While the custom_cnn_model was initially defined and trained using the Sequentia
 
 When CHAINING models, specify data augmentation and rescaling only in first model, not in second
 When ENSEMBLING model, either apply data augmentation and rescaling outside of the models or within both models
+
 # Conclusions and Results
 
 ## Confusion Matrix of Results for Ensemble Model using Categorical cross entropy loss function
