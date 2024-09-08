@@ -222,7 +222,8 @@ Both the models were compiled with the Adam optimizer, and with the loss functio
 
 <img width="910" alt="Screenshot 2024-09-08 170917" src="https://github.com/user-attachments/assets/71cbc01a-20d8-45b6-afd3-498fe9fff535">
 <img width="905" alt="Screenshot 2024-09-08 171613" src="https://github.com/user-attachments/assets/bc07814e-888f-4779-a562-1d874fa9ddef">
-<img width="772" alt="Screenshot 2024-09-08 171817" src="https://github.com/user-attachments/assets/f3e616f5-f5f6-4cff-8ca3-94b8267302a1">
+<img width="772" alt="Screenshot 2024-09-08 171817" src="https://github.com/user-attachments/assets/e91235d6-b62d-407c-bd00-172ee7cf0181">
+
 
 
 
