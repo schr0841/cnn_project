@@ -208,7 +208,9 @@ We asked Claude AI if it could come up with an implementation of simple boosted 
 
 ## Comparison of Chaining and Ensembling Models
 
-We trained the custom_cnn model and the ResNet50 model on the CT chest scan images in the training_set directory. This directory contained 613 files belonging to four classes. Similarly, a testing_set of 315 files belonging to four classes and a validation_set of 72 files belonging to 4 classes, were created for use in validating the model during training, and for evaluating the model after training.   
+We trained the custom_cnn model and the ResNet50 model on the CT chest scan images in the training_set directory. This directory contained 613 files belonging to four classes. Similarly, a testing_set of 315 files belonging to four classes and a validation_set of 72 files belonging to 4 classes, were created for use in validating the model during training, and for evaluating the model after training. One class pertained to images without cancer. Three classes pertained to one each of three forms of cancer. 
+
+The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using image data generators.
 
 
 ![Screenshot 2024-09-08 163909](https://github.com/user-attachments/assets/f2faf09f-0a55-453d-ad60-ba0415310570)
