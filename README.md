@@ -189,12 +189,6 @@ Ensemble methods are a powerful tool in machine learning, often used in practice
 
 ![image](https://github.com/schr0841/cnn_project/blob/main/images/ensemble.png)
 
-![Screenshot 2024-09-08 165703](https://github.com/user-attachments/assets/b50f6779-3154-4ae8-b0e3-5f56c59ab384)
-![Screenshot 2024-09-08 165747](https://github.com/user-attachments/assets/619dfd0f-6093-42d9-976f-7b7a5a5d4984)
-
-
-
-
 
 
 ## Ensemble validation set - figure out why only 1 epoch / why validation accuracy not showing up
@@ -223,6 +217,10 @@ While the custom_cnn_model was initially defined and trained using the Sequentia
 
 
 ![Screenshot 2024-09-08 163909](https://github.com/user-attachments/assets/f2faf09f-0a55-453d-ad60-ba0415310570)
+
+![Screenshot 2024-09-08 165703](https://github.com/user-attachments/assets/b50f6779-3154-4ae8-b0e3-5f56c59ab384)
+![Screenshot 2024-09-08 165747](https://github.com/user-attachments/assets/619dfd0f-6093-42d9-976f-7b7a5a5d4984)
+
 
 
 # Conclusions and Results
