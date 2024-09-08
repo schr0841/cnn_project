@@ -189,6 +189,12 @@ Ensemble methods are a powerful tool in machine learning, often used in practice
 
 ![image](https://github.com/schr0841/cnn_project/blob/main/images/ensemble.png)
 
+![Screenshot 2024-09-08 165703](https://github.com/user-attachments/assets/b50f6779-3154-4ae8-b0e3-5f56c59ab384)
+![Screenshot 2024-09-08 165747](https://github.com/user-attachments/assets/619dfd0f-6093-42d9-976f-7b7a5a5d4984)
+
+
+
+
 
 
 ## Ensemble validation set - figure out why only 1 epoch / why validation accuracy not showing up
@@ -210,7 +216,10 @@ We asked Claude AI if it could come up with an implementation of simple boosted 
 
 We trained the custom_cnn model and the ResNet50 model on the CT chest scan images in the training_set directory. This directory contained 613 files belonging to four classes. Similarly, a testing_set of 315 files belonging to four classes and a validation_set of 72 files belonging to 4 classes, were created for use in validating the model during training, and for evaluating the model after training. One class pertained to images without cancer. Three classes pertained to one each of three forms of cancer. 
 
-The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using image data generators.
+The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using the ImageDataGenerator, as datasets elsewhere in this study were generated. Also of note, the image_size was set to (224, 224) in both the custom_cnn_model and the ResNet50 model, because the ResNet50 model expects images of that size. For purposes of consistency, the image_size was set to (224, 224) for the custom_cnn_model as well. 
+label_mode for the three datasets were set to "int" (integer) because images belong to one of four classes. 
+
+While the custom_cnn_model was initially defined and trained using the Sequential API, this caused issues when it came to ensemble and chain the model with the ResNet50, which was defined using the Functional API to accommodate the ResNet50's greater complexity.   
 
 
 ![Screenshot 2024-09-08 163909](https://github.com/user-attachments/assets/f2faf09f-0a55-453d-ad60-ba0415310570)
