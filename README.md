@@ -228,10 +228,10 @@ ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7
 <img width="772" alt="Screenshot 2024-09-08 171817" src="https://github.com/user-attachments/assets/e91235d6-b62d-407c-bd00-172ee7cf0181">
 
 Both the models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20.
-![Screenshot 2024-09-08 172623](https://github.com/user-attachments/assets/12018eb2-0e74-405c-935b-cd6d56a6a22b)
 
 While the custom_cnn_model was initially defined and trained using the Sequential API, this caused issues when it came to ensemble and chain the model with the ResNet50, which was defined using the Functional API to accommodate the ResNet50's greater complexity. 
 
+![Screenshot 2024-09-08 172623](https://github.com/user-attachments/assets/12018eb2-0e74-405c-935b-cd6d56a6a22b)
 
 # Ensembling Models
 
