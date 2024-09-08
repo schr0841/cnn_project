@@ -220,14 +220,14 @@ label_mode for the three datasets were set to "int" (integer) because images bel
 
 Both the models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20.
 
-<img width="910" alt="Screenshot 2024-09-08 170917" src="https://github.com/user-attachments/assets/71cbc01a-20d8-45b6-afd3-498fe9fff535">
-<img width="905" alt="Screenshot 2024-09-08 171613" src="https://github.com/user-attachments/assets/bc07814e-888f-4779-a562-1d874fa9ddef">
-<img width="772" alt="Screenshot 2024-09-08 171817" src="https://github.com/user-attachments/assets/e91235d6-b62d-407c-bd00-172ee7cf0181">
-
 To prevent the ResNet50 model from generating a classification for the images in the input dataset, we set include_top=False. The second model in the ensemble, the custom_cnn_model, will make the classification. To prevent the ResNet50 model from being re-trained from its ImageNet data source, we froze its layers with by specifying layer.trainable = False. 
 
 Finally, we added some custom layers to the ResNet50 base_model before compiling and training it. 
-ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048) It is not designed to classify only four classes of images. Adding custom layers to ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.   
+ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048) It is not designed to classify only four classes of images. Adding custom layers to ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
+
+<img width="910" alt="Screenshot 2024-09-08 170917" src="https://github.com/user-attachments/assets/71cbc01a-20d8-45b6-afd3-498fe9fff535">
+<img width="905" alt="Screenshot 2024-09-08 171613" src="https://github.com/user-attachments/assets/bc07814e-888f-4779-a562-1d874fa9ddef">
+<img width="772" alt="Screenshot 2024-09-08 171817" src="https://github.com/user-attachments/assets/e91235d6-b62d-407c-bd00-172ee7cf0181">
 
 ![Screenshot 2024-09-08 172623](https://github.com/user-attachments/assets/12018eb2-0e74-405c-935b-cd6d56a6a22b)
 
