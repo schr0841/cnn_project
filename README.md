@@ -218,6 +218,8 @@ label_mode for the three datasets were set to "int" (integer) because images bel
 ![Screenshot 2024-09-08 165703](https://github.com/user-attachments/assets/b50f6779-3154-4ae8-b0e3-5f56c59ab384)
 ![Screenshot 2024-09-08 165747](https://github.com/user-attachments/assets/619dfd0f-6093-42d9-976f-7b7a5a5d4984)
 
+Both the models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, and on 100 epochs.
+
 <img width="910" alt="Screenshot 2024-09-08 170917" src="https://github.com/user-attachments/assets/71cbc01a-20d8-45b6-afd3-498fe9fff535">
 
 
