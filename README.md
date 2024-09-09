@@ -216,10 +216,9 @@ The data sets were generated using the tf.keras.preprocessing.image_dataset_from
 
 ![Screenshot 2024-09-08 165703](https://github.com/user-attachments/assets/b50f6779-3154-4ae8-b0e3-5f56c59ab384)
 
-To prevent the ResNet50 model from generating a classification for the images in the input dataset, we set include_top=False. The second model in the ensemble, the custom_cnn_model, will make the classification. To prevent the ResNet50 model from being re-trained from its ImageNet data source, we froze its layers with by specifying layer.trainable = False. 
+To prevent the ResNet50 model from generating a classification for the images in the input dataset, we set include_top=False. The second model in the sequence, the custom_cnn_model, will make the classification. To prevent the ResNet50 model from being re-trained from its ImageNet data source, we froze its layers with by specifying layer.trainable = False. 
 
-We also added some custom layers to the ResNet50 base_model before compiling and training it. 
-ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048) It is not designed to classify only four classes of images. Adding custom layers to ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
+We also added some custom layers to the ResNet50 base_model before compiling and training it. ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048) It is not designed to classify only four classes of images. Adding custom layers to ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
 
 ![Screenshot 2024-09-08 165747](https://github.com/user-attachments/assets/619dfd0f-6093-42d9-976f-7b7a5a5d4984)
 
@@ -236,32 +235,39 @@ While the custom_cnn_model was initially defined and trained using the Sequentia
 
 # Ensembling Models
 
-The ouputs of the (modified) ResNet50 model and the custom_cnn_model become the inputs to the ensembled model. Unlike the original input data, which contained labels for the image files, the new inputs to the ensemble model do not contain labels. Thus, we need to extract the labels from the TensorFlow datasets and give them to the ensemble model. The ensemble model needs the labels in order to compute loss values, which entails comparing predictions to true labels. 
+
+## Extracting labels from training_set, testing_set, and validation_set
+The ouputs of the (modified) ResNet50 model and the custom_cnn_model become the inputs to the ensembled model. Unlike the original input data, which contained labels for the images, the new inputs to the ensemble model do not contain labels. Thus, we need to extract the labels from the TensorFlow datasets and give them to the ensemble model. The ensemble model needs the labels in order to compute loss values, which entails comparing predictions to true labels. 
 
 <img width="838" alt="Screenshot 2024-09-08 173050" src="https://github.com/user-attachments/assets/94e63c16-57d6-44c1-ae0b-a7ba6ca833c2">
 
-The second step in ensembling our two models is to generate predictions from each of them. Because 
-we used both training_set and validation_set with the two submodels, we need predictions from both models using these datasets. 
+
+## Preparing data and building ensemble model to average outputs
+Before we build the ensemble model from our two submodels, we need to generate predictions (outputs) from each of them using the training_set and validation_set. Because we used both training_set and validation_set to train the two submodels individually, we need predictions from both models on these same datasets to serve as the inputs to the ensembled model.
 
 <img width="840" alt="Screenshot 2024-09-08 173153" src="https://github.com/user-attachments/assets/6277ae2c-a9e6-455f-bef1-b31a5d1fff3e">
 
-The next step in building the ensemble model is averaging the predictions made from the training_set and averaging the predictions made from the validation_set. These averages become the input for the training and validation of the ensemble model. Because these inputs have shape (4,), we need to set the input shape of the ensemble_input to (4,). 
+Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to train the ensembled model. Again, we kept these callback definitions consistent with those used in the two submodels. If the accuracy on the validation dataset did not improve after 20 epochs, the model training would come to an early stop rather than continue on for 100 epochs. Similarly, we defined a filepath to save the best version of the model (that with the maximum validation accuracy). 
 
-The model itself is relatively simple [ensemble_model = Model(inputs=ensemble_input, outputs= final_output] since we have already averaged the fist and second model outputs. Essentially, this model has only two layers: the input layer and the output layer. We compile and train the ensemble model in the same manner as its two submodels. Here, our x value becomes the averaged training_set predictions from the first and second model, while our y values become the true labels corresponding to the averaged training predictions. Finally, the validation_data for the ensemble model is the averaged predictions from the two submodels on the validation dataset and the true labels for the validation dataset itself. 
+
+After that, we defined the training and validation inputs to the ensemble model as the average of the training predictions made by the ResNet50 and the custom_cnn_model and the average of the two submodels' predictions on the validation_set. Because these submodels' outputs/ensemble model's inputs have shape (4,), we set the input shape of the ensemble_input to (4,). 
+
+The model itself is relatively simple since we are only averaging the fist and second models' outputs by dataset. Essentially, this model has only two layers: the input layer and the output layer. We compile and train the ensemble model in the same manner as its two submodels. Here, our x value becomes the averaged training_set predictions from the first and second model, while our y values become the true labels corresponding to the averaged training predictions. Finally, the validation_data for the ensemble model is the averaged predictions from the two submodels on the validation dataset and the true labels for the validation dataset itself. 
 
 <img width="844" alt="Screenshot 2024-09-08 173247t" src="https://github.com/user-attachments/assets/32f297f2-743d-4a63-9095-dcb8a8e39428">
 <img width="875" alt="Screenshot 2024-09-08 173359" src="https://github.com/user-attachments/assets/457282e9-2418-41e3-afaf-6554c509089f">
 <img width="854" alt="Screenshot 2024-09-08 173504" src="https://github.com/user-attachments/assets/94c12058-bc1e-420e-a0f3-ed0e73dc0a18">
 
-When it comes to evaluating the three models, evaluate the first and second models (the submodels) on the unseen testing_set dataset to get unbiased performance metrics. 
+## Evaluating all three models
+When it comes to evaluating the three models, the first and second models (the submodels) need to be evaluated on the unseen testing_set dataset to get unbiased performance metrics. 
 
-To evaluate the ensemble model, average the predictions from the first and second models on the testing_set. 
-Then extract the labels from the testing_set. Estimating ensemble loss and ensemble accuracy then becomes a matter of requesting ensemble_model.evaluate(ensemble_predictions, y_test).
+Evaluating the ensemble model is a matter of 
+a) averaging the predictions from the first and second models on the unseen testing_set,
+b) extracting the labels from the testing_set, and 
+c) Estimating ensemble loss and ensemble accuracy by requesting ensemble_model.evaluate(ensemble_predictions, y_test).
 
 <img width="625" alt="Screenshot 2024-09-08 185804" src="https://github.com/user-attachments/assets/fee59b88-88f0-4418-9eb0-2f0d37882922">
 <img width="489" alt="Screenshot 2024-09-08 185910" src="https://github.com/user-attachments/assets/77ae5b95-c029-4897-a964-52654d046a80">
-
-Besides average the output of two models, ensembling technique include weighted averaging, majority voting (for classification), stacking, blending (also known as bootstrap aggregating), boosting, maximizing, feature concatenation (for neural networks), model cascading, and hybrid ensembling.
 
 # Chaining Models
 
