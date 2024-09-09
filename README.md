@@ -208,15 +208,21 @@ We asked Claude AI if it could come up with an implementation of simple boosted 
 
 ## Comparison of Chaining and Ensembling Models
 
-We trained the custom_cnn model and the ResNet50 model on the CT chest scan images in the training_set directory. This directory contained 613 files belonging to four classes. Similarly, a testing_set of 315 files belonging to four classes and a validation_set of 72 files belonging to 4 classes, were created for use in validating the model during training, and for evaluating the model after training. One class pertained to images without cancer. Three classes pertained to one each of three forms of cancer. 
+We trained the custom_cnn model and the ResNet50-based model on the CT chest scan images in the training_set directory. This directory contained 613 files belonging to four classes. Similarly, a testing_set of 315 files belonging to four classes and a validation_set of 72 files belonging to 4 classes, were created for use in validating the model during training, and for evaluating the model after training. One class pertained to images without cancer. Three classes pertained to one each of three forms of cancer. 
 
-The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using the ImageDataGenerator, as datasets elsewhere in this study were generated. Also of note, the image_size was set to (224, 224) in both the custom_cnn_model and the ResNet50 model, because the ResNet50 model expects images of that size. For purposes of consistency, the image_size was set to (224, 224) for the custom_cnn_model as well. label_mode for the three datasets were set to "int" (integer) because images belong to one of four classes. 
+The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using the ImageDataGenerator, as datasets elsewhere in this study were generated. Also of note, the image_size was set to (224, 224) because the ResNet50-based model expects images of that size. For purposes of consistency, the image_size was set to (224, 224) for the custom_cnn_model as well. label_mode for the three datasets were set to "int" (integer) because images belong to one of four classes. 
 
 ![Screenshot 2024-09-08 163909](https://github.com/user-attachments/assets/f2faf09f-0a55-453d-ad60-ba0415310570)
 
 ![Screenshot 2024-09-08 165703](https://github.com/user-attachments/assets/b50f6779-3154-4ae8-b0e3-5f56c59ab384)
 
-To prevent the ResNet50 model itself from generating a classification for the images in the input dataset, we set include_top=False before adding custom layers that would result in a classification output vector. To prevent the ResNet50 model from being re-trained from its ImageNet data source, we froze its layers (made them unlearnable) by specifying layer.trainable = False. 
+# Use of Data Agumentation and Rescaling
+
+
+
+# Modifying the Pretrained ResNet50 model for compatibility with the custom_cnn_model
+
+To prevent the ResNet50-based model itself from generating a 1,000-classs classification for the chest scan images in the input dataset, we "removed" the output layer of the ResNet50 model by setting include_top=False. To enable the ResNet50-based model to generate a four-class classification for our input data, we added some custom layers.  before adding custom layers that would result in a classification output vector. To prevent the ResNet50 model from being re-trained from its ImageNet data source, we froze its layers (made them unlearnable) by specifying layer.trainable = False. 
 
 We also added some custom layers to the ResNet50 base_model before compiling and training it. ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048) It is not designed to classify only four classes of images. Adding custom layers to ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
 
@@ -226,15 +232,16 @@ We also added some custom layers to the ResNet50 base_model before compiling and
 <img width="905" alt="Screenshot 2024-09-08 171613" src="https://github.com/user-attachments/assets/bc07814e-888f-4779-a562-1d874fa9ddef">
 <img width="772" alt="Screenshot 2024-09-08 171817" src="https://github.com/user-attachments/assets/e91235d6-b62d-407c-bd00-172ee7cf0181">
 
+As with the ResNet50-based model, which had to be customized for caompatibility with the custom_cnn_model, the latter underwent significant adjustments to make it compatible with the ResNet50-based model.  
+
 Both the models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20. When later ensembling models, data augmentation and rescaling can either be applied outside of the models or within both models. In this instance we applied augmentation and rescaling within ResNet50 and custom_cnn_model. 
 
-While the custom_cnn_model was initially defined and trained using the Sequential API, this caused issues when it came to ensemble and chain the model with the ResNet50, which was defined using the Functional API to accommodate the ResNet50's greater complexity. 
+While the custom_cnn_model was initially defined and trained using the Sequential API, this caused issues when it came to ensemble and chain the model with the ResNet50, which was defined using the Functional API to accommodate the ResNet50's greater complexity. As such, the custom_cnn_model was later defined, compiled, and trained with the Functional API. 
 
 ![Screenshot 2024-09-08 172623](https://github.com/user-attachments/assets/413f10cf-3373-470b-9c26-c1feb2cc975d)
 
 
 # Ensembling Models
-
 
 ## Extracting labels from training_set, testing_set, and validation_set
 The ouputs of the (modified) ResNet50 model and the custom_cnn_model become the inputs to the ensembled model. Unlike the original input data, which contained labels for the images, the new inputs to the ensemble model do not contain labels. Thus, we need to extract the labels from the TensorFlow datasets and give them to the ensemble model. The ensemble model needs the labels in order to compute loss values, which entails comparing predictions to true labels. 
@@ -249,7 +256,6 @@ Before we build the ensemble model from our two submodels, we need to generate p
 
 Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to train the ensembled model. Again, we kept these callback definitions consistent with those used in the two submodels. If the accuracy on the validation dataset did not improve after 20 epochs, the model training would come to an early stop rather than continue on for 100 epochs. Similarly, we defined a filepath to save the best version of the model (that with the maximum validation accuracy). 
 
-
 After that, we defined the training and validation inputs to the ensemble model as the average of the training predictions made by the ResNet50 and the custom_cnn_model and the average of the two submodels' predictions on the validation_set. Because these submodels' outputs/ensemble model's inputs have shape (4,), we set the input shape of the ensemble_input to (4,). 
 
 The model itself is relatively simple since we are only averaging the fist and second models' outputs by dataset. Essentially, this model has only two layers: the input layer and the output layer. We compile and train the ensemble model in the same manner as its two submodels. Here, our x value becomes the averaged training_set predictions from the first and second model, while our y values become the true labels corresponding to the averaged training predictions. Finally, the validation_data for the ensemble model is the averaged predictions from the two submodels on the validation dataset and the true labels for the validation dataset itself. 
@@ -259,15 +265,28 @@ The model itself is relatively simple since we are only averaging the fist and s
 <img width="854" alt="Screenshot 2024-09-08 173504" src="https://github.com/user-attachments/assets/94c12058-bc1e-420e-a0f3-ed0e73dc0a18">
 
 ## Evaluating all three models
+
 When it comes to evaluating the three models, the first and second models (the submodels) need to be evaluated on the unseen testing_set dataset to get unbiased performance metrics. 
 
 Evaluating the ensemble model is a matter of 
-a) averaging the predictions from the first and second models on the unseen testing_set,
-b) extracting the labels from the testing_set, and 
+a) averaging the predictions from the first and second models on the unseen testing_set,  
+b) extracting the labels from the testing_set, and   
 c) Estimating ensemble loss and ensemble accuracy by requesting ensemble_model.evaluate(ensemble_predictions, y_test).
 
 <img width="625" alt="Screenshot 2024-09-08 185804" src="https://github.com/user-attachments/assets/fee59b88-88f0-4418-9eb0-2f0d37882922">
 <img width="489" alt="Screenshot 2024-09-08 185910" src="https://github.com/user-attachments/assets/77ae5b95-c029-4897-a964-52654d046a80">
+
+# Validation Loss and Accuracy Metrics for the Three Models
+
+Modified ResNet50 model      Loss: 0.9644      Accuracy: 0.4539
+
+custom_CNN-Model              Loss: 1.3097      Accuracy: 0.4190
+
+Ensemble Model                 Loss: 1.3762      Accuracy: 0.330
+
+
+
+
 
 # Chaining Models
 
