@@ -231,7 +231,9 @@ Both the models were compiled with the Adam optimizer, and with the loss functio
 
 While the custom_cnn_model was initially defined and trained using the Sequential API, this caused issues when it came to ensemble and chain the model with the ResNet50, which was defined using the Functional API to accommodate the ResNet50's greater complexity. 
 
-![Screenshot 2024-09-08 172623](https://github.com/user-attachments/assets/12018eb2-0e74-405c-935b-cd6d56a6a22b)
+![Screenshot 2024-09-08 172623](https://github.com/user-attachments/assets/413f10cf-3373-470b-9c26-c1feb2cc975d)
+
+
 
 # Ensembling Models
 
