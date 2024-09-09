@@ -210,8 +210,7 @@ We asked Claude AI if it could come up with an implementation of simple boosted 
 
 We trained the custom_cnn model and the ResNet50 model on the CT chest scan images in the training_set directory. This directory contained 613 files belonging to four classes. Similarly, a testing_set of 315 files belonging to four classes and a validation_set of 72 files belonging to 4 classes, were created for use in validating the model during training, and for evaluating the model after training. One class pertained to images without cancer. Three classes pertained to one each of three forms of cancer. 
 
-The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using the ImageDataGenerator, as datasets elsewhere in this study were generated. Also of note, the image_size was set to (224, 224) in both the custom_cnn_model and the ResNet50 model, because the ResNet50 model expects images of that size. For purposes of consistency, the image_size was set to (224, 224) for the custom_cnn_model as well. 
-label_mode for the three datasets were set to "int" (integer) because images belong to one of four classes. 
+The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using the ImageDataGenerator, as datasets elsewhere in this study were generated. Also of note, the image_size was set to (224, 224) in both the custom_cnn_model and the ResNet50 model, because the ResNet50 model expects images of that size. For purposes of consistency, the image_size was set to (224, 224) for the custom_cnn_model as well. label_mode for the three datasets were set to "int" (integer) because images belong to one of four classes. 
 
 ![Screenshot 2024-09-08 163909](https://github.com/user-attachments/assets/f2faf09f-0a55-453d-ad60-ba0415310570)
 
@@ -221,6 +220,7 @@ To prevent the ResNet50 model from generating a classification for the images in
 
 We also added some custom layers to the ResNet50 base_model before compiling and training it. 
 ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048) It is not designed to classify only four classes of images. Adding custom layers to ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
+
 ![Screenshot 2024-09-08 165747](https://github.com/user-attachments/assets/619dfd0f-6093-42d9-976f-7b7a5a5d4984)
 
 <img width="910" alt="Screenshot 2024-09-08 170917" src="https://github.com/user-attachments/assets/71cbc01a-20d8-45b6-afd3-498fe9fff535">
@@ -234,10 +234,9 @@ While the custom_cnn_model was initially defined and trained using the Sequentia
 ![Screenshot 2024-09-08 172623](https://github.com/user-attachments/assets/413f10cf-3373-470b-9c26-c1feb2cc975d)
 
 
-
 # Ensembling Models
 
-The ouputs of the (modified) ResNet50 model and the custom_cnn_model become the inputs to the ensembled model. Unlike the original input data, which contained labels for the image files, the new inputs to the ensemble model do not contain labels. Thus, we need to extract the labels from the TensorFlow datasets and give them to the ensemble model. The ensemble models needs the labels in order to compute loss values, which entails comparing predictions to true labels. 
+The ouputs of the (modified) ResNet50 model and the custom_cnn_model become the inputs to the ensembled model. Unlike the original input data, which contained labels for the image files, the new inputs to the ensemble model do not contain labels. Thus, we need to extract the labels from the TensorFlow datasets and give them to the ensemble model. The ensemble model needs the labels in order to compute loss values, which entails comparing predictions to true labels. 
 
 <img width="838" alt="Screenshot 2024-09-08 173050" src="https://github.com/user-attachments/assets/94e63c16-57d6-44c1-ae0b-a7ba6ca833c2">
 
@@ -246,7 +245,7 @@ we used both training_set and validation_set with the two submodels, we need pre
 
 <img width="840" alt="Screenshot 2024-09-08 173153" src="https://github.com/user-attachments/assets/6277ae2c-a9e6-455f-bef1-b31a5d1fff3e">
 
-An initial step to building the ensemble model is averaging the predictions made from the training_set and averaging the predictions made from the validation_set. These averages become the input for the training and validation of the ensemble model. Because these inputs have shape (4,), we need to set the input shape of the ensemble_input to (4,). 
+The next step in building the ensemble model is averaging the predictions made from the training_set and averaging the predictions made from the validation_set. These averages become the input for the training and validation of the ensemble model. Because these inputs have shape (4,), we need to set the input shape of the ensemble_input to (4,). 
 
 The model itself is relatively simple [ensemble_model = Model(inputs=ensemble_input, outputs= final_output] since we have already averaged the fist and second model outputs. Essentially, this model has only two layers: the input layer and the output layer. We compile and train the ensemble model in the same manner as its two submodels. Here, our x value becomes the averaged training_set predictions from the first and second model, while our y values become the true labels corresponding to the averaged training predictions. Finally, the validation_data for the ensemble model is the averaged predictions from the two submodels on the validation dataset and the true labels for the validation dataset itself. 
 
@@ -255,17 +254,27 @@ The model itself is relatively simple [ensemble_model = Model(inputs=ensemble_in
 <img width="854" alt="Screenshot 2024-09-08 173504" src="https://github.com/user-attachments/assets/94c12058-bc1e-420e-a0f3-ed0e73dc0a18">
 
 When it comes to evaluating the three models, evaluate the first and second models (the submodels) on the unseen testing_set dataset to get unbiased performance metrics. 
+
 To evaluate the ensemble model, average the predictions from the first and second models on the testing_set. 
 Then extract the labels from the testing_set. Estimating ensemble loss and ensemble accuracy then becomes a matter of requesting ensemble_model.evaluate(ensemble_predictions, y_test).
 
+<img width="625" alt="Screenshot 2024-09-08 185804" src="https://github.com/user-attachments/assets/fee59b88-88f0-4418-9eb0-2f0d37882922">
+<img width="489" alt="Screenshot 2024-09-08 185910" src="https://github.com/user-attachments/assets/77ae5b95-c029-4897-a964-52654d046a80">
 
-
-
-
+Besides average the output of two models, ensembling technique include weighted averaging, majority voting (for classification), stacking, blending (also known as bootstrap aggregating), boosting, maximizing, feature concatenation (for neural networks), model cascading, and hybrid ensembling.
 
 # Chaining Models
+
+Chaining two models together means creating a composite, where the first model's output becomes the second model's input. 
+
+Model chaining can be performed using the Functional API in a Keras framework, which allows for flexible connection of layers and models.
+
+
 When chaining two models, specify data augmentation and rescaling only in first model, not the in second.
 
+<img width="802" alt="Screenshot 2024-09-08 200128" src="https://github.com/user-attachments/assets/37e73cb5-bcc5-499d-897c-ad995d6fdd8a">
+<img width="879" alt="Screenshot 2024-09-08 200231" src="https://github.com/user-attachments/assets/be08bfe1-f3a5-44b0-b4aa-fa05c2ee3e1e">
+<img width="866" alt="Screenshot 2024-09-08 200435" src="https://github.com/user-attachments/assets/3e58715e-ffaf-4d2c-ab69-6391355aa068">
 
 
 
