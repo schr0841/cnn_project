@@ -216,7 +216,7 @@ The data sets were generated using the tf.keras.preprocessing.image_dataset_from
 
 ![Screenshot 2024-09-08 165703](https://github.com/user-attachments/assets/b50f6779-3154-4ae8-b0e3-5f56c59ab384)
 
-To prevent the ResNet50 model from generating a classification for the images in the input dataset, we set include_top=False. The second model in the sequence, the custom_cnn_model, will make the classification. To prevent the ResNet50 model from being re-trained from its ImageNet data source, we froze its layers with by specifying layer.trainable = False. 
+To prevent the ResNet50 model itself from generating a classification for the images in the input dataset, we set include_top=False before adding custom layers that would result in a classification output vector. To prevent the ResNet50 model from being re-trained from its ImageNet data source, we froze its layers (made them unlearnable) by specifying layer.trainable = False. 
 
 We also added some custom layers to the ResNet50 base_model before compiling and training it. ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048) It is not designed to classify only four classes of images. Adding custom layers to ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
 
@@ -271,19 +271,19 @@ c) Estimating ensemble loss and ensemble accuracy by requesting ensemble_model.e
 
 # Chaining Models
 
-Chaining two models together means creating a composite, where the first model's output becomes the second model's input. 
+Chaining two models together means creating a composite, where the first model's output becomes the second model's input. In this scenario, there is no third model to process the outputs of the two chained models.
 
 Model chaining can be performed using the Functional API in a Keras framework, which allows for flexible connection of layers and models.
 
-
-When chaining two models, specify data augmentation and rescaling only in first model, not the in second.
+Unlike in the case of ensembling models, where data augmentation and rescaling can be applied in both submodels, chaining two models requires specifying data augmentation and rescaling only in first model.
 
 <img width="802" alt="Screenshot 2024-09-08 200128" src="https://github.com/user-attachments/assets/37e73cb5-bcc5-499d-897c-ad995d6fdd8a">
 <img width="879" alt="Screenshot 2024-09-08 200231" src="https://github.com/user-attachments/assets/be08bfe1-f3a5-44b0-b4aa-fa05c2ee3e1e">
 <img width="866" alt="Screenshot 2024-09-08 200435" src="https://github.com/user-attachments/assets/3e58715e-ffaf-4d2c-ab69-6391355aa068">
 
+## Modify ResNet50 and custom_cnn models to enable chaining
 
-
+Because we are chaining the output of the first model with the second model, rather than averaging similarly-shaped outputs, we had to modify the ResNet50 model to make it a feature extractor rather than a classifier. 
 
 
 
