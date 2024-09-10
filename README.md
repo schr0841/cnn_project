@@ -236,19 +236,20 @@ To prevent the ResNet50-based model itself from generating a 1,000-classs classi
 To enable the ResNet50-based model to generate a four-class classification for our input data, we added some custom layers to the 'enhanced' (by data augmentation and rescaling) ResNet50 base model.
 
 Specifically, we specified a   
+
 a) base_model.output layer to extract the output of the ResNet50 model to connect it with the subsequent custom layers. base_model.output represents the features learned by the pretrained ResNet50 model. ResNet50 without its top layer (as we've specified) outputs feature maps instead of classification predictions. The feature maps become the inputs for the subsequent custom layers, which will ultimately result in classification predictions.   
+
 b) BatchNormalization(axis=-1) layer to normalize the base model's output, improving performance and reducing overfitting.    
+
 c) Dense(256, activation='relu) layer to learn more complex patterns from the high-level features provided by ResNet50. The more complex patterns will be relevant to the classification task at hand, while the ReLU activation function supports the cnn to model more intricate relationships between features.   
+
 d) Dropout(0.3) to prevent overfitting by forcing the model to learn more robust features and preventing it from becoming too reliant on specific neurons.   
+
 e) Dense(class_count, activation = 'softmax') to output a probability distribution across the classes  (whose number is given by class_count). Each value in the probability distribution corresponds to the predicted probability that the input belongs to a given class.   
 
 ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048) It is not designed to classify four classes of images. Adding custom layers to ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
 
-![Screenshot 2024-09-08 165747](https://github.com/user-attachments/assets/619dfd0f-6093-42d9-976f-7b7a5a5d4984)
 
-<img width="910" alt="Screenshot 2024-09-08 170917" src="https://github.com/user-attachments/assets/71cbc01a-20d8-45b6-afd3-498fe9fff535">
-<img width="905" alt="Screenshot 2024-09-08 171613" src="https://github.com/user-attachments/assets/bc07814e-888f-4779-a562-1d874fa9ddef">
-<img width="772" alt="Screenshot 2024-09-08 171817" src="https://github.com/user-attachments/assets/e91235d6-b62d-407c-bd00-172ee7cf0181">
 
 As with the ResNet50-based model, which had to be customized for compatibility with the custom_cnn_model, the latter underwent significant adjustments to make it compatible with the ResNet50-based model.  
 
