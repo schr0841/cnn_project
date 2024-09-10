@@ -213,9 +213,9 @@ We trained the custom_cnn model and the ResNet50-based model on the CT chest sca
 The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using the ImageDataGenerator, as datasets elsewhere in this study were generated. Also of note, the image_size was set to (224, 224) because the ResNet50-based model expects images of that size. For purposes of consistency, the image_size was set to (224, 224) for the custom_cnn_model as well. label_mode for the three datasets were set to "int" (integer) because images belong to one of four classes. 
 
 ![Screenshot 2024-09-08 163909](https://github.com/user-attachments/assets/159f4631-1e72-4908-bd72-e7d2c193fcb6)
-![Screenshot 2024-09-08 165703](https://github.com/user-attachments/assets/a93a1a8f-c4e7-44e5-b3cf-45d9e9f2f75b)
 
-# Use of Data Agumentation and Rescaling
+
+# Use of Data Augmentation and Rescaling
 
 When ensembling two models, it is appropriate to apply data augmentation and rescaling in both submodels. It is also appropriate to apply data augmentation and rescaling early in the model pipeline. In particular, data augmentation should come before rescaling, right after defining the model's input layer. Because the ResNet50 model expects pixel values of the inputs to be normalized to a range between 0 and 1, rescaling needs to be performed before passing the images into ResNet50.  
 
