@@ -219,10 +219,10 @@ The data sets were generated using the tf.keras.preprocessing.image_dataset_from
 
 When ensembling two models, it is appropriate to apply data augmentation and rescaling in both submodels. It is also appropriate to apply data augmentation and rescaling early in the model pipeline. In particular, data augmentation should come before rescaling, right after defining the model's input layer. Because the ResNet50 model expects pixel values of the inputs to be normalized to a range between 0 and 1, rescaling needs to be performed before passing the images into ResNet50.  
 
-We applied augmentation and rescaling within the ResNet50-based model and the custom_cnn_model by 
-a) defining data augmentation layers within a Sequential model  
-b) applying the data augmentation layers to the input tensor  
-c) including the augmented inputs as part of a Rescaling layer
+We applied augmentation and rescaling within the ResNet50-based model and the custom_cnn_model by   
+a) defining data augmentation layers within a Sequential model    
+b) applying the data augmentation layers to the input tensor    
+c) including the augmented inputs as part of a Rescaling layer  
 
 <img width="928" alt="Screenshot 2024-09-10 123623" src="https://github.com/user-attachments/assets/57ed1b9c-a780-4318-b7d1-3b06bc01fbec">
 <img width="916" alt="Screenshot 2024-09-10 123837" src="https://github.com/user-attachments/assets/f52f7c21-e84a-4a34-a263-44abc91f01b0">
@@ -249,7 +249,7 @@ e) Dense(class_count, activation = 'softmax') to output a probability distributi
 
 ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048) It is not designed to classify four classes of images. Adding custom layers to ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
 
-
+# Modifying the custom_cnn-mo for compatibility with the ResNet50-based model
 
 As with the ResNet50-based model, which had to be customized for compatibility with the custom_cnn_model, the latter underwent significant adjustments to make it compatible with the ResNet50-based model.  
 
