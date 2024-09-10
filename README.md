@@ -220,6 +220,8 @@ The data sets were generated using the tf.keras.preprocessing.image_dataset_from
 <img width="800" alt="Screenshot 2024-09-10 133154" src="https://github.com/user-attachments/assets/3c2ed6e1-4875-4933-98bc-b2031d65e615">
 <img width="894" alt="Screenshot 2024-09-10 133310" src="https://github.com/user-attachments/assets/6b8cbb87-6440-4e36-a726-e05670658c8a">
 
+<img width="802" alt="Screenshot 2024-09-10 134016" src="https://github.com/user-attachments/assets/bf347834-dc2e-4aaa-b23b-1f4e8a65ffa7">
+<img width="700" alt="Screenshot 2024-09-10 134130" src="https://github.com/user-attachments/assets/6499fffd-ad3c-4037-a76b-f383ed9dca18">
 
 
 
