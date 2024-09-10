@@ -212,13 +212,23 @@ We trained the custom_cnn model and the ResNet50-based model on the CT chest sca
 
 The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using the ImageDataGenerator, as datasets elsewhere in this study were generated. Also of note, the image_size was set to (224, 224) because the ResNet50-based model expects images of that size. For purposes of consistency, the image_size was set to (224, 224) for the custom_cnn_model as well. label_mode for the three datasets were set to "int" (integer) because images belong to one of four classes. 
 
-![Screenshot 2024-09-08 163909](https://github.com/user-attachments/assets/f2faf09f-0a55-453d-ad60-ba0415310570)
-
-![Screenshot 2024-09-08 165703](https://github.com/user-attachments/assets/b50f6779-3154-4ae8-b0e3-5f56c59ab384)
+![Screenshot 2024-09-08 163909](https://github.com/user-attachments/assets/159f4631-1e72-4908-bd72-e7d2c193fcb6)
+![Screenshot 2024-09-08 165703](https://github.com/user-attachments/assets/a93a1a8f-c4e7-44e5-b3cf-45d9e9f2f75b)
 
 # Use of Data Agumentation and Rescaling
 
+When ensembling two models, it is appropriate to apply data augmentation and rescaling in both submodels. It is also appropriate to apply data augmentation and rescaling early in the model pipeline. In particular, data augmentation should come before rescaling, right after defining the model's input layer. Because the ResNet50 model expects pixel values of the inputs to be normalized to a range between 0 and 1, rescaling needs to be performed before passing the images into ResNet50.  
 
+We applied augmentation and rescaling within the ResNet50-based model and the custom_cnn_model by 
+a) defining data augmentation layers within a Sequential model  
+b) applying the data augmentation layers to the input tensor  
+c) including the augmented inputs as part of a Rescaling layer
+
+<img width="928" alt="Screenshot 2024-09-10 123623" src="https://github.com/user-attachments/assets/57ed1b9c-a780-4318-b7d1-3b06bc01fbec">
+<img width="916" alt="Screenshot 2024-09-10 123837" src="https://github.com/user-attachments/assets/f52f7c21-e84a-4a34-a263-44abc91f01b0">
+
+Including the augmented inputs as part of the Rescaling layer is necessary because in the Functional API, which describes the submodels models as a whole, the data flow between model layers is explicitly defined by passing the output of one layer as the input to next layer. 
+In the scaled_inputs = Rescaling(1./255)(augmented_inputs) statement, the '(augmented_inputs)' explicitly indicates the rescaling operation should be applied to the output of the previous layer, augmented_inputs. Without passing '(augmented_inputs)' as the input, the models would not know which data should be rescaled. 
 
 # Modifying the Pretrained ResNet50 model for compatibility with the custom_cnn_model
 
@@ -232,9 +242,9 @@ We also added some custom layers to the ResNet50 base_model before compiling and
 <img width="905" alt="Screenshot 2024-09-08 171613" src="https://github.com/user-attachments/assets/bc07814e-888f-4779-a562-1d874fa9ddef">
 <img width="772" alt="Screenshot 2024-09-08 171817" src="https://github.com/user-attachments/assets/e91235d6-b62d-407c-bd00-172ee7cf0181">
 
-As with the ResNet50-based model, which had to be customized for caompatibility with the custom_cnn_model, the latter underwent significant adjustments to make it compatible with the ResNet50-based model.  
+As with the ResNet50-based model, which had to be customized for compatibility with the custom_cnn_model, the latter underwent significant adjustments to make it compatible with the ResNet50-based model.  
 
-Both the models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20. When later ensembling models, data augmentation and rescaling can either be applied outside of the models or within both models. In this instance we applied augmentation and rescaling within ResNet50 and custom_cnn_model. 
+Both the models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20.  
 
 While the custom_cnn_model was initially defined and trained using the Sequential API, this caused issues when it came to ensemble and chain the model with the ResNet50, which was defined using the Functional API to accommodate the ResNet50's greater complexity. As such, the custom_cnn_model was later defined, compiled, and trained with the Functional API. 
 
