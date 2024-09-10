@@ -214,8 +214,16 @@ The data sets were generated using the tf.keras.preprocessing.image_dataset_from
 
 ![Screenshot 2024-09-08 163909](https://github.com/user-attachments/assets/159f4631-1e72-4908-bd72-e7d2c193fcb6)
 
+# First and Second Models defined and trained independently
 
-# Use of Data Augmentation and Rescaling
+
+<img width="800" alt="Screenshot 2024-09-10 133154" src="https://github.com/user-attachments/assets/3c2ed6e1-4875-4933-98bc-b2031d65e615">
+<img width="894" alt="Screenshot 2024-09-10 133310" src="https://github.com/user-attachments/assets/6b8cbb87-6440-4e36-a726-e05670658c8a">
+
+
+
+
+## Use of Data Augmentation and Rescaling
 
 When ensembling two models, it is appropriate to apply data augmentation and rescaling in both submodels. It is also appropriate to apply data augmentation and rescaling early in the model pipeline. In particular, data augmentation should come before rescaling, right after defining the model's input layer. Because the ResNet50 model expects pixel values of the inputs to be normalized to a range between 0 and 1, rescaling needs to be performed before passing the images into ResNet50.  
 
@@ -249,7 +257,7 @@ e) Dense(class_count, activation = 'softmax') to output a probability distributi
 
 ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048) It is not designed to classify four classes of images. Adding custom layers to ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
 
-# Modifying the custom_cnn-model for compatibility with the ResNet50-based model
+# Modifying the custom_cnn_model for compatibility with the ResNet50-based model
 
 As with the ResNet50-based model, which had to be customized for compatibility with the custom_cnn_model, the latter underwent significant adjustments to make it compatible with the other submodel.  
 
@@ -259,11 +267,12 @@ While the custom_cnn_model was initially defined and trained using the Sequentia
 <img width="903" alt="Screenshot 2024-09-10 132524" src="https://github.com/user-attachments/assets/50f18ad7-9598-4712-abb2-79b0636d5ac2">
 
 
+Both models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20. 
 
 ![Screenshot 2024-09-08 172623](https://github.com/user-attachments/assets/413f10cf-3373-470b-9c26-c1feb2cc975d)
 
 
-Both the models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20. 
+
 
 # Ensembling Models
 
