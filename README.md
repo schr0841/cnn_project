@@ -255,6 +255,9 @@ As with the ResNet50-based model, which had to be customized for compatibility w
 
 While the custom_cnn_model was initially defined and trained using the Sequential API, this caused issues when it came to ensemble and chain the model with the ResNet50, which was defined using the Functional API to accommodate the ResNet50's greater complexity. As such, the custom_cnn_model was later defined, compiled, and trained with the Functional API. 
 
+<img width="904" alt="Screenshot 2024-09-10 132357" src="https://github.com/user-attachments/assets/f587f168-7564-4fb7-ac97-ef110e76523c">
+<img width="903" alt="Screenshot 2024-09-10 132524" src="https://github.com/user-attachments/assets/50f18ad7-9598-4712-abb2-79b0636d5ac2">
+
 
 
 ![Screenshot 2024-09-08 172623](https://github.com/user-attachments/assets/413f10cf-3373-470b-9c26-c1feb2cc975d)
