@@ -223,9 +223,12 @@ The data sets were generated using the tf.keras.preprocessing.image_dataset_from
 <img width="802" alt="Screenshot 2024-09-10 134016" src="https://github.com/user-attachments/assets/bf347834-dc2e-4aaa-b23b-1f4e8a65ffa7">
 <img width="700" alt="Screenshot 2024-09-10 134130" src="https://github.com/user-attachments/assets/6499fffd-ad3c-4037-a76b-f383ed9dca18">
 
+<img width="769" alt="Screenshot 2024-09-10 134644" src="https://github.com/user-attachments/assets/4c2ef882-cf3d-4993-a6ab-1b235db3019f">
+<img width="746" alt="Screenshot 2024-09-10 134742" src="https://github.com/user-attachments/assets/afec635c-56ef-4f4a-a205-7463b6d5ea0a">
+<img width="601" alt="Screenshot 2024-09-10 134845" src="https://github.com/user-attachments/assets/6a8370bf-18c7-4098-a26f-72441c18af4f">
 
 
-## Use of Data Augmentation and Rescaling
+# Use of Data Augmentation and Rescaling
 
 When ensembling two models, it is appropriate to apply data augmentation and rescaling in both submodels. It is also appropriate to apply data augmentation and rescaling early in the model pipeline. In particular, data augmentation should come before rescaling, right after defining the model's input layer. Because the ResNet50 model expects pixel values of the inputs to be normalized to a range between 0 and 1, rescaling needs to be performed before passing the images into ResNet50.  
 
