@@ -217,7 +217,7 @@ The data sets were generated using the tf.keras.preprocessing.image_dataset_from
 
 ### CNN and ResNet50-based Models defined and trained independently
 
-We defined, compiled, trained, and evaluated both models individually before turning our attention to ensembling the two models and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining the two models. The first model, the ResNet550-based model, is defined in the following code as 'first_model'. The cnn model, or base model, is defined as 'second_model'. Alterations to the original ResNet50 model were made to make it compatile with the task at hand: generating a four-class classification of the chest ct scans. As the base model was designed to produce a four-class classification of the chest ct scans, alternations to this model were not necessary until chaining the models.
+We defined, compiled, trained, and evaluated both models individually before turning our attention to ensembling the two models and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining the two models. The first model, the ResNet550-based model, is defined in the following code as 'first_model'. The cnn model, or base model, is defined as 'second_model'. Alterations to the original ResNet50 model were made to make it compatile with the task at hand: generating a four-class classification of the chest ct scans. As the base model was designed to produce a four-class classification of the chest ct scans, alternations to this model were not necessary until it became time to chain the models.
 
 <img width="800" alt="Screenshot 2024-09-10 133154" src="https://github.com/user-attachments/assets/3c2ed6e1-4875-4933-98bc-b2031d65e615">
 <img width="894" alt="Screenshot 2024-09-10 133310" src="https://github.com/user-attachments/assets/6b8cbb87-6440-4e36-a726-e05670658c8a">
@@ -236,7 +236,7 @@ We defined, compiled, trained, and evaluated both models individually before tur
 
 When ensembling two models, it is appropriate to apply data augmentation and rescaling in both submodels. It is also appropriate to apply data augmentation and rescaling early in the model pipeline. In particular, data augmentation should come before rescaling, right after defining the model's input layer. Because the ResNet50 model expects pixel values of the inputs to be normalized to a range between 0 and 1, rescaling needs to be performed before passing the images into ResNet50.  
 
-We applied augmentation and rescaling within the ResNet50-based model and the base cnn model by   
+We applied augmentation and rescaling within first_model (the ResNet50-based model) and second_model (the base cnn model) by   
 a) defining data augmentation layers within a Sequential model    
 b) applying the data augmentation layers to the input tensor    
 c) including the augmented inputs as part of a Rescaling layer  
@@ -244,7 +244,9 @@ c) including the augmented inputs as part of a Rescaling layer
 <img width="928" alt="Screenshot 2024-09-10 123623" src="https://github.com/user-attachments/assets/57ed1b9c-a780-4318-b7d1-3b06bc01fbec">
 <img width="916" alt="Screenshot 2024-09-10 123837" src="https://github.com/user-attachments/assets/f52f7c21-e84a-4a34-a263-44abc91f01b0">
 
-Including the augmented inputs as part of the Rescaling layer was necessary because in the Functional API, which describes the submodels overall, the data flow between model layers is explicitly defined by passing the output of one layer as the input to next layer. In the scaled_inputs = Rescaling(1./255)(augmented_inputs) statement, the '(augmented_inputs)' explicitly indicates the rescaling operation should be applied to the output of the previous layer, augmented_inputs. Without passing '(augmented_inputs)' as the input, the models would not know which data should be rescaled.   
+Even though we created first_model with the Functional API, the data augmentation portion of it was created with the Sequential API. Sequential components of larger models, such as data augmentation pipelines, can be integrated into models built with the Functional API. Both APIs produce layers compatibile with the Keras ecosystem. Because data augmentation transforms input data before it reaches the model's core, it doesn't affect the flow of data within the larger model. Defining data augmentation as a Sequential block effectively creates a single layer that acts as any Keras layer. 
+
+Including the augmented inputs as part of the Rescaling layer was necessary because in the Functional API, the data flow between model layers is explicitly defined by passing the output of one layer as the input to next layer. In the scaled_inputs = Rescaling(1./255)(augmented_inputs) statement, the '(augmented_inputs)' explicitly indicates the rescaling operation should be applied to the output of the previous layer, augmented_inputs. Without passing '(augmented_inputs)' as the input, the models would not know which data should be rescaled.   
 
 ### Modifying the Pretrained ResNet50 model for compatibility with the cnn base model
 
