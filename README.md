@@ -217,7 +217,7 @@ The data sets were generated using the tf.keras.preprocessing.image_dataset_from
 
 ## CNN and ResNet50-based Models defined and trained independently
 
-We defined, compiled, trained, and evaluated both models individually before turning our attention to ensembling the two models and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining the two models.  
+We defined, compiled, trained, and evaluated both models individually before turning our attention to ensembling the two models and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining the two models. The first model, the ResNet550-based model, is defined in the following code as 'first_model'. The cnn model, or base model, is defined as 'second_model'.
 
 <img width="800" alt="Screenshot 2024-09-10 133154" src="https://github.com/user-attachments/assets/3c2ed6e1-4875-4933-98bc-b2031d65e615">
 <img width="894" alt="Screenshot 2024-09-10 133310" src="https://github.com/user-attachments/assets/6b8cbb87-6440-4e36-a726-e05670658c8a">
