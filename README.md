@@ -212,7 +212,9 @@ We trained the cnn base model and the ResNet50-based model on the CT chest scan 
 
 The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using the ImageDataGenerator, as datasets elsewhere in this study were generated. Also of note, the image_size was set to (224, 224) because the ResNet50-based model expects images of that size. For purposes of consistency, the image_size was set to (224, 224) for the custom_cnn_model as well. label_mode for the three datasets were set to "int" (integer) because images belong to one of four classes. 
 
-![Screenshot 2024-09-08 163909](https://github.com/user-attachments/assets/159f4631-1e72-4908-bd72-e7d2c193fcb6)
+<img width="761" alt="Screenshot 2024-09-11 171824" src="https://github.com/user-attachments/<img width="685" alt="Screenshot 2024-09-11 171939" src="https://github.com/user-attachments/assets/e70edbed-0bea-44e3-b346-0a9060d25c15">
+assets/d7a37fa6-cc42-4766-a2c1-dacff6a83fa4">
+
 
 ## CNN and ResNet50-based Models defined and trained independently
 
