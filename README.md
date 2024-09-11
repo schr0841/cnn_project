@@ -206,16 +206,17 @@ We attempt to train 2 models sequentially, where the second model learns from th
 We asked Claude AI if it could come up with an implementation of simple boosted ensemble models and it was able to do that, but the code it provided assumed we have a clear split among the features $X$ and target $y$, whereas here we do not. We have included it as an extra supplementary notebook titled "gemini_boosted_ensemble.ipynb" to look at for further development.
 
 
-## Comparison of Chaining and Ensembling Models
+# Ensembling versus Chaining Models
 
-We trained the custom_cnn model and the ResNet50-based model on the CT chest scan images in the training_set directory. This directory contained 613 files belonging to four classes. Similarly, a testing_set of 315 files belonging to four classes and a validation_set of 72 files belonging to 4 classes were created to validate the model during training and evaluate it after training. One class pertained to images without cancer. Three classes pertained to one each of three forms of cancer. 
+We trained the cnn base model and the ResNet50-based model on the CT chest scan images in the training_set directory. This directory contained 613 files belonging to four classes. Similarly, a testing_set of 315 files belonging to four classes and a validation_set of 72 files belonging to 4 classes were created to validate the model during training and evaluate it after training. One class pertained to images without cancer. Three classes pertained to one each of three forms of cancer. 
 
 The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using the ImageDataGenerator, as datasets elsewhere in this study were generated. Also of note, the image_size was set to (224, 224) because the ResNet50-based model expects images of that size. For purposes of consistency, the image_size was set to (224, 224) for the custom_cnn_model as well. label_mode for the three datasets were set to "int" (integer) because images belong to one of four classes. 
 
 ![Screenshot 2024-09-08 163909](https://github.com/user-attachments/assets/159f4631-1e72-4908-bd72-e7d2c193fcb6)
 
-# First and Second Models defined and trained independently
+## CNN and ResNet50-based Models defined and trained independently
 
+We defined, compiled, trained, and evaluated both models individually before turning our attention to ensembling the two models and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining the two models.  
 
 <img width="800" alt="Screenshot 2024-09-10 133154" src="https://github.com/user-attachments/assets/3c2ed6e1-4875-4933-98bc-b2031d65e615">
 <img width="894" alt="Screenshot 2024-09-10 133310" src="https://github.com/user-attachments/assets/6b8cbb87-6440-4e36-a726-e05670658c8a">
@@ -230,7 +231,7 @@ The data sets were generated using the tf.keras.preprocessing.image_dataset_from
 <img width="601" alt="Screenshot 2024-09-10 134845" src="https://github.com/user-attachments/assets/6a8370bf-18c7-4098-a26f-72441c18af4f">
 
 
-# Use of Data Augmentation and Rescaling
+## Use of Data Augmentation and Rescaling
 
 When ensembling two models, it is appropriate to apply data augmentation and rescaling in both submodels. It is also appropriate to apply data augmentation and rescaling early in the model pipeline. In particular, data augmentation should come before rescaling, right after defining the model's input layer. Because the ResNet50 model expects pixel values of the inputs to be normalized to a range between 0 and 1, rescaling needs to be performed before passing the images into ResNet50.  
 
@@ -242,10 +243,9 @@ c) including the augmented inputs as part of a Rescaling layer
 <img width="928" alt="Screenshot 2024-09-10 123623" src="https://github.com/user-attachments/assets/57ed1b9c-a780-4318-b7d1-3b06bc01fbec">
 <img width="916" alt="Screenshot 2024-09-10 123837" src="https://github.com/user-attachments/assets/f52f7c21-e84a-4a34-a263-44abc91f01b0">
 
-Including the augmented inputs as part of the Rescaling layer was necessary because in the Functional API, which describes the submodels overall, the data flow between model layers is explicitly defined by passing the output of one layer as the input to next layer. 
-In the scaled_inputs = Rescaling(1./255)(augmented_inputs) statement, the '(augmented_inputs)' explicitly indicates the rescaling operation should be applied to the output of the previous layer, augmented_inputs. Without passing '(augmented_inputs)' as the input, the models would not know which data should be rescaled. 
+Including the augmented inputs as part of the Rescaling layer was necessary because in the Functional API, which describes the submodels overall, the data flow between model layers is explicitly defined by passing the output of one layer as the input to next layer. In the scaled_inputs = Rescaling(1./255)(augmented_inputs) statement, the '(augmented_inputs)' explicitly indicates the rescaling operation should be applied to the output of the previous layer, augmented_inputs. Without passing '(augmented_inputs)' as the input, the models would not know which data should be rescaled.   
 
-# Modifying the Pretrained ResNet50 model for compatibility with the custom_cnn_model
+# Modifying the Pretrained ResNet50 model for compatibility with the custom_cnn model
 
 To prevent the ResNet50-based model itself from generating a 1,000-classs classification for the chest scan images in the input dataset, we "removed" the output layer of the ResNet50 model by setting include_top=False. To prevent the ResNet50 model from being re-trained from its ImageNet data source, we froze its layers (made them unlearnable) by specifying layer.trainable = False. 
 To enable the ResNet50-based model to generate a four-class classification for our input data, we added some custom layers to the 'enhanced' (by data augmentation and rescaling) ResNet50 base model.
