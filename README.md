@@ -236,7 +236,7 @@ We defined, compiled, trained, and evaluated both models individually before tur
 
 When ensembling two models, it is appropriate to apply data augmentation and rescaling in both submodels. It is also appropriate to apply data augmentation and rescaling early in the model pipeline. In particular, data augmentation should come before rescaling, right after defining the model's input layer. Because the ResNet50 model expects pixel values of the inputs to be normalized to a range between 0 and 1, rescaling needs to be performed before passing the images into ResNet50.  
 
-We applied augmentation and rescaling within the ResNet50-based model and the custom_cnn_model by   
+We applied augmentation and rescaling within the ResNet50-based model and the base cnn model by   
 a) defining data augmentation layers within a Sequential model    
 b) applying the data augmentation layers to the input tensor    
 c) including the augmented inputs as part of a Rescaling layer  
@@ -265,11 +265,11 @@ e) Dense(class_count, activation = 'softmax') to output a probability distributi
 
 ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048) It is not designed to classify four classes of images. Adding custom layers to ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
 
-# Modifying the custom_cnn_model for compatibility with the ResNet50-based model
+# Modifying the cnn base model for compatibility with the ResNet50-based model
 
 As with the ResNet50-based model, which had to be customized for compatibility with the custom_cnn_model, the latter underwent significant adjustments to make it compatible with the other submodel.  
 
-While the custom_cnn_model was initially defined and trained using the Sequential API, this caused issues when it came to ensemble and chain the model with the ResNet50, which was defined using the Functional API to accommodate the ResNet50's greater complexity. As such, the custom_cnn_model was later defined, compiled, and trained with the Functional API. 
+While the cnn base model (second_model) was initially defined and trained using the Sequential API, characteristics of this API proved complicating when it came to ensemble and chain the model with the ResNet50-based model (first_model). The latter was defined using the Functional API to accommodate the ResNet50's greater complexity. As such, second_model was later defined, compiled, and trained with the Functional API. 
 
 <img width="904" alt="Screenshot 2024-09-10 132357" src="https://github.com/user-attachments/assets/f587f168-7564-4fb7-ac97-ef110e76523c">
 <img width="903" alt="Screenshot 2024-09-10 132524" src="https://github.com/user-attachments/assets/50f18ad7-9598-4712-abb2-79b0636d5ac2">
@@ -281,17 +281,20 @@ Both models were compiled with the Adam optimizer, and with the loss function se
 
 
 
+## Ensembling Models
 
-# Ensembling Models
+We created a third model, called ensemble_model, that averages the predictions of first_model and second_model. 
 
-## Extracting labels from training_set, testing_set, and validation_set
-The ouputs of the (modified) ResNet50 model and the custom_cnn_model become the inputs to the ensembled model. Unlike the original input data, which contained labels for the images, the new inputs to the ensemble model do not contain labels. Thus, we need to extract the labels from the TensorFlow datasets and give them to the ensemble model. The ensemble model needs the labels in order to compute loss values, which entails comparing predictions to true labels. 
+### Extracting labels from training_set, testing_set, and validation_set
+
+The ouputs of first_model and second_model become the inputs to the ensemble model. Unlike the original input data, which contained labels for the images, the new inputs to the ensemble model do not contain labels. Thus, we needed to extract the labels from the TensorFlow datasets and give them to the ensemble model. These labels are necessary for the ensembled model to compute loss values, which entails comparing predictions to true labels. 
 
 <img width="838" alt="Screenshot 2024-09-08 173050" src="https://github.com/user-attachments/assets/94e63c16-57d6-44c1-ae0b-a7ba6ca833c2">
 
 
-## Preparing data and building ensemble model to average outputs
-Before we build the ensemble model from our two submodels, we need to generate predictions (outputs) from each of them using the training_set and validation_set. Because we used both training_set and validation_set to train the two submodels individually, we need predictions from both models on these same datasets to serve as the inputs to the ensembled model.
+### Preparing data and building ensemble model to average outputs
+
+Before we built the ensemble model to process the two submodels's output (predictions), we needed to generate predictions from first_model and second_model using the training_set and validation_set. Because we used both training_set and validation_set to train the two submodels individually, we needed predictions from both models on these same datasets to serve as the inputs to the ensembled model.
 
 <img width="840" alt="Screenshot 2024-09-08 173153" src="https://github.com/user-attachments/assets/6277ae2c-a9e6-455f-bef1-b31a5d1fff3e">
 
@@ -304,6 +307,30 @@ The model itself is relatively simple since we are only averaging the fist and s
 <img width="844" alt="Screenshot 2024-09-08 173247t" src="https://github.com/user-attachments/assets/32f297f2-743d-4a63-9095-dcb8a8e39428">
 <img width="875" alt="Screenshot 2024-09-08 173359" src="https://github.com/user-attachments/assets/457282e9-2418-41e3-afaf-6554c509089f">
 <img width="854" alt="Screenshot 2024-09-08 173504" src="https://github.com/user-attachments/assets/94c12058-bc1e-420e-a0f3-ed0e73dc0a18">
+
+### Chaining Models
+
+Chaining two models together means creating a composite, where the first model's output becomes the second model's input. In this scenario, there is no third model to process the outputs of the two submodels. 
+
+Model chaining can be performed using the Functional API in a Keras framework, which allows for flexible connection of layers and models.
+
+Unlike in the case of ensembling models, where data augmentation and rescaling can be applied in both submodels, chaining two models requires specifying data augmentation and rescaling only in first model.
+
+<img width="802" alt="Screenshot 2024-09-08 200128" src="https://github.com/user-attachments/assets/37e73cb5-bcc5-499d-897c-ad995d6fdd8a">
+<img width="879" alt="Screenshot 2024-09-08 200231" src="https://github.com/user-attachments/assets/be08bfe1-f3a5-44b0-b4aa-fa05c2ee3e1e">
+<img width="866" alt="Screenshot 2024-09-08 200435" src="https://github.com/user-attachments/assets/3e58715e-ffaf-4d2c-ab69-6391355aa068">
+
+
+## Modifying first_model and second_model to enable chaining
+
+Because we are turning the output of the first model into the inputs of the second model, some adjustments to the original versions of first_model and second_model became necessary. In particular, we needed to omit data augmentation and rescaling from second_model and remove a number of its previously-defined layers. Specifically, 
+
+Modifications to the original version of first_model were required to convert this model from a classifier to a feature extractor. That is, the chainable version of first_model needed to process raw input data (the ct scans) and produce a set of informative features that can (eventually) be used for classification tasks. Pretrained models like ResNet50 are often used as feature extractors in transfer learning because they have already learned useful patterns from large datasets on which they were trained. These patterns, or features, are reusable for new tasks. 
+
+
+
+
+
 
 ## Evaluating all three models
 
@@ -329,21 +356,7 @@ Ensemble Model                 Loss: 1.3762      Accuracy: 0.330
 
 
 
-# Chaining Models
 
-Chaining two models together means creating a composite, where the first model's output becomes the second model's input. In this scenario, there is no third model to process the outputs of the two chained models.
-
-Model chaining can be performed using the Functional API in a Keras framework, which allows for flexible connection of layers and models.
-
-Unlike in the case of ensembling models, where data augmentation and rescaling can be applied in both submodels, chaining two models requires specifying data augmentation and rescaling only in first model.
-
-<img width="802" alt="Screenshot 2024-09-08 200128" src="https://github.com/user-attachments/assets/37e73cb5-bcc5-499d-897c-ad995d6fdd8a">
-<img width="879" alt="Screenshot 2024-09-08 200231" src="https://github.com/user-attachments/assets/be08bfe1-f3a5-44b0-b4aa-fa05c2ee3e1e">
-<img width="866" alt="Screenshot 2024-09-08 200435" src="https://github.com/user-attachments/assets/3e58715e-ffaf-4d2c-ab69-6391355aa068">
-
-## Modify ResNet50 and custom_cnn models to enable chaining
-
-Because we are chaining the output of the first model with the second model, rather than averaging similarly-shaped outputs, we had to modify the ResNet50 model to make it a feature extractor rather than a classifier. 
 
 
 
