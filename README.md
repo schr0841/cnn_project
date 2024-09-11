@@ -248,14 +248,13 @@ Even though we created first_model with the Functional API, the data augmentatio
 
 Including the augmented inputs as part of the Rescaling layer was necessary because in the Functional API, the data flow between model layers is explicitly defined by passing the output of one layer as the input to next layer. In the scaled_inputs = Rescaling(1./255)(augmented_inputs) statement, the '(augmented_inputs)' explicitly indicates the rescaling operation should be applied to the output of the previous layer, augmented_inputs. Without passing '(augmented_inputs)' as the input, the models would not know which data should be rescaled.   
 
-### Modifying the Pretrained ResNet50 model for compatibility with the cnn base model
+### Modifying the Pretrained ResNet50 model (first_model) for compatibility with the cnn base model (second_model)
 
-To prevent the ResNet50-based model itself from generating a 1,000-classs classification for the chest scan images in the input dataset, we "removed" the output layer of the ResNet50 model by setting include_top=False. To prevent the ResNet50 model from being re-trained from its ImageNet data source, we froze its layers (made them unlearnable) by specifying layer.trainable = False. 
-To enable the ResNet50-based model to generate a four-class classification for our input data, we added some custom layers to the 'enhanced' (by data augmentation and rescaling) ResNet50 base model.
+To prevent the ResNet50-based model from generating a 1,000-classs classification for the ct scans in the input dataset, we "removed" its output layer by setting include_top=False. To keep ResNet50's pretrained weights from being updated during training on our data, we froze its layers by specifying layer.trainable = False. Freezing layers enables the model to retain the features it learned from pretraining on a large image data set. In other words, freezing layers prevents the learned features from being overwritten. Common in transfer learning, layer freezing effectively turns a pretrained model into a feature extractor.
 
-Specifically, we specified a   
+To direct the ResNet50-based model to generate a four-class classification for our input data, we added some custom layers to it. Specifically, we specified a   
 
-a) base_model.output layer to extract the output of the ResNet50 model to connect it with the subsequent custom layers. base_model.output represents the features learned by the pretrained ResNet50 model. ResNet50 without its top layer (as we've specified) outputs feature maps instead of classification predictions. The feature maps become the inputs for the subsequent custom layers, which will ultimately result in classification predictions.   
+a) base_model.output layer to extract the output of the ResNet50 and connect it with the subsequent custom layers. base_model.output represents the features learned by the pretrained ResNet50 model. ResNet50 without its top layer (as we've specified) outputs feature maps instead of classification predictions. The feature maps become the inputs for the subsequent custom layers, which will ultimately result in classification predictions.   
 
 b) BatchNormalization(axis=-1) layer to normalize the base model's output, improving performance and reducing overfitting.    
 
@@ -269,13 +268,12 @@ ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7
 
 # Modifying the cnn base model for compatibility with the ResNet50-based model
 
-As with the ResNet50-based model, which had to be customized for compatibility with the custom_cnn_model, the latter underwent significant adjustments to make it compatible with the other submodel.  
+As with the first_model, which had to be customized for compatibility with the second_model, the latter underwent significant adjustments to make it compatible.  
 
 While the cnn base model (second_model) was initially defined and trained using the Sequential API, characteristics of this API proved complicating when it came to ensemble and chain the model with the ResNet50-based model (first_model). The latter was defined using the Functional API to accommodate the ResNet50's greater complexity. As such, second_model was later defined, compiled, and trained with the Functional API. 
 
 <img width="904" alt="Screenshot 2024-09-10 132357" src="https://github.com/user-attachments/assets/f587f168-7564-4fb7-ac97-ef110e76523c">
 <img width="903" alt="Screenshot 2024-09-10 132524" src="https://github.com/user-attachments/assets/50f18ad7-9598-4712-abb2-79b0636d5ac2">
-
 
 Both models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20. 
 
