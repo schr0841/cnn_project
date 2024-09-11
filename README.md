@@ -215,9 +215,9 @@ The data sets were generated using the tf.keras.preprocessing.image_dataset_from
 <img width="761" alt="Screenshot 2024-09-11 171824" src="https://github.com/user-attachments/assets/569253a0-4c3b-4329-9596-c99e7dbc291a">
 <img width="685" alt="Screenshot 2024-09-11 171939" src="https://github.com/user-attachments/assets/d9ca206c-6903-48b6-a523-ae54cd1d9404">
 
-## CNN and ResNet50-based Models defined and trained independently
+### CNN and ResNet50-based Models defined and trained independently
 
-We defined, compiled, trained, and evaluated both models individually before turning our attention to ensembling the two models and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining the two models. The first model, the ResNet550-based model, is defined in the following code as 'first_model'. The cnn model, or base model, is defined as 'second_model'.
+We defined, compiled, trained, and evaluated both models individually before turning our attention to ensembling the two models and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining the two models. The first model, the ResNet550-based model, is defined in the following code as 'first_model'. The cnn model, or base model, is defined as 'second_model'. Alterations to the original ResNet50 model were made to make it compatile with the task at hand: generating a four-class classification of the chest ct scans. As the base model was designed to produce a four-class classification of the chest ct scans, alternations to this model were not necessary until chaining the models.
 
 <img width="800" alt="Screenshot 2024-09-10 133154" src="https://github.com/user-attachments/assets/3c2ed6e1-4875-4933-98bc-b2031d65e615">
 <img width="894" alt="Screenshot 2024-09-10 133310" src="https://github.com/user-attachments/assets/6b8cbb87-6440-4e36-a726-e05670658c8a">
@@ -232,7 +232,7 @@ We defined, compiled, trained, and evaluated both models individually before tur
 <img width="601" alt="Screenshot 2024-09-10 134845" src="https://github.com/user-attachments/assets/6a8370bf-18c7-4098-a26f-72441c18af4f">
 
 
-## Use of Data Augmentation and Rescaling
+### Use of Data Augmentation and Rescaling
 
 When ensembling two models, it is appropriate to apply data augmentation and rescaling in both submodels. It is also appropriate to apply data augmentation and rescaling early in the model pipeline. In particular, data augmentation should come before rescaling, right after defining the model's input layer. Because the ResNet50 model expects pixel values of the inputs to be normalized to a range between 0 and 1, rescaling needs to be performed before passing the images into ResNet50.  
 
@@ -246,7 +246,7 @@ c) including the augmented inputs as part of a Rescaling layer
 
 Including the augmented inputs as part of the Rescaling layer was necessary because in the Functional API, which describes the submodels overall, the data flow between model layers is explicitly defined by passing the output of one layer as the input to next layer. In the scaled_inputs = Rescaling(1./255)(augmented_inputs) statement, the '(augmented_inputs)' explicitly indicates the rescaling operation should be applied to the output of the previous layer, augmented_inputs. Without passing '(augmented_inputs)' as the input, the models would not know which data should be rescaled.   
 
-# Modifying the Pretrained ResNet50 model for compatibility with the custom_cnn model
+### Modifying the Pretrained ResNet50 model for compatibility with the cnn base model
 
 To prevent the ResNet50-based model itself from generating a 1,000-classs classification for the chest scan images in the input dataset, we "removed" the output layer of the ResNet50 model by setting include_top=False. To prevent the ResNet50 model from being re-trained from its ImageNet data source, we froze its layers (made them unlearnable) by specifying layer.trainable = False. 
 To enable the ResNet50-based model to generate a four-class classification for our input data, we added some custom layers to the 'enhanced' (by data augmentation and rescaling) ResNet50 base model.
