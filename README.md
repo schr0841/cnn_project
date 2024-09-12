@@ -217,7 +217,7 @@ The data sets were generated using the tf.keras.preprocessing.image_dataset_from
 
 We defined, compiled, trained, and evaluated both models individually before turning our attention to ensembling and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining firat_model and second_model, and if there would be a noticeable difference between ensembling accuracy and chaining accuracy.
 
-The original ResNet50 model is pretrained on a multi-million image dataset with 1,000 classes of images. To make it capable of classifying our chest ct scans into four distinct classes, we had to add some custom layers to it, resuling in first_model. As the cnn base model, second_model, was designed to accomplish the task at hand, alternations to this model were not necessary until it came time to chain the models.
+The original ResNet50 model is pretrained on a multi-million image dataset with 1,000 classes of images. To make it capable of classifying our chest ct scans into four distinct classes, we had to add some custom layers to it, resulting in the definition of first_model. As the cnn base model, second_model, was designed to accomplish the task at hand, alternations to this model were not necessary until it came time to chain the models.
 
 <img width="800" alt="Screenshot 2024-09-10 133154" src="https://github.com/user-attachments/assets/3c2ed6e1-4875-4933-98bc-b2031d65e615">
 <img width="894" alt="Screenshot 2024-09-10 133310" src="https://github.com/user-attachments/assets/6b8cbb87-6440-4e36-a726-e05670658c8a">
@@ -266,11 +266,9 @@ e) Dense(class_count, activation = 'softmax') to output a probability distributi
 
 ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048). Adding custom layers on top of ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
 
-# Modifying the cnn base model for compatibility with the ResNet50-based model
+# Modifying second_model for compatibility with first_model
 
-As with the first_model, which had to be customized for compatibility with the second_model, the latter underwent significant adjustments to make it compatible.  
-
-While the cnn base model (second_model) was initially defined and trained using the Sequential API, characteristics of this API proved complicating when it came to ensemble and chain the model with the ResNet50-based model (first_model). The latter was defined using the Functional API to accommodate the ResNet50's greater complexity. As such, second_model was later defined, compiled, and trained with the Functional API. 
+Our second_model also underwent some adjustments to make it compatible with ensembling and chaining with first_model. While second_model was initially defined and trained using the Sequential API, characteristics of this API proved complicating when it came to ensemble and chain with first_model. Our first_model had been defined using the Functional API to accommodate the ResNet50's greater complexity. As such, second_model was redefined, compiled, and trained with the Functional API. 
 
 <img width="904" alt="Screenshot 2024-09-10 132357" src="https://github.com/user-attachments/assets/f587f168-7564-4fb7-ac97-ef110e76523c">
 <img width="903" alt="Screenshot 2024-09-10 132524" src="https://github.com/user-attachments/assets/50f18ad7-9598-4712-abb2-79b0636d5ac2">
