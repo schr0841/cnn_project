@@ -268,7 +268,7 @@ e) Dense(class_count, activation = 'softmax') to output a probability distributi
 
 ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048). Adding custom layers on top of ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
 
-# Modifying second_model for compatibility with first_model
+### Modifying second_model for compatibility with first_model
 
 Our second_model also underwent some adjustments to make it compatible with ensembling and chaining with first_model. While second_model was initially defined and trained using the Sequential API, characteristics of this API proved complicating when it came to ensemble and chain with first_model. Our first_model had been defined using the Functional API to accommodate the ResNet50's greater complexity. As such, second_model was redefined, compiled, and trained with the Functional API. 
 
@@ -317,11 +317,14 @@ Unlike in the case of ensembling models, where data augmentation and rescaling c
 
 ## Modifying first_model and second_model to enable chaining
 
-Because we are turning the output of the first model into the inputs of the second model, some adjustments to the original versions of first_model and second_model became necessary. In particular, we needed to omit data augmentation and rescaling from second_model and remove a number of its previously-defined layers. Specifically, 
+Because we are turning the output of the first model into the input of the second model, some adjustments to the original versions of first_model and second_model became necessary. In particular, we needed to omit data augmentation and rescaling from second_model and remove a number of its previously-defined layers that become redundant when chaining with the ResNet50-based first_model.
 
 Modifications to the original version of first_model were required to convert this model from a classifier to a feature extractor. That is, the chainable version of first_model needed to process raw input data (the ct scans) and produce a set of informative features that can (eventually) be used for classification tasks. Pretrained models like ResNet50 are often used as feature extractors in transfer learning because they have already learned useful patterns from large datasets on which they were trained. These patterns, or features, are reusable for new tasks. 
 
 
+<img width="688" alt="Screenshot 2024-09-12 174703" src="https://github.com/user-attachments/assets/903f1534-2125-4450-b4e4-f97746407d0d">
+<img width="809" alt="Screenshot 2024-09-12 174943" src="https://github.com/user-attachments/assets/3c474880-558b-45cc-9692-530b47a2a738">
+<img width="808" alt="Screenshot 2024-09-12 175058" src="https://github.com/user-attachments/assets/959efbb6-01d3-4880-994f-12b93e64cb99">
 
 
 
