@@ -250,21 +250,21 @@ Including the augmented inputs as part of the Rescaling layer was necessary beca
 
 ### Modifying pretrained ResNet50 model into first_model, compatible with second_model
 
-To prevent the ResNet50-based model from generating a 1,000-classs classification for the ct scans in the input dataset, we "removed" its output layer by setting include_top=False. To keep ResNet50's pretrained weights from being updated during training on our data, we froze its layers by specifying layer.trainable = False. Freezing layers enables the model to retain the features it learned from pretraining on a large image data set. In other words, freezing layers prevents the learned features from being overwritten. Common in transfer learning, layer freezing effectively turns a pretrained model into a feature extractor.
+To prevent the ResNet50-based model from generating a 1,000-classs classification for the ct scans in the input dataset, we "removed" its output layer by setting include_top=False. To keep ResNet50's pretrained weights from being updated during training on our data, we froze its layers by specifying layer.trainable = False. Freezing layers enables the model to retain the features it learned from pretraining on a large image data set. In other words, freezing layers prevents the learned features from being overwritten. Common in transfer learning, layer freezing effectively turns a pretrained model into a feature extractor. The custom layers we added to the "feature extractor" then produced the four-class classification, drawing from the ResNet50's learned features.
 
-To direct the ResNet50-based model to generate a four-class classification for our input data, we added some custom layers to it. Specifically, we specified a   
+Specifically, we added the following layers:    
 
-a) base_model.output layer to extract the output of the ResNet50 and connect it with the subsequent custom layers. base_model.output represents the features learned by the pretrained ResNet50 model. ResNet50 without its top layer (as we've specified) outputs feature maps instead of classification predictions. The feature maps become the inputs for the subsequent custom layers, which will ultimately result in classification predictions.   
+a) base_model.output layer to extract the output of the ResNet50 and connect it with the subsequent custom layers. base_model.output represents the features learned by the pretrained ResNet50 model. ResNet50 without its top layer (as we've specified) outputs feature maps instead of classification predictions. The feature maps become the inputs for the subsequent custom layers, which will ultimately result in classification predictions     
 
-b) BatchNormalization(axis=-1) layer to normalize the base model's output, improving performance and reducing overfitting.    
+b) BatchNormalization(axis=-1) layer to normalize the ResNet50 base model's output, improving performance and reducing overfitting    
 
-c) Dense(256, activation='relu) layer to learn more complex patterns from the high-level features provided by ResNet50. The more complex patterns will be relevant to the classification task at hand, while the ReLU activation function supports the cnn to model more intricate relationships between features.   
+c) Dense(256, activation='relu) layer to learn more complex patterns from the high-level features provided by ResNet50. The more complex patterns will be relevant to the classification task at hand, while the ReLU activation function supports the cnn to model more intricate relationships between features    
 
-d) Dropout(0.3) to prevent overfitting by forcing the model to learn more robust features and preventing it from becoming too reliant on specific neurons.   
+d) Dropout(0.3) to prevent overfitting by forcing the model to learn more robust features and preventing it from becoming too reliant on specific neurons    
 
-e) Dense(class_count, activation = 'softmax') to output a probability distribution across the classes  (whose number is given by class_count). Each value in the probability distribution corresponds to the predicted probability that the input belongs to a given class.   
+e) Dense(class_count, activation = 'softmax') to output a probability distribution across the classes (whose number is given by class_count). Each value in the probability distribution corresponds to the predicted probability that the input image belongs to a given class    
 
-ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048) It is not designed to classify four classes of images. Adding custom layers to ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
+ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048). Adding custom layers on top of ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
 
 # Modifying the cnn base model for compatibility with the ResNet50-based model
 
