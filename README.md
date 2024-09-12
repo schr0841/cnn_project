@@ -208,16 +208,18 @@ We asked Claude AI if it could come up with an implementation of simple boosted 
 
 # Ensembling versus Chaining Models
 
-We trained the cnn base model and the ResNet50-based model on the CT chest scan images in the training_set directory. This directory contained 613 files belonging to four classes. Similarly, a testing_set of 315 files belonging to four classes and a validation_set of 72 files belonging to 4 classes were created to validate the model during training and evaluate it after training. One class pertained to images without cancer. Three classes pertained to one each of three forms of cancer. 
+We trained the cnn base model (first_model) and the ResNet50-based model (second_model) on the CT chest scan images in the training_set directory. This directory contained 613 files belonging to four classes. Similarly, a testing_set of 315 files belonging to four classes and a validation_set of 72 files belonging to 4 classes were created to validate the model during training and evaluate it after training. One class pertained to images without cancer. Three classes pertained to one each of three forms of cancer. 
 
-The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using the ImageDataGenerator, as datasets elsewhere in this study were generated. Also of note, the image_size was set to (224, 224) because the ResNet50-based model expects images of that size. For purposes of consistency, the image_size was set to (224, 224) for the custom_cnn_model as well. label_mode for the three datasets were set to "int" (integer) because images belong to one of four classes. 
+The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using the ImageDataGenerator, as datasets elsewhere in this study may have been generated. Also of note, the image_size was set to (224, 224) because the ResNet50-based model expects images of that size. For purposes of consistency, the image_size was set to (224, 224) for the custom_cnn_model as well. label_mode for the three datasets were set to "int" (integer) because images belong to one of four classes. 
 
 <img width="761" alt="Screenshot 2024-09-11 171824" src="https://github.com/user-attachments/assets/569253a0-4c3b-4329-9596-c99e7dbc291a">
 <img width="685" alt="Screenshot 2024-09-11 171939" src="https://github.com/user-attachments/assets/d9ca206c-6903-48b6-a523-ae54cd1d9404">
 
-### CNN and ResNet50-based Models defined and trained independently
+### first_model and second_model trained and evaluated independently
 
-We defined, compiled, trained, and evaluated both models individually before turning our attention to ensembling the two models and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining the two models. The first model, the ResNet550-based model, is defined in the following code as 'first_model'. The cnn model, or base model, is defined as 'second_model'. Alterations to the original ResNet50 model were made to make it compatile with the task at hand: generating a four-class classification of the chest ct scans. As the base model was designed to produce a four-class classification of the chest ct scans, alternations to this model were not necessary until it became time to chain the models.
+We defined, compiled, trained, and evaluated both models individually before turning our attention to ensembling and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining firat_model and second_model, and if there would be a noticeable difference between ensembling accuracy and chaining accuracy.
+
+We had to alter the original ResNet50 model to made to make it compatile with the task at hand: generating a four-class classification of the chest ct scans. As the base model was designed to produce a four-class classification of the chest ct scans, alternations to this model were not necessary until it became time to chain the models.
 
 <img width="800" alt="Screenshot 2024-09-10 133154" src="https://github.com/user-attachments/assets/3c2ed6e1-4875-4933-98bc-b2031d65e615">
 <img width="894" alt="Screenshot 2024-09-10 133310" src="https://github.com/user-attachments/assets/6b8cbb87-6440-4e36-a726-e05670658c8a">
@@ -248,7 +250,7 @@ Even though we created first_model with the Functional API, the data augmentatio
 
 Including the augmented inputs as part of the Rescaling layer was necessary because in the Functional API, the data flow between model layers is explicitly defined by passing the output of one layer as the input to next layer. In the scaled_inputs = Rescaling(1./255)(augmented_inputs) statement, the '(augmented_inputs)' explicitly indicates the rescaling operation should be applied to the output of the previous layer, augmented_inputs. Without passing '(augmented_inputs)' as the input, the models would not know which data should be rescaled.   
 
-### Modifying the Pretrained ResNet50 model (first_model) for compatibility with the cnn base model (second_model)
+### Modifying pretrained ResNet50 model into first_model, compatible with second_model
 
 To prevent the ResNet50-based model from generating a 1,000-classs classification for the ct scans in the input dataset, we "removed" its output layer by setting include_top=False. To keep ResNet50's pretrained weights from being updated during training on our data, we froze its layers by specifying layer.trainable = False. Freezing layers enables the model to retain the features it learned from pretraining on a large image data set. In other words, freezing layers prevents the learned features from being overwritten. Common in transfer learning, layer freezing effectively turns a pretrained model into a feature extractor.
 
@@ -332,7 +334,7 @@ Modifications to the original version of first_model were required to convert th
 
 
 
-## Evaluating all three models
+## Evaluating all four models
 
 When it comes to evaluating the three models, the first and second models (the submodels) need to be evaluated on the unseen testing_set dataset to get unbiased performance metrics. 
 
@@ -353,7 +355,14 @@ custom_CNN-Model              Loss: 1.3097      Accuracy: 0.4190
 Ensemble Model                 Loss: 1.3762      Accuracy: 0.330
 
 
+## Table of results
 
+| model | loss | accuracy | val_loss | val_accuracy |
+|-------|------|----------|----------|--------------|
+| first_model  | 0.0112  | 0.9644  | 2.0032 | 0.4539 |
+| second_model  | 0.0536 | 0.9837 | 0.6506 | 0.8317 |
+| ensemble_model | 0.0682 | 0.9886 | 2.0240 | 0.7365 |
+| chained_model | 0.0615 | 0.9902 | 2.9775 | 0.5111 |
 
 
 
