@@ -230,6 +230,11 @@ The original ResNet50 model is pretrained on a multi-million image dataset with 
 
 ### second_model
 
+<img width="604" alt="Screenshot 2024-09-12 171903" src="https://github.com/user-attachments/assets/312f8c83-9813-4799-b194-45a155e49f9e">
+<img width="532" alt="Screenshot 2024-09-12 172026" src="https://github.com/user-attachments/assets/68ef61bd-6b44-4980-8271-980c9318a537">
+<img width="491" alt="Screenshot 2024-09-12 172206" src="https://github.com/user-attachments/assets/373c17e0-9a47-4a5a-8912-804cc7dd4c8b">
+<img width="733" alt="Screenshot 2024-09-12 172353" src="https://github.com/user-attachments/assets/8ac5a6ed-8eac-4a55-ada3-335870f3aa3d">
+<img width="660" alt="Screenshot 2024-09-12 172528" src="https://github.com/user-attachments/assets/4e076027-c55e-4146-a3f6-368c6cecf27e">
 
 
 ### Use of Data Augmentation and Rescaling
