@@ -290,11 +290,15 @@ The ouputs of first_model and second_model become the inputs to the ensemble mod
 
 Before we built the ensemble_model to process the two submodels's output (predictions), we needed to generate predictions from first_model and second_model using the training_set and validation_set. Because we used both training_set and validation_set to train the two submodels individually, we needed predictions from both models on these same datasets to serve as the inputs to the ensemble_model.
 
-
-
 Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to train ensemble_model. We kept these callback definitions consistent with those used in the two submodels. If the accuracy on the validation dataset did not improve after 20 epochs, the model training would come to an early stop rather than continue on for 100 epochs. Similarly, we defined a filepath to save the best version of the model (that with the maximum validation accuracy). 
 
-After that, we defined the training and validation inputs to the ensemble model as the average of the training predictions made by the ResNet50 and the custom_cnn_model and the average of the two submodels' predictions on the validation_set. Because these submodels' outputs/ensemble model's inputs have shape (4,), we set the input shape of the ensemble_input to (4,). 
+<img width="697" alt="Screenshot 2024-09-12 180637" src="https://github.com/user-attachments/assets/e7dac44d-157e-43c5-946c-6cd13fc357ac">
+<img width="744" alt="Screenshot 2024-09-12 180909" src="https://github.com/user-attachments/assets/17d05e57-f4fa-4e6a-a1e5-ba0acc50a42f">
+
+Then we defined the training and validation inputs to the ensemble model as the average of the training predictions made by the ResNet50 and the custom_cnn_model and the average of the two submodels' predictions on the validation_set. Because these submodels' outputs/ensemble model's inputs have shape (4,), we set the input shape of the ensemble_input to (4,). 
+
+<img width="871" alt="Screenshot 2024-09-12 181055" src="https://github.com/user-attachments/assets/e0521ee1-fe80-4b2a-8849-e28bc5529543">
+
 
 The model itself is relatively simple since we are only averaging the fist and second models' outputs by dataset. Essentially, this model has only two layers: the input layer and the output layer. We compile and train the ensemble model in the same manner as its two submodels. Here, our x value becomes the averaged training_set predictions from the first and second model, while our y values become the true labels corresponding to the averaged training predictions. Finally, the validation_data for the ensemble model is the averaged predictions from the two submodels on the validation dataset and the true labels for the validation dataset itself. 
 
