@@ -246,9 +246,6 @@ a) defining data augmentation layers within a Sequential model
 b) applying the data augmentation layers to the input tensor    
 c) including the augmented inputs as part of a Rescaling layer  
 
-<img width="928" alt="Screenshot 2024-09-10 123623" src="https://github.com/user-attachments/assets/57ed1b9c-a780-4318-b7d1-3b06bc01fbec">
-<img width="916" alt="Screenshot 2024-09-10 123837" src="https://github.com/user-attachments/assets/f52f7c21-e84a-4a34-a263-44abc91f01b0">
-
 Even though we created first_model with the Functional API, the data augmentation portion of it was created with the Sequential API. Sequential components of larger models, such as data augmentation pipelines, can be integrated into models built with the Functional API. Both APIs produce layers compatibile with the Keras ecosystem. Because data augmentation transforms input data before it reaches the model's core, it doesn't affect the flow of data within the larger model. Defining data augmentation as a Sequential block effectively creates a single layer that acts as any Keras layer. 
 
 Including the augmented inputs as part of the Rescaling layer was necessary because in the Functional API, the data flow between model layers is explicitly defined by passing the output of one layer as the input to next layer. In the scaled_inputs = Rescaling(1./255)(augmented_inputs) statement, the '(augmented_inputs)' explicitly indicates the rescaling operation should be applied to the output of the previous layer, augmented_inputs. Without passing '(augmented_inputs)' as the input, the models would not know which data should be rescaled.   
@@ -275,13 +272,7 @@ ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7
 
 Our second_model also underwent some adjustments to make it compatible with ensembling and chaining with first_model. While second_model was initially defined and trained using the Sequential API, characteristics of this API proved complicating when it came to ensemble and chain with first_model. Our first_model had been defined using the Functional API to accommodate the ResNet50's greater complexity. As such, second_model was redefined, compiled, and trained with the Functional API. 
 
-<img width="904" alt="Screenshot 2024-09-10 132357" src="https://github.com/user-attachments/assets/f587f168-7564-4fb7-ac97-ef110e76523c">
-<img width="903" alt="Screenshot 2024-09-10 132524" src="https://github.com/user-attachments/assets/50f18ad7-9598-4712-abb2-79b0636d5ac2">
-
 Both models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20. 
-
-![Screenshot 2024-09-08 172623](https://github.com/user-attachments/assets/413f10cf-3373-470b-9c26-c1feb2cc975d)
-
 
 
 ## Ensembling Models
