@@ -208,18 +208,16 @@ We asked Claude AI if it could come up with an implementation of simple boosted 
 
 # Ensembling versus Chaining Models
 
-We trained the cnn base model (first_model) and the ResNet50-based model (second_model) on the CT chest scan images in the training_set directory. This directory contained 613 files belonging to four classes. Similarly, a testing_set of 315 files belonging to four classes and a validation_set of 72 files belonging to 4 classes were created to validate the model during training and evaluate it after training. One class pertained to images without cancer. Three classes pertained to one each of three forms of cancer. 
+We trained the ResNet50-based model (first_model) and the cnn base model (second_model) on the CT chest scan images in the training_set (613 images) and validation_set (315 images) directories. We maintained for evaluation puposes 72 unseen images in the testing_set directory. All images pertained to one of four classes, with one class comprised of cancer-free images and the other three classes pertaining to three different types of cancer. 
 
 The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using the ImageDataGenerator, as datasets elsewhere in this study may have been generated. Also of note, the image_size was set to (224, 224) because the ResNet50-based model expects images of that size. For purposes of consistency, the image_size was set to (224, 224) for the custom_cnn_model as well. label_mode for the three datasets were set to "int" (integer) because images belong to one of four classes. 
 
 <img width="761" alt="Screenshot 2024-09-11 171824" src="https://github.com/user-attachments/assets/569253a0-4c3b-4329-9596-c99e7dbc291a">
 <img width="685" alt="Screenshot 2024-09-11 171939" src="https://github.com/user-attachments/assets/d9ca206c-6903-48b6-a523-ae54cd1d9404">
 
-### first_model and second_model trained and evaluated independently
-
 We defined, compiled, trained, and evaluated both models individually before turning our attention to ensembling and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining firat_model and second_model, and if there would be a noticeable difference between ensembling accuracy and chaining accuracy.
 
-We had to alter the original ResNet50 model to made to make it compatile with the task at hand: generating a four-class classification of the chest ct scans. As the base model was designed to produce a four-class classification of the chest ct scans, alternations to this model were not necessary until it became time to chain the models.
+The original ResNet50 model is pretrained on a multi-million image dataset with 1,000 classes of images. To make it capable of classifying our chest ct scans into four distinct classes, we had to add some custom layers to it, resuling in first_model. As the cnn base model, second_model, was designed to accomplish the task at hand, alternations to this model were not necessary until it came time to chain the models.
 
 <img width="800" alt="Screenshot 2024-09-10 133154" src="https://github.com/user-attachments/assets/3c2ed6e1-4875-4933-98bc-b2031d65e615">
 <img width="894" alt="Screenshot 2024-09-10 133310" src="https://github.com/user-attachments/assets/6b8cbb87-6440-4e36-a726-e05670658c8a">
