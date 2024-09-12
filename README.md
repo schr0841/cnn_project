@@ -298,6 +298,9 @@ Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to t
 Then we defined the training and validation inputs to the ensemble model as the average of the training predictions made by the ResNet50 and the custom_cnn_model and the average of the two submodels' predictions on the validation_set. Because these submodels' outputs/ensemble model's inputs have shape (4,), we set the input shape of the ensemble_input to (4,). 
 
 <img width="871" alt="Screenshot 2024-09-12 181055" src="https://github.com/user-attachments/assets/e0521ee1-fe80-4b2a-8849-e28bc5529543">
+<img width="889" alt="Screenshot 2024-09-12 182108" src="https://github.com/user-attachments/assets/0451c1ac-2fdf-44b0-8278-1189899f1347">
+<img width="887" alt="Screenshot 2024-09-12 182229" src="https://github.com/user-attachments/assets/878e58bc-12db-4c8f-91b1-9aa2b854ff5f">
+<img width="630" alt="Screenshot 2024-09-12 182404" src="https://github.com/user-attachments/assets/92385612-198a-485c-83dc-efeff4fa3be3">
 
 
 The model itself is relatively simple since we are only averaging the fist and second models' outputs by dataset. Essentially, this model has only two layers: the input layer and the output layer. We compile and train the ensemble model in the same manner as its two submodels. Here, our x value becomes the averaged training_set predictions from the first and second model, while our y values become the true labels corresponding to the averaged training predictions. Finally, the validation_data for the ensemble model is the averaged predictions from the two submodels on the validation dataset and the true labels for the validation dataset itself. 
