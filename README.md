@@ -219,16 +219,17 @@ We defined, compiled, trained, and evaluated both models individually before tur
 
 The original ResNet50 model is pretrained on a multi-million image dataset with 1,000 classes of images. To make it capable of classifying our chest ct scans into four distinct classes, we had to add some custom layers to it, resulting in the definition of first_model. As the cnn base model, second_model, was designed to accomplish the task at hand, alternations to this model were not necessary until it came time to chain the models.
 
+### first_model
 <img width="747" alt="Screenshot 2024-09-12 165648" src="https://github.com/user-attachments/assets/5095917b-e89a-4d8f-94be-c6aab6a140fd">
 <img width="718" alt="Screenshot 2024-09-12 165800" src="https://github.com/user-attachments/assets/743fc59c-2541-4a0b-bb8b-49d64d33301d">
 <img width="769" alt="Screenshot 2024-09-12 165915" src="https://github.com/user-attachments/assets/deaad652-fb39-413b-991b-dae48eb282fd">
+<img width="545" alt="Screenshot 2024-09-12 171022" src="https://github.com/user-attachments/assets/9259e7d7-010e-4b8c-9d2a-42681e58c12f">
+<img width="686" alt="Screenshot 2024-09-12 171241" src="https://github.com/user-attachments/assets/2bfaba9b-16fb-4cd1-af94-56782297b493">
+<img width="670" alt="Screenshot 2024-09-12 171422" src="https://github.com/user-attachments/assets/4b60c346-8567-40c7-b7d7-719b10a53d09">
 
 
+### second_model
 
-<img width="769" alt="Screenshot 2024-09-10 134644" src="https://github.com/user-attachments/assets/4c2ef882-cf3d-4993-a6ab-1b235db3019f">
-<img width="746" alt="Screenshot 2024-09-10 134742" src="https://github.com/user-attachments/assets/afec635c-56ef-4f4a-a205-7463b6d5ea0a">
-<img width="678" alt="Screenshot 2024-09-10 135156" src="https://github.com/user-attachments/assets/79d2a79f-977f-46be-a7df-65a30fb3ddf1">
-<img width="601" alt="Screenshot 2024-09-10 134845" src="https://github.com/user-attachments/assets/6a8370bf-18c7-4098-a26f-72441c18af4f">
 
 
 ### Use of Data Augmentation and Rescaling
