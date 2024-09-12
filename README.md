@@ -284,15 +284,16 @@ We created a third model, called ensemble_model, that averages the predictions o
 The ouputs of first_model and second_model become the inputs to the ensemble model. Unlike the original input data, which contained labels for the images, the new inputs to the ensemble model do not contain labels. Thus, we needed to extract the labels from the TensorFlow datasets and give them to the ensemble model. These labels are necessary for the ensembled model to compute loss values, which entails comparing predictions to true labels. 
 
 <img width="838" alt="Screenshot 2024-09-08 173050" src="https://github.com/user-attachments/assets/94e63c16-57d6-44c1-ae0b-a7ba6ca833c2">
+<img width="646" alt="Screenshot 2024-09-12 180029" src="https://github.com/user-attachments/assets/ba9baf12-5de0-41f9-8795-7aeebefafeb2">
 
 
 ### Preparing data and building ensemble model to average outputs
 
-Before we built the ensemble model to process the two submodels's output (predictions), we needed to generate predictions from first_model and second_model using the training_set and validation_set. Because we used both training_set and validation_set to train the two submodels individually, we needed predictions from both models on these same datasets to serve as the inputs to the ensembled model.
+Before we built the ensemble_model to process the two submodels's output (predictions), we needed to generate predictions from first_model and second_model using the training_set and validation_set. Because we used both training_set and validation_set to train the two submodels individually, we needed predictions from both models on these same datasets to serve as the inputs to the ensemble_model.
 
-<img width="840" alt="Screenshot 2024-09-08 173153" src="https://github.com/user-attachments/assets/6277ae2c-a9e6-455f-bef1-b31a5d1fff3e">
+<img width="882" alt="Screenshot 2024-09-12 175710" src="https://github.com/user-attachments/assets/69059f24-a3d8-4070-923d-044300a42ec1">
 
-Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to train the ensembled model. Again, we kept these callback definitions consistent with those used in the two submodels. If the accuracy on the validation dataset did not improve after 20 epochs, the model training would come to an early stop rather than continue on for 100 epochs. Similarly, we defined a filepath to save the best version of the model (that with the maximum validation accuracy). 
+Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to train ensemble_model. We kept these callback definitions consistent with those used in the two submodels. If the accuracy on the validation dataset did not improve after 20 epochs, the model training would come to an early stop rather than continue on for 100 epochs. Similarly, we defined a filepath to save the best version of the model (that with the maximum validation accuracy). 
 
 After that, we defined the training and validation inputs to the ensemble model as the average of the training predictions made by the ResNet50 and the custom_cnn_model and the average of the two submodels' predictions on the validation_set. Because these submodels' outputs/ensemble model's inputs have shape (4,), we set the input shape of the ensemble_input to (4,). 
 
