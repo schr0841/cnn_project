@@ -206,9 +206,9 @@ We attempt to train 2 models sequentially, where the second model learns from th
 We asked Claude AI if it could come up with an implementation of simple boosted ensemble models and it was able to do that, but the code it provided assumed we have a clear split among the features $X$ and target $y$, whereas here we do not. We have included it as an extra supplementary notebook titled "gemini_boosted_ensemble.ipynb" to look at for further development.
 
 
-# Ensembling versus Chaining Models
+# Ensembling and Chaining Models
 
-We defined, compiled, and trained the ResNet50-based (first_model) and the CNN base model (second_model) individually before ensembling and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining first_model and second_model, and if the manner in which we combined the models (ensembling versus chaining) would generate a noticeable accuracy difference between the two methods.
+We defined, compiled, and trained the ResNet50-based (first_model) and the CNN base model (second_model) individually before ensembling and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining first_model and second_model over each of the submodels, and whether the method used to combine models (ensembling versus chaining) made much of a difference.
 
 We trained first_model and second_model on the CT chest scan images in the training_set (613 images) and validation_set (315 images) directories. We maintained for evaluation puposes 72 unseen images in the testing_set directory. All images pertained to one of four classes, with one class comprised of cancer-free images and the other three classes indicating three different types of cancer. 
 
@@ -218,7 +218,25 @@ We used the preprocessing.image_dataset_from_directory method to generate the th
 <img width="685" alt="Screenshot 2024-09-11 171939" src="https://github.com/user-attachments/assets/d9ca206c-6903-48b6-a523-ae54cd1d9404">
 
 
-The original ResNet50 model is pretrained on a multi-million image dataset with 1,000 classes of images. To make it capable of classifying our chest ct scans into four distinct classes, we had to add some custom layers to it and remove its original output layer. first_model became our resulting ResNet50-based model. As we designed the cnn base model, second_model, for our four-class classification, we did not need to make any alternations to this model until it came time to chain first_model and second_model.
+### Building first-model from pretrained ResNet50
+
+The original ResNet50 model is pretrained on a multi-million image dataset with 1,000 classes of images. To make it capable of classifying our chest ct scans into four distinct classes, we had to add some custom layers to it and remove its original output layer. first_model became our resulting ResNet50-based model.
+
+To prevent the ResNet50-based model from generating a 1,000-classs classification for the ct scans in the input dataset, we "removed" its output layer by setting include_top=False. To keep ResNet50's pretrained weights from being updated during training on our data, we froze its layers by specifying layer.trainable = False. Freezing layers enables the model to retain the features it learned from pretraining on a large image data set. In other words, freezing layers prevents the learned features from being overwritten. Common in transfer learning, layer freezing effectively turns a pretrained model into a feature extractor. The custom layers we added to the "feature extractor" then produced the four-class classification, drawing from the ResNet50's learned features.
+
+Specifically, we added the following custom layers:    
+
+a) base_model.output layer to extract the output of the ResNet50 and connect it with the subsequent custom layers. base_model.output represents the features learned by the pretrained ResNet50 model. ResNet50 without its top layer (as we've specified) outputs feature maps instead of classification predictions. The feature maps become the inputs for the subsequent custom layers, which will ultimately result in classification predictions     
+
+b) BatchNormalization(axis=-1) layer to normalize the ResNet50 base model's output, improving performance and reducing overfitting    
+
+c) Dense(256, activation='relu) layer to learn more complex patterns from the high-level features provided by ResNet50. The more complex patterns will be relevant to the classification task at hand, while the ReLU activation function supports the cnn to model more intricate relationships between features    
+
+d) Dropout(0.3) to prevent overfitting by forcing the model to learn more robust features and preventing it from becoming too reliant on specific neurons    
+
+e) Dense(class_count, activation = 'softmax') to output a probability distribution across the classes (whose number is given by class_count). Each value in the probability distribution corresponds to the predicted probability that the input image belongs to a given class    
+
+ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048). Adding custom layers on top of ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
 
 
 ### first_model
@@ -228,15 +246,6 @@ The original ResNet50 model is pretrained on a multi-million image dataset with 
 <img width="545" alt="Screenshot 2024-09-12 171022" src="https://github.com/user-attachments/assets/9259e7d7-010e-4b8c-9d2a-42681e58c12f">
 <img width="686" alt="Screenshot 2024-09-12 171241" src="https://github.com/user-attachments/assets/2bfaba9b-16fb-4cd1-af94-56782297b493">
 <img width="670" alt="Screenshot 2024-09-12 171422" src="https://github.com/user-attachments/assets/4b60c346-8567-40c7-b7d7-719b10a53d09">
-
-
-### second_model
-
-<img width="604" alt="Screenshot 2024-09-12 171903" src="https://github.com/user-attachments/assets/312f8c83-9813-4799-b194-45a155e49f9e">
-<img width="532" alt="Screenshot 2024-09-12 172026" src="https://github.com/user-attachments/assets/68ef61bd-6b44-4980-8271-980c9318a537">
-<img width="491" alt="Screenshot 2024-09-12 172206" src="https://github.com/user-attachments/assets/373c17e0-9a47-4a5a-8912-804cc7dd4c8b">
-<img width="733" alt="Screenshot 2024-09-12 172353" src="https://github.com/user-attachments/assets/8ac5a6ed-8eac-4a55-ada3-335870f3aa3d">
-<img width="660" alt="Screenshot 2024-09-12 172528" src="https://github.com/user-attachments/assets/4e076027-c55e-4146-a3f6-368c6cecf27e">
 
 
 ### Use of Data Augmentation and Rescaling
@@ -253,46 +262,34 @@ Even though we created first_model with the Functional API, the data augmentatio
 Including the augmented inputs as part of the Rescaling layer was necessary because in the Functional API, the data flow between model layers is explicitly defined by passing the output of one layer as the input to next layer. In the scaled_inputs = Rescaling(1./255)(augmented_inputs) statement, the '(augmented_inputs)' explicitly indicates the rescaling operation should be applied to the output of the previous layer, augmented_inputs. Without passing '(augmented_inputs)' as the input, the models would not know which data should be rescaled.   
 
 
-### Modifying pretrained ResNet50 model into first_model, compatible with ensembling second_model
+### second_model
 
-To prevent the ResNet50-based model from generating a 1,000-classs classification for the ct scans in the input dataset, we "removed" its output layer by setting include_top=False. To keep ResNet50's pretrained weights from being updated during training on our data, we froze its layers by specifying layer.trainable = False. Freezing layers enables the model to retain the features it learned from pretraining on a large image data set. In other words, freezing layers prevents the learned features from being overwritten. Common in transfer learning, layer freezing effectively turns a pretrained model into a feature extractor. The custom layers we added to the "feature extractor" then produced the four-class classification, drawing from the ResNet50's learned features.
+ As we designed the cnn base model, second_model, for our four-class classification task, no alternations to this model were necessary until it came time to chain first_model and second_model.
 
-Specifically, we added the following layers:    
+<img width="604" alt="Screenshot 2024-09-12 171903" src="https://github.com/user-attachments/assets/312f8c83-9813-4799-b194-45a155e49f9e">
+<img width="532" alt="Screenshot 2024-09-12 172026" src="https://github.com/user-attachments/assets/68ef61bd-6b44-4980-8271-980c9318a537">
+<img width="491" alt="Screenshot 2024-09-12 172206" src="https://github.com/user-attachments/assets/373c17e0-9a47-4a5a-8912-804cc7dd4c8b">
+<img width="733" alt="Screenshot 2024-09-12 172353" src="https://github.com/user-attachments/assets/8ac5a6ed-8eac-4a55-ada3-335870f3aa3d">
+<img width="660" alt="Screenshot 2024-09-12 172528" src="https://github.com/user-attachments/assets/4e076027-c55e-4146-a3f6-368c6cecf27e">
 
-a) base_model.output layer to extract the output of the ResNet50 and connect it with the subsequent custom layers. base_model.output represents the features learned by the pretrained ResNet50 model. ResNet50 without its top layer (as we've specified) outputs feature maps instead of classification predictions. The feature maps become the inputs for the subsequent custom layers, which will ultimately result in classification predictions     
-
-b) BatchNormalization(axis=-1) layer to normalize the ResNet50 base model's output, improving performance and reducing overfitting    
-
-c) Dense(256, activation='relu) layer to learn more complex patterns from the high-level features provided by ResNet50. The more complex patterns will be relevant to the classification task at hand, while the ReLU activation function supports the cnn to model more intricate relationships between features    
-
-d) Dropout(0.3) to prevent overfitting by forcing the model to learn more robust features and preventing it from becoming too reliant on specific neurons    
-
-e) Dense(class_count, activation = 'softmax') to output a probability distribution across the classes (whose number is given by class_count). Each value in the probability distribution corresponds to the predicted probability that the input image belongs to a given class    
-
-ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048). Adding custom layers on top of ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
-
-
-### Modifying second_model for compatibility with ensembling first_model
-
-Our second_model also underwent some adjustments to make it compatible with ensembling and chaining with first_model. While second_model was initially defined and trained using the Sequential API, characteristics of this API proved complicating when it came to ensemble and chain with first_model. Our first_model had been defined using the Functional API to accommodate the ResNet50's greater complexity. As such, second_model was redefined, compiled, and trained with the Functional API. 
-
-Both models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20. 
 
 
 ## Ensembling Models
 
-We created a third model, called ensemble_model, that averages the predictions of first_model and second_model. 
+After training first_model and second_model, we created a third model, ensemble_model, to average the first two models' output
+. 
 
-### Extracting labels from training_set, testing_set, and validation_set
+### Extracting dataset labels
 
-The ouputs of first_model and second_model become the inputs to the ensemble model. Unlike the original input data, which contained labels for the images, the new inputs to the ensemble model do not contain labels. Thus, we needed to extract the labels from the TensorFlow datasets and give them to the ensemble model. These labels are necessary for the ensembled model to compute loss values, which entails comparing predictions to true labels. 
+The ouputs of first_model and second_model become the inputs to ensemble_model. Unlike the original input data, which contained images and class labels, the input to the ensemble model lacks labels. Thus, we needed to extract the labels from the TensorFlow datasets and give them to ensemble_model. These labels are necessary for the ensembled model to compute loss values, which entails comparing predictions to true labels. 
 
 <img width="882" alt="Screenshot 2024-09-12 175710" src="https://github.com/user-attachments/assets/69059f24-a3d8-4070-923d-044300a42ec1">
 <img width="646" alt="Screenshot 2024-09-12 180029" src="https://github.com/user-attachments/assets/ba9baf12-5de0-41f9-8795-7aeebefafeb2">
 
+
 ### Preparing data and building ensemble model to average outputs
 
-Before we built the ensemble_model to process the two submodels's output (predictions), we needed to generate predictions from first_model and second_model using the training_set and validation_set. Because we used both training_set and validation_set to train the two submodels individually, we needed predictions from both models on these same datasets to serve as the inputs to the ensemble_model.
+Before we built the ensemble_model to process the two submodels's output (predictions), we needed to generate predictions from first_model and second_model using the training_set and validation_set. Because we used both training_set and validation_set to train each submodel, we needed predictions from both models on these same datasets to serve as the inputs to the ensemble_model.
 
 Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to train ensemble_model. We kept these callback definitions consistent with those used in the two submodels. If the accuracy on the validation dataset did not improve after 20 epochs, the model training would come to an early stop rather than continue on for 100 epochs. Similarly, we defined a filepath to save the best version of the model (that with the maximum validation accuracy). 
 
@@ -320,6 +317,12 @@ Chaining two models together means creating a composite, where the first model's
 Model chaining can be performed using the Functional API in a Keras framework, which allows for flexible connection of layers and models.
 
 Unlike in the case of ensembling models, where data augmentation and rescaling can be applied in both submodels, chaining two models requires specifying data augmentation and rescaling only in first model.
+
+### Modifying second_model for compatibility with ensembling first_model
+
+Our second_model also underwent some adjustments to make it compatible with ensembling and chaining with first_model. While second_model was initially defined and trained using the Sequential API, characteristics of this API proved complicating when it came to ensemble and chain with first_model. Our first_model had been defined using the Functional API to accommodate the ResNet50's greater complexity. As such, second_model was redefined, compiled, and trained with the Functional API. 
+
+Both models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20. 
 
 <img width="802" alt="Screenshot 2024-09-08 200128" src="https://github.com/user-attachments/assets/37e73cb5-bcc5-499d-897c-ad995d6fdd8a">
 <img width="879" alt="Screenshot 2024-09-08 200231" src="https://github.com/user-attachments/assets/be08bfe1-f3a5-44b0-b4aa-fa05c2ee3e1e">
