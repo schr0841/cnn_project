@@ -208,16 +208,18 @@ We asked Claude AI if it could come up with an implementation of simple boosted 
 
 # Ensembling versus Chaining Models
 
-We trained the ResNet50-based model (first_model) and the cnn base model (second_model) on the CT chest scan images in the training_set (613 images) and validation_set (315 images) directories. We maintained for evaluation puposes 72 unseen images in the testing_set directory. All images pertained to one of four classes, with one class comprised of cancer-free images and the other three classes pertaining to three different types of cancer. 
+We defined, compiled, and trained the ResNet50-based (first_model) and the CNN base model (second_model) individually before ensembling and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining first_model and second_model, and if the manner in which we combined the models (ensembling versus chaining) would generate a noticeable accuracy difference between the two methods.
 
-The data sets were generated using the tf.keras.preprocessing.image_dataset_from_directory method. This is to say they were not generated using the ImageDataGenerator, as datasets elsewhere in this study may have been generated. Also of note, the image_size was set to (224, 224) because the ResNet50-based model expects images of that size. For purposes of consistency, the image_size was set to (224, 224) for the custom_cnn_model as well. label_mode for the three datasets were set to "int" (integer) because images belong to one of four classes. 
+We trained first_model and second_model on the CT chest scan images in the training_set (613 images) and validation_set (315 images) directories. We maintained for evaluation puposes 72 unseen images in the testing_set directory. All images pertained to one of four classes, with one class comprised of cancer-free images and the other three classes indicating three different types of cancer. 
+
+We used the preprocessing.image_dataset_from_directory method to generate the three data sets. This is to say we did not use the ImageDataGenerator to create the datasets, as may have been done elsewhere in this study. Also of note, we set the image_size to (224, 224) for first_model because ResNet50-based models expect images of that size. For purposes of consistency, we set the image_size to (224, 224) for second_model as well. We set label_mode for the three datasets to "int" (integer) because all images in this study belong to one of four classes. 
 
 <img width="761" alt="Screenshot 2024-09-11 171824" src="https://github.com/user-attachments/assets/569253a0-4c3b-4329-9596-c99e7dbc291a">
 <img width="685" alt="Screenshot 2024-09-11 171939" src="https://github.com/user-attachments/assets/d9ca206c-6903-48b6-a523-ae54cd1d9404">
 
-We defined, compiled, trained, and evaluated both models individually before turning our attention to ensembling and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining firat_model and second_model, and if there would be a noticeable difference between ensembling accuracy and chaining accuracy.
 
-The original ResNet50 model is pretrained on a multi-million image dataset with 1,000 classes of images. To make it capable of classifying our chest ct scans into four distinct classes, we had to add some custom layers to it, resulting in the definition of first_model. As the cnn base model, second_model, was designed to accomplish the task at hand, alternations to this model were not necessary until it came time to chain the models.
+The original ResNet50 model is pretrained on a multi-million image dataset with 1,000 classes of images. To make it capable of classifying our chest ct scans into four distinct classes, we had to add some custom layers to it and remove its original output layer. first_model became our resulting ResNet50-based model. As we designed the cnn base model, second_model, for our four-class classification, we did not need to make any alternations to this model until it came time to chain first_model and second_model.
+
 
 ### first_model
 <img width="747" alt="Screenshot 2024-09-12 165648" src="https://github.com/user-attachments/assets/5095917b-e89a-4d8f-94be-c6aab6a140fd">
@@ -239,9 +241,9 @@ The original ResNet50 model is pretrained on a multi-million image dataset with 
 
 ### Use of Data Augmentation and Rescaling
 
-When ensembling two models, it is appropriate to apply data augmentation and rescaling in both submodels. It is also appropriate to apply data augmentation and rescaling early in the model pipeline. In particular, data augmentation should come before rescaling, right after defining the model's input layer. Because the ResNet50 model expects pixel values of the inputs to be normalized to a range between 0 and 1, rescaling needs to be performed before passing the images into ResNet50.  
+When ensembling two models, it is appropriate to apply data augmentation and rescaling in both submodels. It is also appropriate to apply data augmentation and rescaling early in the model pipeline. In particular, data augmentation should come before rescaling, right after defining the model's input layer. Because the ResNet50 base model component of our first_model expects inputs' pixel values to be normalized to a range between 0 and 1, we rescale the input data before passing it to the ResNet50 layers.  
 
-We applied augmentation and rescaling within first_model (the ResNet50-based model) and second_model (the base cnn model) by   
+We applied augmentation and rescaling within first_model and second_model by   
 a) defining data augmentation layers within a Sequential model    
 b) applying the data augmentation layers to the input tensor    
 c) including the augmented inputs as part of a Rescaling layer  
@@ -250,7 +252,8 @@ Even though we created first_model with the Functional API, the data augmentatio
 
 Including the augmented inputs as part of the Rescaling layer was necessary because in the Functional API, the data flow between model layers is explicitly defined by passing the output of one layer as the input to next layer. In the scaled_inputs = Rescaling(1./255)(augmented_inputs) statement, the '(augmented_inputs)' explicitly indicates the rescaling operation should be applied to the output of the previous layer, augmented_inputs. Without passing '(augmented_inputs)' as the input, the models would not know which data should be rescaled.   
 
-### Modifying pretrained ResNet50 model into first_model, compatible with second_model
+
+### Modifying pretrained ResNet50 model into first_model, compatible with ensembling second_model
 
 To prevent the ResNet50-based model from generating a 1,000-classs classification for the ct scans in the input dataset, we "removed" its output layer by setting include_top=False. To keep ResNet50's pretrained weights from being updated during training on our data, we froze its layers by specifying layer.trainable = False. Freezing layers enables the model to retain the features it learned from pretraining on a large image data set. In other words, freezing layers prevents the learned features from being overwritten. Common in transfer learning, layer freezing effectively turns a pretrained model into a feature extractor. The custom layers we added to the "feature extractor" then produced the four-class classification, drawing from the ResNet50's learned features.
 
@@ -268,7 +271,8 @@ e) Dense(class_count, activation = 'softmax') to output a probability distributi
 
 ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048). Adding custom layers on top of ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
 
-### Modifying second_model for compatibility with first_model
+
+### Modifying second_model for compatibility with ensembling first_model
 
 Our second_model also underwent some adjustments to make it compatible with ensembling and chaining with first_model. While second_model was initially defined and trained using the Sequential API, characteristics of this API proved complicating when it came to ensemble and chain with first_model. Our first_model had been defined using the Functional API to accommodate the ResNet50's greater complexity. As such, second_model was redefined, compiled, and trained with the Functional API. 
 
