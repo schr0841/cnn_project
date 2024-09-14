@@ -218,7 +218,7 @@ We used the preprocessing.image_dataset_from_directory method to generate the th
 <img width="685" alt="Screenshot 2024-09-11 171939" src="https://github.com/user-attachments/assets/d9ca206c-6903-48b6-a523-ae54cd1d9404">
 
 
-### Building first-model from pretrained ResNet50
+### Building first_model from pretrained ResNet50
 
 The original ResNet50 model is pretrained on a multi-million image dataset with 1,000 classes of images. To make it capable of classifying our chest ct scans into four distinct classes, we had to add some custom layers to it and remove its original output layer. first_model became our resulting ResNet50-based model.
 
