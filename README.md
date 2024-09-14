@@ -264,7 +264,8 @@ Including the augmented inputs as part of the Rescaling layer was necessary beca
 
 ### second_model
 
- As we designed the cnn base model, second_model, for our four-class classification task, no alternations to this model were necessary until it came time to chain first_model and second_model.
+As we designed the cnn base model, second_model, for our four-class classification task, few alternations to this model were necessary until it came time to chain first_model and second_model.
+The one modification we made prior to training second_model was to re-define and re-train it using the Functional API. In earlier attempts to ensembled second_model with first_model, our initial choice of defining and training second_model using the Sequential API proved complicating. We defined and trained first_model using the Functional API, to accommodate the ResNet50's greater complexity, but not second_model. As such, we neede to redefine, recompiled, and retrained second_model the Functional API. 
 
 <img width="604" alt="Screenshot 2024-09-12 171903" src="https://github.com/user-attachments/assets/312f8c83-9813-4799-b194-45a155e49f9e">
 <img width="532" alt="Screenshot 2024-09-12 172026" src="https://github.com/user-attachments/assets/68ef61bd-6b44-4980-8271-980c9318a537">
@@ -273,6 +274,7 @@ Including the augmented inputs as part of the Rescaling layer was necessary beca
 <img width="660" alt="Screenshot 2024-09-12 172528" src="https://github.com/user-attachments/assets/4e076027-c55e-4146-a3f6-368c6cecf27e">
 
 
+We compiled both models with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. We trained both with x as the training_set dataset and validation_data as the validation_set dataset. Training lasted for 100 epochs, unless our EarlyStopping callback - set to monitor 'val_accuracy' with a patience value of 20 - stopped training early. 
 
 ## Ensembling Models
 
@@ -335,19 +337,7 @@ Because we are turning first_model's output into second_model's input, some adju
 
 ## Modifying second_model to be compatibile for chaining
 
-In ordet to chain second_model with mod_resnet_model, we needed to omit data augmentation and rescaling and remove a number of second_model layers that become redundant when chaining with mod_resnet_model. Also, while second_model was initially defined and trained using the Sequential API, characteristics of this API proved complicating when it came to ensemble and chain with first_model. Our first_model had been defined using the Functional API to accommodate the ResNet50's greater complexity. As such, second_model was redefined, compiled, and trained with the Functional API. We named this altered version of second_model 'mod_custom_cnn_model' to keep the two distinct. 
-
-
-##
-
-Both models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20. 
-
-<img width="802" alt="Screenshot 2024-09-08 200128" src="https://github.com/user-attachments/assets/37e73cb5-bcc5-499d-897c-ad995d6fdd8a">
-<img width="879" alt="Screenshot 2024-09-08 200231" src="https://github.com/user-attachments/assets/be08bfe1-f3a5-44b0-b4aa-fa05c2ee3e1e">
-<img width="866" alt="Screenshot 2024-09-08 200435" src="https://github.com/user-attachments/assets/3e58715e-ffaf-4d2c-ab69-6391355aa068">
-
-
-
+In ordet to chain second_model with mod_resnet_model, we needed to omit data augmentation and rescaling and remove a number of second_model layers that become redundant when chaining with mod_resnet_model. We named this altered version of second_model 'mod_custom_cnn_model' to keep the two distinct. 
 
 
 
