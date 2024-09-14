@@ -339,7 +339,9 @@ Because we are turning first_model's output into second_model's input, some adju
 
 In ordet to chain second_model with mod_resnet_model, we needed to omit data augmentation and rescaling and remove a number of second_model layers that become redundant when chaining with mod_resnet_model. We named this altered version of second_model 'mod_custom_cnn_model' to keep the two distinct. 
 
-
+<img width="842" alt="Screenshot 2024-09-14 153749" src="https://github.com/user-attachments/assets/c6002003-e154-41e7-bc5a-f637e52ed3c8">
+<img width="626" alt="Screenshot 2024-09-14 154038" src="https://github.com/user-attachments/assets/f6121c95-a8bc-4c68-ba94-31065ce5b3e4">
+<img width="681" alt="Screenshot 2024-09-14 154139" src="https://github.com/user-attachments/assets/6b110560-9229-4614-b5b6-7e452b5c69ed">
 
 
 ## Evaluating all four models
