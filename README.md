@@ -276,8 +276,8 @@ Including the augmented inputs as part of the Rescaling layer was necessary beca
 
 ## Ensembling Models
 
-After training first_model and second_model, we created a third model, ensemble_model, to average the first two models' output
-. 
+After training first_model and second_model, we created a third model, ensemble_model, to average the first two models' output. 
+
 
 ### Extracting dataset labels
 
@@ -318,16 +318,28 @@ We compile and train the ensemble model in the same manner as its two submodels.
 
 ### Chaining Models
 
-Chaining two models together means creating a composite, where the first model's output becomes the second model's input. In this scenario, there is no third model to process the outputs of the two submodels. 
+Chaining two models together means creating a composite model, where the first model's output becomes the second model's input. In this scenario, there is no third model to process the outputs of the two submodels. Similarly, the output of the first model in a two-model chain is not a classification, but features that will help the final model in the chain make a classification.
 
 Model chaining can be performed using the Functional API in a Keras framework, which allows for flexible connection of layers and models.
 
 Unlike with ensembling models, where data augmentation and rescaling can be applied in both submodels, chaining two models requires specifying data augmentation and rescaling only in first model.
 
 
-### Modifying second_model to be compatibile with chaining first_model
+## Modifying first_model from classifier to feature extractor
 
-Our second_model also underwent some adjustments to make it compatible with ensembling and chaining with first_model. While second_model was initially defined and trained using the Sequential API, characteristics of this API proved complicating when it came to ensemble and chain with first_model. Our first_model had been defined using the Functional API to accommodate the ResNet50's greater complexity. As such, second_model was redefined, compiled, and trained with the Functional API. 
+Because we are turning first_model's output into second_model's input, some adjustments to the original versions of these models became necessary. In particular, first_model needed to be redefined from a classifier to a feature extractor. That is, first_model now needed to process raw input data (the ct scans) and produce informative features to be used for classification in a subsequent model in the chain. Pretrained models like ResNet50 are often used as feature extractors in transfer learning because they have already learned useful patterns from large datasets on which they were trained. These patterns, or features, are reusable for new tasks. To diffferentiate first_model and these modifications, we called our modified first_model 'mod_resnet_model'.
+
+<img width="688" alt="Screenshot 2024-09-12 174703" src="https://github.com/user-attachments/assets/903f1534-2125-4450-b4e4-f97746407d0d">
+<img width="809" alt="Screenshot 2024-09-12 174943" src="https://github.com/user-attachments/assets/3c474880-558b-45cc-9692-530b47a2a738">
+<img width="808" alt="Screenshot 2024-09-12 175058" src="https://github.com/user-attachments/assets/959efbb6-01d3-4880-994f-12b93e64cb99">
+
+
+## Modifying second_model to be compatibile with chaining first_model
+
+In ordet to chain second_model with mod_resnet_model, we needed to omit data augmentation and rescaling and remove a number of second_model layers that become redundant when chaining with mod_resnet_model. Also, while second_model was initially defined and trained using the Sequential API, characteristics of this API proved complicating when it came to ensemble and chain with first_model. Our first_model had been defined using the Functional API to accommodate the ResNet50's greater complexity. As such, second_model was redefined, compiled, and trained with the Functional API. 
+
+
+ mod_custom_cnn_model.
 
 Both models were compiled with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. Both were trained with x as the training_set dataset, with validation_data specified as the validation_set dataset, on 100 epochs, and with an EarlyStopping callback set to monitor 'val_accuracy' with a patience value of 20. 
 
@@ -336,16 +348,7 @@ Both models were compiled with the Adam optimizer, and with the loss function se
 <img width="866" alt="Screenshot 2024-09-08 200435" src="https://github.com/user-attachments/assets/3e58715e-ffaf-4d2c-ab69-6391355aa068">
 
 
-## Modifying first_model and second_model to enable chaining
 
-Because we are turning the output of the first model into the input of the second model, some adjustments to the original versions of first_model and second_model became necessary. In particular, we needed to omit data augmentation and rescaling from second_model and remove a number of its previously-defined layers that become redundant when chaining with the ResNet50-based first_model.
-
-Modifications to the original version of first_model were required to convert this model from a classifier to a feature extractor. That is, the chainable version of first_model needed to process raw input data (the ct scans) and produce a set of informative features that can (eventually) be used for classification tasks. Pretrained models like ResNet50 are often used as feature extractors in transfer learning because they have already learned useful patterns from large datasets on which they were trained. These patterns, or features, are reusable for new tasks. 
-
-
-<img width="688" alt="Screenshot 2024-09-12 174703" src="https://github.com/user-attachments/assets/903f1534-2125-4450-b4e4-f97746407d0d">
-<img width="809" alt="Screenshot 2024-09-12 174943" src="https://github.com/user-attachments/assets/3c474880-558b-45cc-9692-530b47a2a738">
-<img width="808" alt="Screenshot 2024-09-12 175058" src="https://github.com/user-attachments/assets/959efbb6-01d3-4880-994f-12b93e64cb99">
 
 
 
