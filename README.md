@@ -315,11 +315,6 @@ The model itself is relatively simple; we are only averaging the fist and second
 We compile and train the ensemble model in the same manner as its two submodels. Here, our x value becomes the averaged training_set predictions from the first and second model, while our y values become the true labels corresponding to the averaged training predictions. Finally, the validation_data for the ensemble model is the averaged predictions from the two submodels on the validation dataset and the true labels for the validation dataset itself. 
 
 
-<img width="844" alt="Screenshot 2024-09-08 173247t" src="https://github.com/user-attachments/assets/32f297f2-743d-4a63-9095-dcb8a8e39428">
-<img width="875" alt="Screenshot 2024-09-08 173359" src="https://github.com/user-attachments/assets/457282e9-2418-41e3-afaf-6554c509089f">
-<img width="854" alt="Screenshot 2024-09-08 173504" src="https://github.com/user-attachments/assets/94c12058-bc1e-420e-a0f3-ed0e73dc0a18">
-
-
 ## Chaining Models
 
 Chaining two models together means creating a composite model, where the first model's output becomes the second model's input. In this scenario, there is no third model to process the outputs of the two submodels. Similarly, the output of the first model in a two-model chain is not a classification, but features that will help the final model in the chain make a classification.
