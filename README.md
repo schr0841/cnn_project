@@ -229,7 +229,7 @@ We used the preprocessing.image_dataset_from_directory method to generate the th
 
 The original ResNet50 model is pretrained on a multi-million image dataset with 1,000 classes of images. To make it capable of classifying our chest ct scans into four distinct classes, we had to add some custom layers to it and remove its original output layer. first_model became our resulting ResNet50-based model.
 
-To prevent the ResNet50-based model from generating a 1,000-classs classification for the ct scans in the input dataset, we "removed" its output layer by setting include_top=False. To keep ResNet50's pretrained weights from being updated during training on our data, we froze its layers by specifying layer.trainable = False. Freezing layers enables the model to retain the features it learned from pretraining on a large image data set. In other words, freezing layers prevents the learned features from being overwritten. Common in transfer learning, layer freezing effectively turns a pretrained model into a feature extractor. The custom layers we added to the "feature extractor" then produced the four-class classification, drawing from the ResNet50's learned features.
+To prevent the ResNet50-based model from generating a 1,000-classs classification for the ct scans in the input dataset, we "removed" its output layer by setting include_top=False. To keep ResNet50's pretrained weights from being updated during training on our data, we froze its layers by specifying layer.trainable = False. Freezing layers enabled the ResNet50 base_model to retain the features it learned from pretraining on the much larger ImageNet data set. In other words, freezing layers prevented the learned features from being overwritten. Common in transfer learning, layer freezing effectively turns a pretrained model into a feature extractor. The custom layers we added to the "feature extractor" then produced the four-class classification, drawing from the ResNet50's learned features.
 
 Specifically, we added the following custom layers:    
 
@@ -243,7 +243,7 @@ d) Dropout(0.3) to prevent overfitting by forcing the model to learn more robust
 
 e) Dense(class_count, activation = 'softmax') to output a probability distribution across the classes (whose number is given by class_count). Each value in the probability distribution corresponds to the predicted probability that the input image belongs to a given class    
 
-ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048). Adding custom layers on top of ResNet50 allows us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assist with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduces the dimensionality of the original ResNet50 model's output, making it more managable for the final output layer which outputs probabilities for each class.
+ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048). Adding custom layers on top of ResNet50 allowed us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assisted with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduced the dimensionality of the ResNet50 base_model's output, making it more managable for the final output layer to generate probabilities for each class.
 
 
 ### first_model
@@ -257,7 +257,7 @@ ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7
 
 ### Use of Data Augmentation and Rescaling
 
-When ensembling two models, it is appropriate to apply data augmentation and rescaling in both submodels. It is also appropriate to apply data augmentation and rescaling early in the model pipeline. In particular, data augmentation should come before rescaling, right after defining the model's input layer. Because the ResNet50 base model component of our first_model expects inputs' pixel values to be normalized to a range between 0 and 1, we rescale the input data before passing it to the ResNet50 layers.  
+When ensembling two models, it is appropriate to apply data augmentation and rescaling in both submodels. It is also appropriate to apply data augmentation and rescaling early in the model pipeline. In particular, data augmentation should come before rescaling, right after defining the model's input layer. Because the ResNet50 base_model component of our first_model expected inputs' pixel values to be normalized to a range between 0 and 1, we rescaled the input data before passing it to the ResNet50 layers.  
 
 We applied augmentation and rescaling within first_model and second_model by   
 a) defining data augmentation layers within a Sequential model    
