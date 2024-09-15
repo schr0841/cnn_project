@@ -313,14 +313,8 @@ Then we defined the training and validation inputs to the ensemble_model as the 
 
 For each sample image in the batch, however, the output is a vector of length (4,) the predicted probabilities for each class. While the None dimension appears in the tensor shape when considering the entire batch of samples (to indicates a non-fixed batch size), None becomes irrelevant in the shape of single sample's output. The output shape for each individual sample, ignoring batch, is just (4,).
 
- the inputs typically consist of the submodels' class probabilities but in shape (4,).  since these outputs represent predictions for each class, they are of shape (4,) (for each sample).
+The ensemble_model operates on individual predictions per sample image rather than on an entire batch at once. Thus, it expects vectors of shape (4,) for inputs. When we reshaped the submodels' outputs from (None, 4) to (4,), we extracted the predictions sample by sample. This shape enabled the ensemble_model to combine the class probabilities from each submodel for each sample. 
 
-a. Removing the Batch Dimension (None):
-The None dimension (batch size) is not always relevant when combining the predictions from two models because the ensemble model needs to operate on the individual predictions for each image, not the entire batch at once.
-By reshaping the output from (None, 4) to (4,), you extract the prediction for a single sample (one image). This ensures that the ensemble model can work on combining the class probabilities from both submodels for that specific sample.
-b. Ensuring Input Compatibility in the Ensemble:
-In an ensemble model, the inputs typically consist of the outputs of the submodels (the class probabilities). Since these outputs represent predictions for each class, they are of shape (4,) (for each sample).
-For the ensemble to properly process these predictions, it expects inputs of shape (4,). By reshaping (None, 4) to (4,), you are ensuring that each sample’s prediction is passed into the ensemble in the correct format (without the batch dimension).
 c. Combining Outputs on a Per-Sample Basis:
 When combining outputs from two submodels, you typically combine their predictions for each image/sample. So, for an image, you would want to combine two vectors of shape (4,) from the two submodels.
 If you don’t reshape the outputs to (4,) per image, you’d be attempting to combine outputs for entire batches at once, which adds unnecessary complexity. Instead, reshaping ensures that the ensemble model can focus on the class probabilities for each individual sample.
