@@ -284,12 +284,12 @@ We compiled both models with the Adam optimizer, and with the loss function set 
 
 ## Ensembling Models
 
-After training first_model and second_model, we created a third model, ensemble_model, to average the first two models' output. 
+After training first_model and second_model, we created a third model, ensemble_model, to average the first two models' output. The submodels output predictions of shape (None, 4). The ensemble_model takes these outputs as inputs. We do not feed the same image datasets we fed to the submodels to the ensemble_model. Only the predictions (outputs) from first_model and second_model are inputs to ensemble_model.
 
 
 ### Extracting dataset labels
 
-The ouputs of first_model and second_model become the inputs to ensemble_model. Unlike the original input data, which contained images and class labels, the input to the ensemble model lacks labels. Thus, we needed to extract the labels from the TensorFlow datasets and give them to ensemble_model. These labels are necessary for the ensembled model to compute loss values, which entails comparing predictions to true labels. 
+Unlike the original input datasets, which contained images and class labels, the inputs to the ensemble_model lacks labels. Thus, we needed to extract the labels from the TensorFlow datasets and give them to ensemble_model. These labels are necessary for the ensemble_model to compute loss values, which entails comparing predictions to true labels. 
 
 <img width="882" alt="Screenshot 2024-09-12 175710" src="https://github.com/user-attachments/assets/69059f24-a3d8-4070-923d-044300a42ec1">
 <img width="646" alt="Screenshot 2024-09-12 180029" src="https://github.com/user-attachments/assets/ba9baf12-5de0-41f9-8795-7aeebefafeb2">
@@ -309,9 +309,11 @@ Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to t
 <img width="744" alt="Screenshot 2024-09-12 180909" src="https://github.com/user-attachments/assets/17d05e57-f4fa-4e6a-a1e5-ba0acc50a42f">
 
 
-Then we defined the training and validation inputs to the ensemble_model as the average of the training predictions made by first_model and second_model and the average of the validation predictions made by first_model and second_model. Because these submodels' outputs/ensemble model's inputs have shape (4,), we set the input shape of the ensemble_input to (4,). 
+Then we defined the training and validation inputs to the ensemble_model as the average of the training predictions made by first_model and second_model and the average of the validation predictions made by first_model and second_model. These submodels' outputs have shape (None, 4), where None represents the variable batch size and 4 represents the class probabilities for each image in the batch.
 
-When ensembling two models, it’s important to combine the predictions for each individual sample (or image). Here’s why reshaping is necessary:
+To ensemble first_model and second_model, we had to reshape their output to be compatible with what the ensemble_model expected of an input.
+
+the inputs typically consist of the submodels' class probabilities but in shape (4,).  since these outputs represent predictions for each class, they are of shape (4,) (for each sample).
 
 a. Removing the Batch Dimension (None):
 The None dimension (batch size) is not always relevant when combining the predictions from two models because the ensemble model needs to operate on the individual predictions for each image, not the entire batch at once.
