@@ -297,7 +297,7 @@ Unlike the original input datasets, which contained images and class labels, the
 
 ### Preparing data and building ensemble model to average outputs
 
-Before we built the ensemble_model to process the two submodels's output (predictions), we needed to generate predictions from first_model and second_model using the training_set and validation_set. Because we used both training_set and validation_set to train each submodel, we needed predictions from both models on these same datasets to serve as the inputs to the ensemble_model
+Before we built the ensemble_model to process the two submodels's output (predictions), we needed to generate predictions from first_model and second_model using the training_set and validation_set. Because we used both training_set and validation_set to train each submodel, we needed predictions from these same models on the same datasets to serve as the inputs to the ensemble_model
 
 
 <img width="697" alt="Screenshot 2024-09-12 180637" src="https://github.com/user-attachments/assets/e7dac44d-157e-43c5-946c-6cd13fc357ac">
@@ -309,11 +309,11 @@ Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to t
 <img width="744" alt="Screenshot 2024-09-12 180909" src="https://github.com/user-attachments/assets/17d05e57-f4fa-4e6a-a1e5-ba0acc50a42f">
 
 
-Then we defined the training and validation inputs to the ensemble_model as the average of the training predictions made by first_model and second_model and the average of the validation predictions made by first_model and second_model. These submodels' outputs have shape (None, 4), where None represents the variable batch size and 4 represents the class probabilities for each image in the batch.
+Then we defined the training and validation inputs to the ensemble_model as the average of the training predictions made by first_model and second_model and the average of the validation predictions made by first_model and second_model. The submodels' outputs have shape (None, 4), where None represents the variable batch size and 4 represents the class probabilities for each image in the batch. To ensemble first_model and second_model, we had to reshape their output to be compatible the ensemble_model's input expectations. 
 
-To ensemble first_model and second_model, we had to reshape their output to be compatible with what the ensemble_model expected of an input.
+For each sample image in the batch, however, the output is a vector of length (4,) the predicted probabilities for each class. While the None dimension appears in the tensor shape when considering the entire batch of samples (to indicates a non-fixed batch size), None becomes irrelevant in the shape of single sample's output. The output shape for each individual sample, ignoring batch, is just (4,).
 
-the inputs typically consist of the submodels' class probabilities but in shape (4,).  since these outputs represent predictions for each class, they are of shape (4,) (for each sample).
+ the inputs typically consist of the submodels' class probabilities but in shape (4,).  since these outputs represent predictions for each class, they are of shape (4,) (for each sample).
 
 a. Removing the Batch Dimension (None):
 The None dimension (batch size) is not always relevant when combining the predictions from two models because the ensemble model needs to operate on the individual predictions for each image, not the entire batch at once.
