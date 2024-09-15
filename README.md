@@ -227,7 +227,7 @@ We used the preprocessing.image_dataset_from_directory method to generate the th
 
 ### Building first_model from pretrained ResNet50
 
-The original ResNet50 model is pretrained on a multi-million image ImageNet dataset with 1,000 classes of images. To make it capable of classifying our chest ct scans into four distinct classes, we had to add some custom layers to it and remove its original output layer. These modifications to the ResNet50 model became our 'first_model'.
+The original ResNet50 model is pretrained on over a million images in 1,000 classes in the ImageNet dataset. To make it capable of classifying our chest ct scans into four distinct classes, we had to add some custom layers to it and remove its original output layer. These modifications to the ResNet50 model became our 'first_model'.
 
 To prevent the ResNet50 base_model within first_model from generating a 1,000-classs classification for the ct scans in the input dataset, we "removed" ResNet50's output layer by setting include_top=False. To keep ResNet50's pretrained weights from being updated during training on our data, we froze its layers by specifying layer.trainable = False. Freezing layers enabled the ResNet50 base_model to retain the features it learned from pretraining on the much larger ImageNet data set. In other words, freezing layers prevented the learned features from being overwritten. Common in transfer learning, layer freezing effectively turns a pretrained model into a feature extractor. The custom layers we added to the "feature extractor" then produced the four-class classification, drawing from the ResNet50's learned features.
 
@@ -243,7 +243,7 @@ d) Dropout(0.3) to prevent overfitting by forcing the model to learn more robust
 
 e) Dense(class_count, activation = 'softmax') to output a probability distribution across the classes (whose number is given by class_count). Each value in the probability distribution corresponds to the predicted probability that the input image belongs to a given class    
 
-ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048). Adding custom layers on top of the ResNet50 base_model allowed us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the custom_cnn_model, and chaining with the custom_cnn_model). Furthermore, the added BatchNormalization and Dropout layers assisted with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduced the dimensionality of the ResNet50 base_model's output, making it more managable for the final output layer to generate probabilities for each class.
+ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7, 2048). Adding custom layers on top of the ResNet50 base_model allowed us to adapt the pretrained model to fit our specific needs (e.g., completing a four-class classification task, ensembling with the base CNN model, and chaining with the base CNN model). Furthermore, the added BatchNormalization and Dropout layers assisted with regularizing the model, or improving its generalization on unseen data. At the same time, the custom Dense(256) layer reduced the dimensionality of the ResNet50 base_model's output, making it more managable for the final output layer to generate probabilities for each class.
 
 
 ### first_model
@@ -309,7 +309,31 @@ Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to t
 <img width="744" alt="Screenshot 2024-09-12 180909" src="https://github.com/user-attachments/assets/17d05e57-f4fa-4e6a-a1e5-ba0acc50a42f">
 
 
-Then we defined the training and validation inputs to the ensemble model as the average of the training predictions made by first_model and second_model and the average of the two submodels' predictions on the validation_set. Because these submodels' outputs/ensemble model's inputs have shape (4,), we set the input shape of the ensemble_input to (4,). 
+Then we defined the training and validation inputs to the ensemble_model as the average of the training predictions made by first_model and second_model and the average of the validation predictions made by first_model and second_model. Because these submodels' outputs/ensemble model's inputs have shape (4,), we set the input shape of the ensemble_input to (4,). 
+
+When ensembling two models, it’s important to combine the predictions for each individual sample (or image). Here’s why reshaping is necessary:
+
+a. Removing the Batch Dimension (None):
+The None dimension (batch size) is not always relevant when combining the predictions from two models because the ensemble model needs to operate on the individual predictions for each image, not the entire batch at once.
+By reshaping the output from (None, 4) to (4,), you extract the prediction for a single sample (one image). This ensures that the ensemble model can work on combining the class probabilities from both submodels for that specific sample.
+b. Ensuring Input Compatibility in the Ensemble:
+In an ensemble model, the inputs typically consist of the outputs of the submodels (the class probabilities). Since these outputs represent predictions for each class, they are of shape (4,) (for each sample).
+For the ensemble to properly process these predictions, it expects inputs of shape (4,). By reshaping (None, 4) to (4,), you are ensuring that each sample’s prediction is passed into the ensemble in the correct format (without the batch dimension).
+c. Combining Outputs on a Per-Sample Basis:
+When combining outputs from two submodels, you typically combine their predictions for each image/sample. So, for an image, you would want to combine two vectors of shape (4,) from the two submodels.
+If you don’t reshape the outputs to (4,) per image, you’d be attempting to combine outputs for entire batches at once, which adds unnecessary complexity. Instead, reshaping ensures that the ensemble model can focus on the class probabilities for each individual sample.
+3. Example Scenario:
+Suppose you have two submodels, both producing outputs of shape (None, 4) after processing a batch of images.
+Each model outputs a batch of predictions, say (32, 4) if your batch size is 32.
+However, for ensembling, the goal is to combine the predictions for each image (i.e., combine two (4,) vectors).
+Reshaping the outputs from (None, 4) to (4,) ensures that each sample’s (or image's) prediction is treated individually when passed into the ensemble model.
+4. Practical Considerations:
+The reshaping typically happens inside the ensemble model definition, or at a point where you're combining the outputs of the submodels.
+If you concatenate or average the outputs of two models, you need the predictions for each sample to be in shape (4,), so they can be easily processed by the ensemble.
+5. Summary:
+The None in (None, 4) represents the batch size, and the 4 represents class probabilities for each sample.
+Reshaping from (None, 4) to (4,) when passing outputs to the ensemble ensures that each sample’s predictions are properly handled without the batch dimension, making it easier to combine the outputs from two models on a per-sample basis.
+This reshaping is necessary to ensure that the ensemble model can focus on combining or processing the predictions for each individual image rather than entire batches of predictions at once.
 
 
 <img width="871" alt="Screenshot 2024-09-12 181055" src="https://github.com/user-attachments/assets/e0521ee1-fe80-4b2a-8849-e28bc5529543">
