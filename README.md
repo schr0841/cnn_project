@@ -337,8 +337,35 @@ Because we are turning first_model's output into second_model's input, some adju
 
 ## Modifying second_model to be compatibile for chaining
 
-In ordet to chain second_model with mod_resnet_model, we needed to omit data augmentation and rescaling and remove a number of second_model layers that become redundant when chaining with mod_resnet_model. We named this altered version of second_model 'mod_custom_cnn_model' to keep the two distinct. 
+In ordet to chain second_model with mod_resnet_model, we needed to omit the data augmentation and rescaling layers. We also needed to remove a number of second_model layers that become redundant when chaining with mod_resnet_model. We named this altered version of second_model 'mod_custom_cnn_model' to keep the two distinct. 
 
+They layers we dropped from second_model to create mod_custom_cnn_model were the MaxPooling, Conv2D, and Dropout layers. The ResNet50-based model, first_model, already performs many of these operations. 
+
+1. Redundancy:
+ResNet50 is already a deep Convolutional Neural Network (CNN) that consists of multiple Conv2D layers, MaxPooling layers, and even Dropout can be applied afterward in the chain. These layers extract features at different spatial scales and hierarchies from the input image. Including your own convolution and pooling layers is redundant because ResNet50 already takes care of this feature extraction.
+
+Applying additional convolution and pooling layers before passing the data through ResNet50 could alter the features in a way that diminishes the effectiveness of ResNet50’s learned representations.
+
+2. ResNet50’s Architecture:
+ResNet50 is designed to take inputs of a specific shape (e.g., 224x224x3) and perform convolutional operations on these images. Adding your own Conv2D and MaxPooling layers before ResNet50 would modify the input shape, which may no longer be compatible with ResNet50’s expected input.
+
+ResNet50 includes downsampling via pooling and residual blocks, so stacking your own pooling and convolution operations can lead to too much downsampling or over-processing of features, resulting in poor performance or vanishing information.
+
+3. Chaining with ResNet50:
+When you chain models, ResNet50 typically serves as the feature extractor, meaning it is already optimized to capture intricate patterns in the image. You only need to add custom layers like dense layers on top of ResNet50’s output to adapt it to your specific classification task.
+
+The reason you can still include data augmentation and rescaling before ResNet50 is because these operations are not part of feature extraction; they just prepare the input image (scaling pixel values or augmenting the image with flips/rotations). However, convolution, pooling, and dropout operations are all feature extractors, which ResNet50 already handles.
+
+4. Transfer Learning:
+The power of transfer learning lies in leveraging pre-trained networks like ResNet50, which have already learned how to extract useful features from images. Your job is to take those features and apply them to your custom task, often by adding dense layers on top, not additional convolutions or poolings.
+Solution:
+Instead of defining your own Conv2D and MaxPooling2D layers, you should chain the output of ResNet50 directly to dense layers and any additional custom operations you want (e.g., BatchNormalization, Dropout, or Dense layers). This way, you use ResNet50 for feature extraction and adapt it to your problem by modifying only the top layers (classification head).
+
+Updated Model Flow:
+Data augmentation and Rescaling can be applied before the ResNet50 model.
+Use ResNet50 as the core feature extractor (instead of custom Conv2D and Pooling layers).
+Add custom Dense layers after ResNet50 to fine-tune the model for your specific classification task.
+This approach optimally uses the power of ResNet50’s deep architecture without redundant operations.
 
 
 <img width="842" alt="Screenshot 2024-09-14 153749" src="https://github.com/user-attachments/assets/c6002003-e154-41e7-bc5a-f637e52ed3c8">
