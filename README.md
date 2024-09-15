@@ -210,6 +210,9 @@ We asked Claude AI if it could come up with an implementation of simple boosted 
 
 We defined, compiled, and trained the ResNet50-based (first_model) and the CNN base model (second_model) individually before ensembling and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining first_model and second_model over each of the submodels, and whether the method used to combine models (ensembling versus chaining) made much of a difference.
 
+Because the ResNet50-based model and the CNN base model will be direct ensembled, both first_model and second_model need Dense layers as their final output layers, created with the Softmax activation function. Ensembling the two models require that both produce output tensors of identical shape 
+
+
 We trained first_model and second_model on the CT chest scan images in the training_set (613 images) and validation_set (315 images) directories. We maintained for evaluation puposes 72 unseen images in the testing_set directory. All images pertained to one of four classes, with one class comprised of cancer-free images and the other three classes indicating three different types of cancer. 
 
 We used the preprocessing.image_dataset_from_directory method to generate the three data sets. This is to say we did not use the ImageDataGenerator to create the datasets, as may have been done elsewhere in this study. Also of note, we set the image_size to (224, 224) for first_model because ResNet50-based models expect images of that size. For purposes of consistency, we set the image_size to (224, 224) for second_model as well. We set label_mode for the three datasets to "int" (integer) because all images in this study belong to one of four classes. 
