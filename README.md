@@ -271,8 +271,7 @@ Including the augmented inputs as part of the Rescaling layer was necessary beca
 
 ### second_model
 
-As we designed the cnn base model, second_model, for our four-class classification task, few alternations to this model were necessary until it came time to chain first_model and second_model. The one modification we made prior to training second_model was to re-define and 
-re-train it using the Functional API. In earlier attempts to ensembled second_model with first_model, our initial choice of defining and training second_model using the Sequential API proved complicating. We defined and trained first_model using the Functional API, to accommodate the ResNet50's greater complexity, but not second_model. As such, we neede to redefine, recompiled, and retrained second_model the Functional API. 
+As we designed the base cnn model, second_model, for our four-class classification task, few alternations to this model were necessary until it came time to chain first_model and second_model. The one modification we made prior to training second_model was to re-define and re-train it using the Functional API. In earlier attempts to ensembled second_model with first_model, our initial choice of defining and training second_model using the Sequential API proved complicating. We defined and trained first_model using the Functional API, to accommodate the ResNet50's greater complexity, but not second_model. As such, we neede to redefine, recompiled, and retrained second_model the Functional API. 
 
 <img width="604" alt="Screenshot 2024-09-12 171903" src="https://github.com/user-attachments/assets/312f8c83-9813-4799-b194-45a155e49f9e">
 <img width="532" alt="Screenshot 2024-09-12 172026" src="https://github.com/user-attachments/assets/68ef61bd-6b44-4980-8271-980c9318a537">
