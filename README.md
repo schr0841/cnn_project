@@ -264,8 +264,8 @@ Including the augmented inputs as part of the Rescaling layer was necessary beca
 
 ### second_model
 
-As we designed the cnn base model, second_model, for our four-class classification task, few alternations to this model were necessary until it came time to chain first_model and second_model.
-The one modification we made prior to training second_model was to re-define and re-train it using the Functional API. In earlier attempts to ensembled second_model with first_model, our initial choice of defining and training second_model using the Sequential API proved complicating. We defined and trained first_model using the Functional API, to accommodate the ResNet50's greater complexity, but not second_model. As such, we neede to redefine, recompiled, and retrained second_model the Functional API. 
+As we designed the cnn base model, second_model, for our four-class classification task, few alternations to this model were necessary until it came time to chain first_model and second_model. The one modification we made prior to training second_model was to re-define and 
+re-train it using the Functional API. In earlier attempts to ensembled second_model with first_model, our initial choice of defining and training second_model using the Sequential API proved complicating. We defined and trained first_model using the Functional API, to accommodate the ResNet50's greater complexity, but not second_model. As such, we neede to redefine, recompiled, and retrained second_model the Functional API. 
 
 <img width="604" alt="Screenshot 2024-09-12 171903" src="https://github.com/user-attachments/assets/312f8c83-9813-4799-b194-45a155e49f9e">
 <img width="532" alt="Screenshot 2024-09-12 172026" src="https://github.com/user-attachments/assets/68ef61bd-6b44-4980-8271-980c9318a537">
@@ -319,16 +319,16 @@ We compile and train the ensemble model in the same manner as its two submodels.
 
 ## Chaining Models
 
-Chaining two models together means creating a composite model, where the first model's output becomes the second model's input. In this scenario, there is no third model to process the outputs of the two submodels. Similarly, the output of the first model in a two-model chain is not a classification, but features that will help the final model in the chain make a classification.
+Chaining two models together means creating a composite model, where the first model's output becomes the input for the second model's layers. In this scenario, there is no third model to process the outputs of the two submodels. The output of the first model in a two-model chain is not a classification, but features that will help the second model's layers make a classification. Chaining two models results in a single model that can be trained end-to-end
 
 Model chaining can be performed using the Functional API in a Keras framework, which allows for flexible connection of layers and models.
 
-Unlike with ensembling models, where data augmentation and rescaling can be applied in both submodels, chaining two models requires specifying data augmentation and rescaling only in first model.
+Unlike with ensembling models, where data augmentation and rescaling can be applied in both submodels, chaining two models requires specifying data augmentation and rescaling only in the first model's layers.
 
 
 ## Modifying first_model from classifier to feature extractor
 
-Because we are turning first_model's output into second_model's input, some adjustments to the original versions of these models became necessary. In particular, first_model needed to be redefined from a classifier to a feature extractor. That is, first_model is now needed to process raw input data (the ct scans) and produce informative features to be used for classification in a subsequent model in the chain. Pretrained models like ResNet50 are often used as feature extractors in transfer learning because they have already learned useful patterns from large datasets on which they were trained. These patterns, or features, are reusable for new tasks. To diffferentiate first_model and these modifications, we called our modified first_model 'mod_resnet_model'.
+Because we are turning first_model's output into second_model's input, some adjustments to the original versions of these models became necessary. In particular, first_model needed to be redefined from a classifier to a feature extractor. That is, first_model became tasked with processing raw input data (the ct scans) and producing informative features to be used for classification in second_model's layers. Pretrained models like ResNet50 are often used as feature extractors in transfer learning because they have already learned useful patterns from the large datasets on which they were trained. These patterns, or features, are reusable for new tasks. To diffferentiate first_model and it's modified version, we called our modified first_model 'mod_resnet_model'.
 
 <img width="688" alt="Screenshot 2024-09-12 174703" src="https://github.com/user-attachments/assets/903f1534-2125-4450-b4e4-f97746407d0d">
 <img width="809" alt="Screenshot 2024-09-12 174943" src="https://github.com/user-attachments/assets/3c474880-558b-45cc-9692-530b47a2a738">
@@ -338,6 +338,8 @@ Because we are turning first_model's output into second_model's input, some adju
 ## Modifying second_model to be compatibile for chaining
 
 In ordet to chain second_model with mod_resnet_model, we needed to omit data augmentation and rescaling and remove a number of second_model layers that become redundant when chaining with mod_resnet_model. We named this altered version of second_model 'mod_custom_cnn_model' to keep the two distinct. 
+
+
 
 <img width="842" alt="Screenshot 2024-09-14 153749" src="https://github.com/user-attachments/assets/c6002003-e154-41e7-bc5a-f637e52ed3c8">
 <img width="626" alt="Screenshot 2024-09-14 154038" src="https://github.com/user-attachments/assets/f6121c95-a8bc-4c68-ba94-31065ce5b3e4">
