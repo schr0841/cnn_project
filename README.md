@@ -333,13 +333,13 @@ Because we are turning first_model's output into second_model's input, some adju
 
 ## Modifying second_model to be compatibile for chaining
 
-In ordet to chain second_model with mod_resnet_model, we needed to omit the data augmentation and rescaling layers. We also needed to remove a number of second_model layers that become redundant when chaining with mod_resnet_model. We named this altered version of second_model 'mod_custom_cnn_model' to keep the two distinct. 
+In order to chain second_model with mod_resnet_model, we needed to omit the data augmentation and rescaling layers. We also needed to remove a number of second_model layers that became redundant when chained with mod_resnet_model. We named this altered version of second_model 'mod_custom_cnn_model' to keep the two distinct. 
 
-They layers we dropped from second_model to create mod_custom_cnn_model were the MaxPooling, Conv2D, and Dropout layers. The first_model, baed on the ResNet50 model, already performs these operations in the first part of the chain. Reapplying these layers, by including them in second_model's layers, would be redundant and not necessarily improve performance. The point of chaining first_model and second_model is to use ResNet50 for feature extraction and then use second_model to perform further processing on the extracted features for classification purposes.
+The layers we dropped from second_model to create mod_custom_cnn_model were the MaxPooling, Conv2D, and Dropout layers. The first_model layers, based on the ResNet50 model, already performed these operations in the first part of the chain. Reapplying these layers, by including them in second_model's layers, would have been redundant and not necessarily improved performance. The point of chaining first_model and second_model was to use ResNet50 for feature extraction and then use second_model to perform further processing on the extracted features for classification purposes.
 
-Because ResNet50 already includes downsampling layers, adding additional pooling and convolution operations with second_model could result in too much downsampling or feature over-processing.
+Because ResNet50 already included downsampling layers, adding additional pooling and convolution operations with second_model could have resulted in too much downsampling or feature over-processing.
 
-It is appropriate to still include data augmentation and rescaling before the ResNet50 layers since these operations are not part of the feature extraction operations. These pre-processing layers simply prepare the input data for feature extraction.
+It was appropriate to still include data augmentation and rescaling before the ResNet50 layers since these operations were not part of the feature extraction operations. These pre-processing layers simply prepared the input data for feature extraction.
 
 
 <img width="842" alt="Screenshot 2024-09-14 153749" src="https://github.com/user-attachments/assets/c6002003-e154-41e7-bc5a-f637e52ed3c8">
@@ -349,12 +349,12 @@ It is appropriate to still include data augmentation and rescaling before the Re
 
 ## Evaluating all four models
 
-When it comes to evaluating the three models, the first and second models (the submodels) need to be evaluated on the unseen testing_set dataset to get unbiased performance metrics. 
+When it came to evaluating all four models, first_model and second_model (the submodels) needed to be evaluated on the unseen testing_set dataset to get unbiased performance metrics. 
 
-Evaluating the ensemble model is a matter of 
-a) averaging the predictions from the first and second models on the unseen testing_set,  
+Evaluating the ensemble model was a matter of 
+a) averaging the predictions from the two submodels models on the unseen testing_set,  
 b) extracting the labels from the testing_set, and   
-c) Estimating ensemble loss and ensemble accuracy by requesting ensemble_model.evaluate(ensemble_predictions, y_test).
+c) estimating ensemble loss and ensemble accuracy by requesting ensemble_model.evaluate(ensemble_predictions, y_test)
 
 <img width="625" alt="Screenshot 2024-09-08 185804" src="https://github.com/user-attachments/assets/fee59b88-88f0-4418-9eb0-2f0d37882922">
 <img width="489" alt="Screenshot 2024-09-08 185910" src="https://github.com/user-attachments/assets/77ae5b95-c029-4897-a964-52654d046a80">
