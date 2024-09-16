@@ -347,13 +347,14 @@ It was appropriate to still include data augmentation and rescaling before the R
 <img width="681" alt="Screenshot 2024-09-14 154139" src="https://github.com/user-attachments/assets/6b110560-9229-4614-b5b6-7e452b5c69ed">
 
 
-## Defining the chained model
+## Defining, compiling, and training the chained model
 
 We created the chained model by chaining the modified ResNet50-based model, 'mod_resnet_model', with the modified base cnn model, 'mod_custom_cnn_model'. The two individual models were, themselves, variations of first_model and second_model that made them compatible for chaining. 
 
 
 <img width="905" alt="Screenshot 2024-09-15 233258" src="https://github.com/user-attachments/assets/941da4a7-457b-400c-8f68-aa4f7edd8562">
-
+<img width="744" alt="Screenshot 2024-09-16 000001" src="https://github.com/user-attachments/assets/f890df19-4dfe-45cc-8dcc-d22f11cdee53">
+<img width="727" alt="Screenshot 2024-09-16 000138" src="https://github.com/user-attachments/assets/cf1444e4-6c06-4dba-8d51-e398b7573186">
 
 
 
