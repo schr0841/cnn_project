@@ -363,8 +363,16 @@ By defining mod_resnet_output as mod_resnet_model.output, we specified mod_resne
 ## Evaluating all four models
 When it came to evaluating all four models, first_model and second_model (the submodels) needed to be evaluated on the unseen testing_set dataset to get unbiased performance metrics. 
 
+With first_model, second_model, and chained_model already trained on the training_set and validated on the validation_set, and the best versions of these models saved, we evaluated these three models on the testing_data with the following statements:
 
+first_model_loss, first_model_accuracy = first_model.evaluate(testing_set)
+print(f"First model - Loss: {first_model_loss}, Accuracy: {first_model_accuracy}")
 
+second_model_loss, second_model_accuracy = second_model.evaluate(testing_set)
+print(f"Second model - Loss: {second_model_loss}, Accuracy: {second_model_accuracy}")
+
+chained_model_loss, chained_model_accuracy = first_model.evaluate(testing_set)
+print(f"Chained model - Loss: {chained_model_loss}, Accuracy: {chained_model_accuracy}")
 
 Evaluating the ensemble model was a matter of 
 a) averaging the predictions from the two submodels models on the unseen testing_set,  
@@ -379,10 +387,10 @@ c) estimating ensemble loss and ensemble accuracy by requesting ensemble_model.e
 
 | model | loss | accuracy | val_loss | val_accuracy |
 |-------|------|----------|----------|--------------|
-| first_model  | 0.0112  | 0.9644  | 2.0032 | 0.4539 |
-| second_model  | 0.0536 | 0.9837 | 0.6506 | 0.8317 |
-| ensemble_model | 0.0682 | 0.9886 | 2.0240 | 0.7365 |
-| chained_model | 0.0615 | 0.9902 | 2.9775 | 0.5111 |
+| first_model  |   |   |  |  |
+| second_model   |   |   |  |  |
+| ensemble_model  |   |   |  |  |
+| chained_model  |   |   |  |  |
 
 
 
