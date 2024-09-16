@@ -351,6 +351,8 @@ It was appropriate to still include data augmentation and rescaling before the R
 
 We created the chained model by chaining the modified ResNet50-based model, 'mod_resnet_model', with the modified base cnn model, 'mod_custom_cnn_model'. The two individual models were, themselves, variations of first_model and second_model that made them compatible for chaining. 
 
+By defining mod_resnet_output as mod_resnet_model.output, we specified mod_resnet_model's layers as the first 'link' in the chain. By specifying mod_custom_cnn_output = mod_custom_cnn_model(mod_resnet_output), we passed the first 'link's' output to the second 'link' in the chain, mod_custom_cnn_model, and defined the resulting output as mod_custom_cnn_output. This allowed us to define the composite model, chained_model, as Model(inputs=mod_resnet_model.input, outputs=mod_custom_cnn_output). Before training chained_model, we specified optimizer = Adam(), defined a filepath to save chained_model's best model, and defined equivalent EarlyStopping and ModelCheckpoint callbacks as we'd used previously. We trained chained_model on the dataset training_set and set validation_set as the validation_data.   
+
 
 <img width="905" alt="Screenshot 2024-09-15 233258" src="https://github.com/user-attachments/assets/941da4a7-457b-400c-8f68-aa4f7edd8562">
 <img width="744" alt="Screenshot 2024-09-16 000001" src="https://github.com/user-attachments/assets/f890df19-4dfe-45cc-8dcc-d22f11cdee53">
