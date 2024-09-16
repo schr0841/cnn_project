@@ -297,7 +297,7 @@ Unlike the original input datasets, which contained images and class labels, the
 
 ### Preparing data and building ensemble model to average outputs
 
-Before we built the ensemble_model to process the two submodels's output (predictions), we needed to generate predictions from first_model and second_model using the training_set and validation_set. Because we used both training_set and validation_set to train each submodel, we needed predictions from these same models on the same datasets to serve as the inputs to the ensemble_model
+Before we could built the ensemble_model to process the two submodels's output (predictions), we needed to generate predictions from first_model and second_model using the training_set and validation_set. Because we used both training_set and validation_set to train each submodel, we needed predictions from these same models on the same datasets to serve as the inputs to the ensemble_model
 
 
 <img width="697" alt="Screenshot 2024-09-12 180637" src="https://github.com/user-attachments/assets/e7dac44d-157e-43c5-946c-6cd13fc357ac">
@@ -309,12 +309,10 @@ Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to t
 <img width="744" alt="Screenshot 2024-09-12 180909" src="https://github.com/user-attachments/assets/17d05e57-f4fa-4e6a-a1e5-ba0acc50a42f">
 
 
-Then we defined the training and validation inputs to the ensemble_model as the average of the training predictions made by first_model and second_model and the average of the validation predictions made by first_model and second_model. The submodels' outputs have shape (None, 4), where None represents the variable batch size and 4 represents the class probabilities for each image in the batch. For each sample image in the batch, however, the output is a vector of length (4,) the predicted probabilities for each class. While the None dimension appears in the tensor shape when considering the entire batch of samples (to indicates a non-fixed batch size), it becomes irrelevant in the shape of single sample's output. 
+Then we defined the training and validation inputs to the ensemble_model as the average of the training predictions made by first_model and second_model and the average of the validation predictions made by first_model and second_model. The submodels' outputs have shape (None, 4), where None represents variable batch size and 4 represents the class probabilities for each image in the batch. Because the ensemble_model, on the other hand, processes individual predictions per sample, it expects inputs of shape (4,) that represent the 4 class probabilities for each sample. While the None dimension appears in the tensor shape of an entire batch of samples (to indicates a non-fixed batch size), it becomes irrelevant in the shape of single sample's output. 
 
-To ensemble first_model and second_model, we don't need to explicitly reshape their output to be compatible with the ensemble_model's input expectations (shape (4,)). In an ensemble_model designed to process averaged predictions, inputs for each sample need be a vector of the 4 class probability values. With Keras, we omit batch size when defining an input shape. Because Keras automatically handles batch size dynamically during training, it's only necessary to specify the shape of each sample. Thus, the input shape (4,) reflects the shape of the data entering the ensemble_model, a vector of 4 values per sample after averaging the submodels' predictions.
+To ensemble first_model and second_model, we don't need to explicitly reshape their output to be compatible with the ensemble_model's input expectations. The ensemble_model operates on individual predictions per sample image rather than on an entire batch at once. Thus, it's only necessary to specify the shape of each sample. Therefore, data enters ensemble_model in input shape (4,). In other words, the input is a vector of 4 values per sample after averaging the submodels' predictions.
 
-
-The ensemble_model operates on individual predictions per sample image rather than on an entire batch at once. Thus, it expects vectors of shape (4,) for inputs. When we reshaped the submodels' outputs from (None, 4) to (4,), we extracted the predictions sample by sample. This shape enabled the ensemble_model to combine the class probabilities from each submodel for each sample. 
 
 c. Combining Outputs on a Per-Sample Basis:
 When combining outputs from two submodels, you typically combine their predictions for each image/sample. So, for an image, you would want to combine two vectors of shape (4,) from the two submodels.
