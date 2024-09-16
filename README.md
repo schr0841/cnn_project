@@ -297,7 +297,7 @@ Unlike the original input datasets, which contained images and class labels, the
 
 ### Preparing data and building ensemble model to average outputs
 
-Before we could built the ensemble_model to process the two submodels's output (predictions), we needed to generate predictions from first_model and second_model using the training_set and validation_set. Because we used both training_set and validation_set to train each submodel, we needed predictions from these same models on the same datasets to serve as the inputs to the ensemble_model
+Before we could build the ensemble_model to process the two submodels's output (predictions), we needed to generate predictions from first_model and second_model using the training_set and validation_set. We had used both training_set and validation_set to train each submodel, so we needed predictions from these same models on the same datasets to be inputs to the ensemble_model
 
 
 <img width="697" alt="Screenshot 2024-09-12 180637" src="https://github.com/user-attachments/assets/e7dac44d-157e-43c5-946c-6cd13fc357ac">
@@ -309,26 +309,9 @@ Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to t
 <img width="744" alt="Screenshot 2024-09-12 180909" src="https://github.com/user-attachments/assets/17d05e57-f4fa-4e6a-a1e5-ba0acc50a42f">
 
 
-Then we defined the training and validation inputs to the ensemble_model as the average of the training predictions made by first_model and second_model and the average of the validation predictions made by first_model and second_model. The submodels' outputs have shape (None, 4), where None represents variable batch size and 4 represents the class probabilities for each image in the batch. Because the ensemble_model, on the other hand, processes individual predictions per sample, it expects inputs of shape (4,) that represent the 4 class probabilities for each sample. While the None dimension appears in the tensor shape of an entire batch of samples (to indicates a non-fixed batch size), it becomes irrelevant in the shape of single sample's output. 
+We defined ensemble_model to average the training_set and validation_set predictions made by first_model and second_model. Keras performs this averaging element-wise across the class probabilities for each sample. Thus, while the submodels' ouput were of shape (None, 4), with None representing variable batch size and 4 representing class probabilities for each image in the batch, the input flowing into ensemble_model needed to be (4,). With ensemble_model processing individual predictions per sample, it expected inputs of shape (4,) representing the 4 class probabilities for each sample. The None dimension appeared in the tensor shape of an entire batch of samples but became irrelevant for the shape of a single sample's output. 
 
-To ensemble first_model and second_model, we don't need to explicitly reshape their output to be compatible with the ensemble_model's input expectations. The ensemble_model operates on individual predictions per sample image rather than on an entire batch at once. Thus, it's only necessary to specify the shape of each sample. Therefore, data enters ensemble_model in input shape (4,). In other words, the input is a vector of 4 values per sample after averaging the submodels' predictions.
-
-
-c. Combining Outputs on a Per-Sample Basis:
-When combining outputs from two submodels, you typically combine their predictions for each image/sample. So, for an image, you would want to combine two vectors of shape (4,) from the two submodels.
-If you don’t reshape the outputs to (4,) per image, you’d be attempting to combine outputs for entire batches at once, which adds unnecessary complexity. Instead, reshaping ensures that the ensemble model can focus on the class probabilities for each individual sample.
-3. Example Scenario:
-Suppose you have two submodels, both producing outputs of shape (None, 4) after processing a batch of images.
-Each model outputs a batch of predictions, say (32, 4) if your batch size is 32.
-However, for ensembling, the goal is to combine the predictions for each image (i.e., combine two (4,) vectors).
-Reshaping the outputs from (None, 4) to (4,) ensures that each sample’s (or image's) prediction is treated individually when passed into the ensemble model.
-4. Practical Considerations:
-The reshaping typically happens inside the ensemble model definition, or at a point where you're combining the outputs of the submodels.
-If you concatenate or average the outputs of two models, you need the predictions for each sample to be in shape (4,), so they can be easily processed by the ensemble.
-5. Summary:
-The None in (None, 4) represents the batch size, and the 4 represents class probabilities for each sample.
-Reshaping from (None, 4) to (4,) when passing outputs to the ensemble ensures that each sample’s predictions are properly handled without the batch dimension, making it easier to combine the outputs from two models on a per-sample basis.
-This reshaping is necessary to ensure that the ensemble model can focus on combining or processing the predictions for each individual image rather than entire batches of predictions at once.
+To ensemble first_model and second_model, we didn't need to explicitly reshape their outputs to be compatible with ensemble_model's input expectations. The reshaping ocurred inside ensemble_model's definition, where we combined the submodels' outputs. This process made it possible to combine the submodel outputs on a sample-by-sample basis rather than processing whole batches of predictions at once. Gven the pupose of ensembling the submodels was combining each image's first_model and second_model predictions (shaped as two (4,) vectors), we simply had to specify the shape of each sample with ensemble_input = Input(shape=(4,)).
 
 
 <img width="871" alt="Screenshot 2024-09-12 181055" src="https://github.com/user-attachments/assets/e0521ee1-fe80-4b2a-8849-e28bc5529543">
