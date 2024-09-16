@@ -309,9 +309,7 @@ Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to t
 <img width="744" alt="Screenshot 2024-09-12 180909" src="https://github.com/user-attachments/assets/17d05e57-f4fa-4e6a-a1e5-ba0acc50a42f">
 
 
-We defined ensemble_model to average the training_set and validation_set predictions made by first_model and second_model. Keras performs this averaging element-wise across the class probabilities for each sample. Thus, while the submodels' ouput were of shape (None, 4), with None representing variable batch size and 4 representing class probabilities for each image in the batch, the input flowing into ensemble_model needed to be (4,). With ensemble_model processing individual predictions per sample, it expected inputs of shape (4,) representing the 4 class probabilities for each sample. The None dimension appeared in the tensor shape of an entire batch of samples but became irrelevant for the shape of a single sample's output. 
-
-To ensemble first_model and second_model, we didn't need to explicitly reshape their outputs to be compatible with ensemble_model's input expectations. The reshaping ocurred inside ensemble_model's definition, where we combined the submodels' outputs. This process made it possible to combine the submodel outputs on a sample-by-sample basis rather than processing whole batches of predictions at once. Gven the pupose of ensembling the submodels was combining each image's first_model and second_model predictions (shaped as two (4,) vectors), we simply had to specify the shape of each sample with ensemble_input = Input(shape=(4,)).
+We defined ensemble_model to average the training_set and validation_set predictions made by first_model and second_model. Keras performs this averaging element-wise across the class probabilities for each sample. Though the submodels' ouput were of shape (None, 4), with None representing variable batch size and 4 representing class probabilities for each image in the batch, Keras implicitly understood that each sample in each batch had a shape of (4,). This was equivalent to the shape ensemble_model expected for its inputs, tensors representing the 4 class probabilities for each sample. We didn't need to reshape any outputs explicitly. The implicit reshaping made it possible to combine the submodel outputs on a sample-by-sample basis rather than processing whole batches of predictions at once. We simply had to specify the shape of each sample with ensemble_input = Input(shape=(4,)).
 
 
 <img width="871" alt="Screenshot 2024-09-12 181055" src="https://github.com/user-attachments/assets/e0521ee1-fe80-4b2a-8849-e28bc5529543">
@@ -320,18 +318,14 @@ To ensemble first_model and second_model, we didn't need to explicitly reshape t
 <img width="630" alt="Screenshot 2024-09-12 182404" src="https://github.com/user-attachments/assets/92385612-198a-485c-83dc-efeff4fa3be3">
 
 
-The model itself is relatively simple; we are only averaging the fist and second models' outputs by dataset. Essentially, this model has only two layers: the input layer and the output layer. 
-
-We compile and train the ensemble model in the same manner as its two submodels. Here, our x value becomes the averaged training_set predictions from the first and second model, while our y values become the true labels corresponding to the averaged training predictions. Finally, the validation_data for the ensemble model is the averaged predictions from the two submodels on the validation dataset and the true labels for the validation dataset itself. 
+We compiled and trained ensemble_model in the same manner as we did its two submodels. Here, our x value became the averaged training_set predictions from the first and second model, while our y values became the true labels corresponding to the averaged training predictions. Finally, the validation_data for the ensemble model became the averaged predictions from the two submodels on the validation dataset and the true labels for the validation dataset itself. 
 
 
 ## Chaining Models
 
-Chaining two models together means creating a composite model, where the first model's output becomes the input for the second model's layers. In this scenario, there is no third model to process the outputs of the two submodels. The output of the first model in a two-model chain is not a classification, but features that will help the second model's layers make a classification. Chaining two models results in a single model that can be trained end-to-end
+Chaining two models together means creating a composite model, where the first model's output becomes the input for the second model's layers. In this scenario, there is no third model to process the outputs of the two submodels. The output of the first model in a two-model chain is not a classification, but features that will help the second model's layers make a classification. Chaining two models results in a single model that can be trained end-to-end.
 
-Model chaining can be performed using the Functional API in a Keras framework, which allows for flexible connection of layers and models.
-
-Unlike with ensembling models, where data augmentation and rescaling can be applied in both submodels, chaining two models requires specifying data augmentation and rescaling only in the first model's layers.
+Model chaining can be performed using the Functional API in a Keras framework, which allows for flexible connection of layers and models. Unlike in the ensembling, where data augmentation and rescaling can be applied in both submodels, chaining two models requires specifying data augmentation and rescaling only in the first model's layers.
 
 
 ## Modifying first_model from classifier to feature extractor
@@ -351,18 +345,7 @@ They layers we dropped from second_model to create mod_custom_cnn_model were the
 
 Because ResNet50 already includes downsampling layers, adding additional pooling and convolution operations with second_model could result in too much downsampling or feature over-processing.
 
-It is appropriate to still include data augmentation and rescaling before the ResNet50 layers since these operations are not part of the feature extraction operations.  These pre-processing layers simply prepare the input data for feature extraction.
-
-4. Transfer Learning:
-The power of transfer learning lies in leveraging pre-trained networks like ResNet50, which have already learned how to extract useful features from images. Your job is to take those features and apply them to your custom task, often by adding dense layers on top, not additional convolutions or poolings.
-Solution:
-Instead of defining your own Conv2D and MaxPooling2D layers, you should chain the output of ResNet50 directly to dense layers and any additional custom operations you want (e.g., BatchNormalization, Dropout, or Dense layers). This way, you use ResNet50 for feature extraction and adapt it to your problem by modifying only the top layers (classification head).
-
-Updated Model Flow:
-Data augmentation and Rescaling can be applied before the ResNet50 model.
-Use ResNet50 as the core feature extractor (instead of custom Conv2D and Pooling layers).
-Add custom Dense layers after ResNet50 to fine-tune the model for your specific classification task.
-This approach optimally uses the power of ResNet50’s deep architecture without redundant operations.
+It is appropriate to still include data augmentation and rescaling before the ResNet50 layers since these operations are not part of the feature extraction operations. These pre-processing layers simply prepare the input data for feature extraction.
 
 
 <img width="842" alt="Screenshot 2024-09-14 153749" src="https://github.com/user-attachments/assets/c6002003-e154-41e7-bc5a-f637e52ed3c8">
