@@ -347,9 +347,21 @@ It was appropriate to still include data augmentation and rescaling before the R
 <img width="681" alt="Screenshot 2024-09-14 154139" src="https://github.com/user-attachments/assets/6b110560-9229-4614-b5b6-7e452b5c69ed">
 
 
-## Evaluating all four models
+## Defining the chained model
 
+We created the chained model by chaining the modified ResNet50-based model, 'mod_resnet_model', with the modified base cnn model, 'mod_custom_cnn_model'. The two individual models were, themselves, variations of first_model and second_model that made them compatible for chaining. 
+
+
+<img width="905" alt="Screenshot 2024-09-15 233258" src="https://github.com/user-attachments/assets/941da4a7-457b-400c-8f68-aa4f7edd8562">
+
+
+
+
+## Evaluating all four models
 When it came to evaluating all four models, first_model and second_model (the submodels) needed to be evaluated on the unseen testing_set dataset to get unbiased performance metrics. 
+
+
+
 
 Evaluating the ensemble model was a matter of 
 a) averaging the predictions from the two submodels models on the unseen testing_set,  
@@ -358,14 +370,6 @@ c) estimating ensemble loss and ensemble accuracy by requesting ensemble_model.e
 
 <img width="625" alt="Screenshot 2024-09-08 185804" src="https://github.com/user-attachments/assets/fee59b88-88f0-4418-9eb0-2f0d37882922">
 <img width="489" alt="Screenshot 2024-09-08 185910" src="https://github.com/user-attachments/assets/77ae5b95-c029-4897-a964-52654d046a80">
-
-# Validation Loss and Accuracy Metrics for the Three Models
-
-Modified ResNet50 model      Loss: 0.9644      Accuracy: 0.4539
-
-custom_CNN-Model              Loss: 1.3097      Accuracy: 0.4190
-
-Ensemble Model                 Loss: 1.3762      Accuracy: 0.330
 
 
 ## Table of results
