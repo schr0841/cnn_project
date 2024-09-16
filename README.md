@@ -311,10 +311,8 @@ Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to t
 
 We defined ensemble_model to average the training_set and validation_set predictions made by first_model and second_model. Keras performs this averaging element-wise across the class probabilities for each sample. Though the submodels' ouput were of shape (None, 4), with None representing variable batch size and 4 representing class probabilities for each image in the batch, Keras implicitly understood that each sample in each batch had a shape of (4,). This was equivalent to the shape ensemble_model expected for its inputs, tensors representing the 4 class probabilities for each sample. We didn't need to reshape any outputs explicitly. The implicit reshaping made it possible to combine the submodel outputs on a sample-by-sample basis rather than processing whole batches of predictions at once. We simply had to specify the shape of each sample with ensemble_input = Input(shape=(4,)).
 
-
-<img width="871" alt="Screenshot 2024-09-12 181055" src="https://github.com/user-attachments/assets/e0521ee1-fe80-4b2a-8849-e28bc5529543">
-<img width="889" alt="Screenshot 2024-09-12 182108" src="https://github.com/user-attachments/assets/0451c1ac-2fdf-44b0-8278-1189899f1347">
-<img width="887" alt="Screenshot 2024-09-12 182229" src="https://github.com/user-attachments/assets/878e58bc-12db-4c8f-91b1-9aa2b854ff5f">
+<img width="882" alt="Screenshot 2024-09-15 225334" src="https://github.com/user-attachments/assets/04d12bbd-a8ca-4d28-b627-773cfb299d03">
+<img width="917" alt="Screenshot 2024-09-15 231351" src="https://github.com/user-attachments/assets/6e88b314-613d-4a69-af1a-f38a49cbd7dc">
 <img width="630" alt="Screenshot 2024-09-12 182404" src="https://github.com/user-attachments/assets/92385612-198a-485c-83dc-efeff4fa3be3">
 
 
