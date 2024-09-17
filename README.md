@@ -251,10 +251,9 @@ ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7
 <img width="913" alt="Screenshot01" src="https://github.com/user-attachments/assets/f907df78-a421-4290-b85d-287d9dedf82f">
 <img width="906" alt="Screenshot02" src="https://github.com/user-attachments/assets/15840ff8-05c8-4569-be6f-304f19b4e251">
 <img width="903" alt="Screenshot03" src="https://github.com/user-attachments/assets/88c8107c-3a46-452e-90b9-6844647aeae4">
-
-<img width="545" alt="Screenshot 2024-09-12 171022" src="https://github.com/user-attachments/assets/9259e7d7-010e-4b8c-9d2a-42681e58c12f">
-<img width="686" alt="Screenshot 2024-09-12 171241" src="https://github.com/user-attachments/assets/2bfaba9b-16fb-4cd1-af94-56782297b493">
-<img width="670" alt="Screenshot 2024-09-12 171422" src="https://github.com/user-attachments/assets/4b60c346-8567-40c7-b7d7-719b10a53d09">
+<img width="918" alt="Screenshot 04" src="https://github.com/user-attachments/assets/61e88054-4fe9-406a-a6ee-825798b28aec">
+<img width="914" alt="Screenshot 05" src="https://github.com/user-attachments/assets/79bad4fe-f038-4605-a163-b82084b774bd">
+<img width="914" alt="Screenshot 06" src="https://github.com/user-attachments/assets/cf63c8f3-1672-44aa-9446-eb6cc00de99b">
 
 
 ### Use of Data Augmentation and Rescaling
@@ -275,12 +274,9 @@ Including the augmented inputs as part of the Rescaling layer was necessary beca
 
 As we designed the base cnn model, second_model, for our four-class classification task, few alternations to this model were necessary until it came time to chain first_model and second_model. The one modification we made prior to training second_model was to re-define and re-train it using the Functional API. In earlier attempts to ensembled second_model with first_model, our initial choice of defining and training second_model using the Sequential API proved complicating. We defined and trained first_model using the Functional API, to accommodate the ResNet50's greater complexity, but not second_model. As such, we neede to redefine, recompiled, and retrained second_model the Functional API. 
 
-<img width="604" alt="Screenshot 2024-09-12 171903" src="https://github.com/user-attachments/assets/312f8c83-9813-4799-b194-45a155e49f9e">
-<img width="532" alt="Screenshot 2024-09-12 172026" src="https://github.com/user-attachments/assets/68ef61bd-6b44-4980-8271-980c9318a537">
-<img width="491" alt="Screenshot 2024-09-12 172206" src="https://github.com/user-attachments/assets/373c17e0-9a47-4a5a-8912-804cc7dd4c8b">
-<img width="733" alt="Screenshot 2024-09-12 172353" src="https://github.com/user-attachments/assets/8ac5a6ed-8eac-4a55-ada3-335870f3aa3d">
-<img width="660" alt="Screenshot 2024-09-12 172528" src="https://github.com/user-attachments/assets/4e076027-c55e-4146-a3f6-368c6cecf27e">
-
+<img width="914" alt="Screenshot 07" src="https://github.com/user-attachments/assets/3654f0e2-f567-44dc-b93f-8900fea2d3a7">
+<img width="911" alt="Screenshot 08" src="https://github.com/user-attachments/assets/8860ac38-ae0a-451f-bfd6-fe4d7ba0b074">
+<img width="916" alt="Screenshot 09" src="https://github.com/user-attachments/assets/43cbfa72-dd52-4c70-b5c2-9de80ad7c7f3">
 
 We compiled both models with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. We trained both with x as the training_set dataset and validation_data as the validation_set dataset. Training lasted for 100 epochs, unless our EarlyStopping callback - set to monitor 'val_accuracy' with a patience value of 20 - stopped training early. 
 
