@@ -351,7 +351,6 @@ It was appropriate to still include data augmentation and rescaling before the R
 
 <img width="901" alt="Screenshot 26" src="https://github.com/user-attachments/assets/3273d338-f2fc-4b9b-9045-2c29fc8df042">
 <img width="902" alt="Screenshot 27" src="https://github.com/user-attachments/assets/3cde961f-4f3c-4c05-bd8d-cadaefad16b4">
-<img width="889" alt="Screenshot 28" src="https://github.com/user-attachments/assets/45544ef4-4ee1-48fa-929f-34c3c4054a6d">
 
 
 ## Defining, compiling, and training the chained model
@@ -361,10 +360,9 @@ We created the chained model by chaining the modified ResNet50-based model, 'mod
 By defining mod_resnet_output as mod_resnet_model.output, we specified mod_resnet_model's layers as the first 'link' in the chain. By specifying mod_custom_cnn_output = mod_custom_cnn_model(mod_resnet_output), we passed the first 'link's' output to the second 'link' in the chain, mod_custom_cnn_model, and defined the resulting output as mod_custom_cnn_output. This allowed us to define the composite model, chained_model, as Model(inputs=mod_resnet_model.input, outputs=mod_custom_cnn_output). Before training chained_model, we specified optimizer = Adam(), defined a filepath to save chained_model's best model, and defined equivalent EarlyStopping and ModelCheckpoint callbacks as we'd used previously. We trained chained_model on the dataset training_set and set validation_set as the validation_data.   
 
 
-<img width="905" alt="Screenshot 2024-09-15 233258" src="https://github.com/user-attachments/assets/941da4a7-457b-400c-8f68-aa4f7edd8562">
-<img width="744" alt="Screenshot 2024-09-16 000001" src="https://github.com/user-attachments/assets/f890df19-4dfe-45cc-8dcc-d22f11cdee53">
-<img width="727" alt="Screenshot 2024-09-16 000138" src="https://github.com/user-attachments/assets/cf1444e4-6c06-4dba-8d51-e398b7573186">
-
+<img width="889" alt="Screenshot 28" src="https://github.com/user-attachments/assets/b0406598-ebe6-4f89-a288-f2dcec304dce">
+<img width="906" alt="Screenshot 29" src="https://github.com/user-attachments/assets/72dcca01-284c-48a8-811d-ebb79c3171a4">
+<img width="887" alt="Screenshot 30" src="https://github.com/user-attachments/assets/161a3ba4-c89c-48e0-ad00-3bb328fcc6bd">
 
 
 ## Evaluating all four models
@@ -386,8 +384,9 @@ a) averaging the predictions from the two submodels models on the unseen testing
 b) extracting the labels from the testing_set, and   
 c) estimating ensemble loss and ensemble accuracy by requesting ensemble_model.evaluate(ensemble_predictions, y_test)
 
-<img width="625" alt="Screenshot 2024-09-08 185804" src="https://github.com/user-attachments/assets/fee59b88-88f0-4418-9eb0-2f0d37882922">
-<img width="489" alt="Screenshot 2024-09-08 185910" src="https://github.com/user-attachments/assets/77ae5b95-c029-4897-a964-52654d046a80">
+
+<img width="897" alt="Screenshot 31" src="https://github.com/user-attachments/assets/671b15de-1eb8-48b2-b493-ed34f330a754">
+<img width="902" alt="Screenshot 32" src="https://github.com/user-attachments/assets/6fd3212f-6ce8-4f7c-b133-d82cfdb1e2de">
 
 
 ## Table of results
