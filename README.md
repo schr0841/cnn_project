@@ -315,6 +315,10 @@ We defined ensemble_model to average the training_set and validation_set predict
 <img width="882" alt="Screenshot 2024-09-15 225334" src="https://github.com/user-attachments/assets/04d12bbd-a8ca-4d28-b627-773cfb299d03">
 <img width="917" alt="Screenshot 2024-09-15 231351" src="https://github.com/user-attachments/assets/6e88b314-613d-4a69-af1a-f38a49cbd7dc">
 <img width="630" alt="Screenshot 2024-09-12 182404" src="https://github.com/user-attachments/assets/92385612-198a-485c-83dc-efeff4fa3be3">
+<img width="913" alt="Screenshot 19" src="https://github.com/user-attachments/assets/ce1519c3-a742-4a86-8092-b41b80949a93">
+<img width="907" alt="Screenshot 20" src="https://github.com/user-attachments/assets/99d07b95-cb92-4db1-9591-4dfa66fe95c4">
+<img width="914" alt="Screenshot 21" src="https://github.com/user-attachments/assets/9121fc34-0c2a-46dc-8223-34c25be54238">
+<img width="913" alt="Screenshot 22" src="https://github.com/user-attachments/assets/5ccd775e-92c9-40eb-be30-30db71dbee08">
 
 
 We compiled and trained ensemble_model in the same manner as we did its two submodels. Here, our x value became the averaged training_set predictions from the first and second model, while our y values became the true labels corresponding to the averaged training predictions. Finally, the validation_data for the ensemble model became the averaged predictions from the two submodels on the validation dataset and the true labels for the validation dataset itself. 
