@@ -251,9 +251,9 @@ ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7
 <img width="913" alt="Screenshot01" src="https://github.com/user-attachments/assets/f907df78-a421-4290-b85d-287d9dedf82f">
 <img width="906" alt="Screenshot02" src="https://github.com/user-attachments/assets/15840ff8-05c8-4569-be6f-304f19b4e251">
 <img width="903" alt="Screenshot03" src="https://github.com/user-attachments/assets/88c8107c-3a46-452e-90b9-6844647aeae4">
-<img width="918" alt="Screenshot 04" src="https://github.com/user-attachments/assets/61e88054-4fe9-406a-a6ee-825798b28aec">
-<img width="914" alt="Screenshot 05" src="https://github.com/user-attachments/assets/79bad4fe-f038-4605-a163-b82084b774bd">
-<img width="914" alt="Screenshot 06" src="https://github.com/user-attachments/assets/cf63c8f3-1672-44aa-9446-eb6cc00de99b">
+<img width="918" alt="Screenshot 04" src="https://github.com/user-attachments/assets/d30ef19b-bee7-480e-ba22-35367ba0f35c">
+<img width="914" alt="Screenshot 05" src="https://github.com/user-attachments/assets/7a999f0e-09d7-48b3-8709-c1e91f792304">
+<img width="914" alt="Screenshot 06" src="https://github.com/user-attachments/assets/856b99db-fd75-4db3-b7f7-3041b69e65a1">
 
 
 ### Use of Data Augmentation and Rescaling
