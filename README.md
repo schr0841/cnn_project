@@ -360,9 +360,9 @@ We created the chained model by chaining the modified ResNet50-based model, 'mod
 By defining mod_resnet_output as mod_resnet_model.output, we specified mod_resnet_model's layers as the first 'link' in the chain. By specifying mod_custom_cnn_output = mod_custom_cnn_model(mod_resnet_output), we passed the first 'link's' output to the second 'link' in the chain, mod_custom_cnn_model, and defined the resulting output as mod_custom_cnn_output. This allowed us to define the composite model, chained_model, as Model(inputs=mod_resnet_model.input, outputs=mod_custom_cnn_output). Before training chained_model, we specified optimizer = Adam(), defined a filepath to save chained_model's best model, and defined equivalent EarlyStopping and ModelCheckpoint callbacks as we'd used previously. We trained chained_model on the dataset training_set and set validation_set as the validation_data.   
 
 
-<img width="889" alt="Screenshot 28" src="https://github.com/user-attachments/assets/11e7e4dd-414f-43c9-909b-312c2d2a6923">
-<img width="906" alt="Screenshot 29" src="https://github.com/user-attachments/assets/72dcca01-284c-48a8-811d-ebb79c3171a4">
-<img width="887" alt="Screenshot 30" src="https://github.com/user-attachments/assets/161a3ba4-c89c-48e0-ad00-3bb328fcc6bd">
+<img width="889" alt="Screenshot 28" src="https://github.com/user-attachments/assets/4a27f82a-462b-4287-af38-e2984f576bf3">
+<img width="913" alt="Screenshot 29" src="https://github.com/user-attachments/assets/78e3e396-7543-421a-a851-cb66eb0a264f">
+<img width="886" alt="Screenshot 30" src="https://github.com/user-attachments/assets/6c06d877-6cad-420b-9d57-806e501c9b28">
 
 
 ## Evaluating all four models
