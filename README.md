@@ -276,9 +276,10 @@ Including the augmented inputs as part of the Rescaling layer was necessary beca
 
 As we designed the base cnn model, second_model, for our four-class classification task, few alternations to this model were necessary until it came time to chain first_model and second_model. The one modification we made prior to training second_model was to re-define and re-train it using the Functional API. In earlier attempts to ensembled second_model with first_model, our initial choice of defining and training second_model using the Sequential API proved complicating. We defined and trained first_model using the Functional API, to accommodate the ResNet50's greater complexity, but not second_model. As such, we neede to redefine, recompiled, and retrained second_model the Functional API. 
 
-<img width="914" alt="Screenshot 07" src="https://github.com/user-attachments/assets/3654f0e2-f567-44dc-b93f-8900fea2d3a7">
-<img width="911" alt="Screenshot 08" src="https://github.com/user-attachments/assets/2eb7be99-13c3-4413-ad8b-924ce02a0c83">
-<img width="916" alt="Screenshot 09" src="https://github.com/user-attachments/assets/43cbfa72-dd52-4c70-b5c2-9de80ad7c7f3">
+<img width="910" alt="Screenshot 09" src="https://github.com/user-attachments/assets/6d4d5ca1-4dce-44ba-98b3-90e6720ad515">
+<img width="907" alt="Screenshot 10" src="https://github.com/user-attachments/assets/1bb08068-4152-4ccf-8619-192297c71e0b">
+<img width="910" alt="Screenshot 11" src="https://github.com/user-attachments/assets/3f8669b0-0ef1-4c8e-b338-1a8a0c018512">
+
 
 We compiled both models with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. We trained both with x as the training_set dataset and validation_data as the validation_set dataset. Training lasted for 100 epochs, unless our EarlyStopping callback - set to monitor 'val_accuracy' with a patience value of 20 - stopped training early. 
 
