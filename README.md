@@ -333,9 +333,9 @@ Model chaining can be performed using the Functional API in a Keras framework, w
 
 Because we are turning first_model's output into second_model's input, some adjustments to the original versions of these models became necessary. In particular, first_model needed to be redefined from a classifier to a feature extractor. That is, first_model became tasked with processing raw input data (the ct scans) and producing informative features to be used for classification in second_model's layers. Pretrained models like ResNet50 are often used as feature extractors in transfer learning because they have already learned useful patterns from the large datasets on which they were trained. These patterns, or features, are reusable for new tasks. To diffferentiate first_model and it's modified version, we called our modified first_model 'mod_resnet_model'.
 
-<img width="688" alt="Screenshot 2024-09-12 174703" src="https://github.com/user-attachments/assets/903f1534-2125-4450-b4e4-f97746407d0d">
-<img width="809" alt="Screenshot 2024-09-12 174943" src="https://github.com/user-attachments/assets/3c474880-558b-45cc-9692-530b47a2a738">
-<img width="808" alt="Screenshot 2024-09-12 175058" src="https://github.com/user-attachments/assets/959efbb6-01d3-4880-994f-12b93e64cb99">
+<img width="902" alt="Screenshot 23" src="https://github.com/user-attachments/assets/d4cefbbe-8a3f-4922-a52e-db8b0c760121">
+<img width="896" alt="Screenshot 24" src="https://github.com/user-attachments/assets/dd23844d-69f2-4ebc-921b-fe6c621f5a55">
+<img width="883" alt="Screenshot 25" src="https://github.com/user-attachments/assets/70de0f23-1638-4e77-a7c1-31d83c48cf2a">
 
 
 ## Modifying second_model to be compatibile for chaining
