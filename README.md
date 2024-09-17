@@ -221,8 +221,8 @@ We trained first_model and second_model on the CT chest scan images in the train
 
 We used the preprocessing.image_dataset_from_directory method to generate the three data sets. This is to say we did not use the ImageDataGenerator to create the datasets, as may have been done elsewhere in this study. Also of note, we set the image_size to (224, 224) for first_model because ResNet50-based models expect images of that size. For purposes of consistency, we set the image_size to (224, 224) for second_model as well. We set label_mode for the three datasets to "int" (integer) because all images in this study belong to one of four classes. 
 
-<img width="761" alt="Screenshot 2024-09-11 171824" src="https://github.com/user-attachments/assets/569253a0-4c3b-4329-9596-c99e7dbc291a">
-<img width="685" alt="Screenshot 2024-09-11 171939" src="https://github.com/user-attachments/assets/d9ca206c-6903-48b6-a523-ae54cd1d9404">
+<img width="914" alt="Screenshot 00a" src="https://github.com/user-attachments/assets/1c553bd2-3721-4a88-a616-a1523fc68a76">
+<img width="915" alt="Screenshot 00b" src="https://github.com/user-attachments/assets/a056c7aa-509f-4825-8a81-d6ed52e130a4">
 
 
 ### Building first_model from pretrained ResNet50
@@ -247,9 +247,11 @@ ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7
 
 
 ### first_model
-<img width="747" alt="Screenshot 2024-09-12 165648" src="https://github.com/user-attachments/assets/5095917b-e89a-4d8f-94be-c6aab6a140fd">
-<img width="718" alt="Screenshot 2024-09-12 165800" src="https://github.com/user-attachments/assets/743fc59c-2541-4a0b-bb8b-49d64d33301d">
-<img width="769" alt="Screenshot 2024-09-12 165915" src="https://github.com/user-attachments/assets/deaad652-fb39-413b-991b-dae48eb282fd">
+
+<img width="913" alt="Screenshot01" src="https://github.com/user-attachments/assets/f907df78-a421-4290-b85d-287d9dedf82f">
+<img width="906" alt="Screenshot02" src="https://github.com/user-attachments/assets/15840ff8-05c8-4569-be6f-304f19b4e251">
+<img width="903" alt="Screenshot03" src="https://github.com/user-attachments/assets/88c8107c-3a46-452e-90b9-6844647aeae4">
+
 <img width="545" alt="Screenshot 2024-09-12 171022" src="https://github.com/user-attachments/assets/9259e7d7-010e-4b8c-9d2a-42681e58c12f">
 <img width="686" alt="Screenshot 2024-09-12 171241" src="https://github.com/user-attachments/assets/2bfaba9b-16fb-4cd1-af94-56782297b493">
 <img width="670" alt="Screenshot 2024-09-12 171422" src="https://github.com/user-attachments/assets/4b60c346-8567-40c7-b7d7-719b10a53d09">
