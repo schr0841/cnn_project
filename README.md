@@ -350,7 +350,7 @@ It was appropriate to still include data augmentation and rescaling before the R
 
 
 <img width="901" alt="Screenshot 26" src="https://github.com/user-attachments/assets/3273d338-f2fc-4b9b-9045-2c29fc8df042">
-<img width="902" alt="Screenshot 27" src="https://github.com/user-attachments/assets/958050fa-afc5-4aa8-a46f-bb76e009a0b7">
+<img width="902" alt="Screenshot 27" src="https://github.com/user-attachments/assets/3cde961f-4f3c-4c05-bd8d-cadaefad16b4">
 <img width="889" alt="Screenshot 28" src="https://github.com/user-attachments/assets/45544ef4-4ee1-48fa-929f-34c3c4054a6d">
 
 
