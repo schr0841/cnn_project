@@ -306,7 +306,8 @@ Before we could build the ensemble_model to process the two submodels's output (
 Next, we defined the EarlyStopping and ModelCheckpoint callbacks to be used to train ensemble_model. We kept these callback definitions consistent with those used in the two submodels. If the accuracy on the validation dataset did not improve after 20 epochs, the model training would come to an early stop rather than continue on for 100 epochs. Similarly, we defined a filepath to save the best version of the model (that with the maximum validation accuracy). 
 
 
-<img width="878" alt="Screenshot 2024-09-15 232017" src="https://github.com/user-attachments/assets/d97a3e20-e577-4027-bb45-c1cdf21b683e">
+<img width="912" alt="Screenshot 17" src="https://github.com/user-attachments/assets/d97b10b3-7c94-4552-833b-b12ca1dc4789">
+<img width="907" alt="Screenshot 18" src="https://github.com/user-attachments/assets/9a4d3a77-3bc1-46f4-91d3-c20df954c988">
 
 
 We defined ensemble_model to average the training_set and validation_set predictions made by first_model and second_model. Keras performs this averaging element-wise across the class probabilities for each sample. Though the submodels' ouput were of shape (None, 4), with None representing variable batch size and 4 representing class probabilities for each image in the batch, Keras implicitly understood that each sample in each batch had a shape of (4,). This was equivalent to the shape ensemble_model expected for its inputs, tensors representing the 4 class probabilities for each sample. We didn't need to reshape any outputs explicitly. The implicit reshaping made it possible to combine the submodel outputs on a sample-by-sample basis rather than processing whole batches of predictions at once. We simply had to specify the shape of each sample with ensemble_input = Input(shape=(4,)).
