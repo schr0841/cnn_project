@@ -349,9 +349,9 @@ Because ResNet50 already included downsampling layers, adding additional pooling
 It was appropriate to still include data augmentation and rescaling before the ResNet50 layers since these operations were not part of the feature extraction operations. These pre-processing layers simply prepared the input data for feature extraction.
 
 
-<img width="842" alt="Screenshot 2024-09-14 153749" src="https://github.com/user-attachments/assets/c6002003-e154-41e7-bc5a-f637e52ed3c8">
-<img width="626" alt="Screenshot 2024-09-14 154038" src="https://github.com/user-attachments/assets/f6121c95-a8bc-4c68-ba94-31065ce5b3e4">
-<img width="681" alt="Screenshot 2024-09-14 154139" src="https://github.com/user-attachments/assets/6b110560-9229-4614-b5b6-7e452b5c69ed">
+<img width="901" alt="Screenshot 26" src="https://github.com/user-attachments/assets/3273d338-f2fc-4b9b-9045-2c29fc8df042">
+<img width="902" alt="Screenshot 27" src="https://github.com/user-attachments/assets/958050fa-afc5-4aa8-a46f-bb76e009a0b7">
+<img width="889" alt="Screenshot 28" src="https://github.com/user-attachments/assets/45544ef4-4ee1-48fa-929f-34c3c4054a6d">
 
 
 ## Defining, compiling, and training the chained model
