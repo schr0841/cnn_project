@@ -278,10 +278,10 @@ As we designed the base cnn model, second_model, for our four-class classificati
 
 <img width="910" alt="Screenshot 09" src="https://github.com/user-attachments/assets/6d4d5ca1-4dce-44ba-98b3-90e6720ad515">
 <img width="907" alt="Screenshot 10" src="https://github.com/user-attachments/assets/1bb08068-4152-4ccf-8619-192297c71e0b">
-<img width="910" alt="Screenshot 11" src="https://github.com/user-attachments/assets/3f8669b0-0ef1-4c8e-b338-1a8a0c018512">
-<img width="929" alt="Screenshot 12" src="https://github.com/user-attachments/assets/7fe22e00-6959-46c9-89c7-6019a2e57efc">
-<img width="928" alt="Screenshot 13" src="https://github.com/user-attachments/assets/b37f8633-44a8-493d-9bbb-e09cb44b845f">
-<img width="912" alt="Screenshot 14" src="https://github.com/user-attachments/assets/54e2bc8d-1ddc-4202-ad18-4d39d9a6b0ef">
+<img width="910" alt="Screenshot 11" src="https://github.com/user-attachments/assets/2789d83c-bd25-4e8d-92b4-5feecfdea36a">
+<img width="929" alt="Screenshot 12" src="https://github.com/user-attachments/assets/00a41035-6806-45af-90d8-eb67824362b1">
+<img width="928" alt="Screenshot 13" src="https://github.com/user-attachments/assets/261455e6-73b5-4ad2-ba62-0d30652e8929">
+<img width="912" alt="Screenshot 14" src="https://github.com/user-attachments/assets/cfdd3fba-05a4-4227-bdbc-624346d344e8">
 
 
 We compiled both models with the Adam optimizer, and with the loss function set to sparse_categorical_crossentropy. We trained both with x as the training_set dataset and validation_data as the validation_set dataset. Training lasted for 100 epochs, unless our EarlyStopping callback - set to monitor 'val_accuracy' with a patience value of 20 - stopped training early. 
