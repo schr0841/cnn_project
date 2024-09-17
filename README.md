@@ -295,8 +295,8 @@ After training first_model and second_model, we created a third model, ensemble_
 
 Unlike the original input datasets, which contained images and class labels, the inputs to the ensemble_model lacks labels. Thus, we needed to extract the labels from the TensorFlow datasets and give them to ensemble_model. These labels are necessary for the ensemble_model to compute loss values, which entails comparing predictions to true labels. 
 
-<img width="882" alt="Screenshot 2024-09-12 175710" src="https://github.com/user-attachments/assets/69059f24-a3d8-4070-923d-044300a42ec1">
-<img width="646" alt="Screenshot 2024-09-12 180029" src="https://github.com/user-attachments/assets/ba9baf12-5de0-41f9-8795-7aeebefafeb2">
+<img width="921" alt="Screenshot 15" src="https://github.com/user-attachments/assets/349ac984-af66-4000-92e4-8acc58df8fd1">
+<img width="932" alt="Screenshot 16" src="https://github.com/user-attachments/assets/43efe309-5737-485f-96d4-0992ab5cf365">
 
 
 ### Preparing data and building ensemble model to average outputs
