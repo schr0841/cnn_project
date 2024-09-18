@@ -254,8 +254,6 @@ ResNet50, when its top layer is excluded, outputs a feature map with shape (7, 7
 <img width="913" alt="Screenshot 04" src="https://github.com/user-attachments/assets/c61d8576-6345-4c2a-9c74-a345b50db68f">
 <img width="914" alt="Screenshot 05" src="https://github.com/user-attachments/assets/3c702eec-23b1-4138-960f-e9a53b320867">
 <img width="914" alt="Screenshot 06" src="https://github.com/user-attachments/assets/7236696d-ceb5-4b35-b3b6-f2716be9ff8c">
-<img width="915" alt="Screenshot 07" src="https://github.com/user-attachments/assets/f684737b-7f1c-447f-b14b-645005b2d848">
-<img width="909" alt="Screenshot 08" src="https://github.com/user-attachments/assets/9c072431-0181-4b04-bcf9-6a0d845352da">
 
 
 ### Use of Data Augmentation and Rescaling
