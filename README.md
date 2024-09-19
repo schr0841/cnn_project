@@ -400,31 +400,15 @@ We noted some unexpected results when combining the two models. Neither the ense
 
 It is unusual for an ensemble model that combines its submodels' output to have lower accuracy than its individual submodels. Such results can indicate that there's an issue with prediction averaging, if the models' outputs are raw logits or probabilities. Because the two classification models are generating averageable probabilities, however, averaging errors are not at play.
 
-Likewise, we can rule out the possibility that the model was trained using pseudo-lables rather than true labels, since we explicitly specified the relevant true lables as the validation_data.
+Likewise, we can rule out the possibility that the model was trained using pseudo-lables rather than true labels, since we explicitly specified the relevant true lables as the validation_data. Pseudo-labeling would have occured if we trained the ensemble model on the submodel predictions as labels, instead of using the true labels.
 
-Evaluation Methodology: Ensure that the evaluation of the ensemble model is consistent with how it was trained. For instance, if the ensemble model was trained on averaged predictions, it should be evaluated in a similar manner.
-The fact that ensemble_model is generating a lower accuracy value than the individual submodels, despite averaging probabilities, could be due to several reasons:
+Finally, a problem with the evaluation methodology doesn't explain the lower accuracy scores for the ensemble_model. The evaluation of the ensemble model wass consistent with how the model was trained (e.g., on averaged predictions). 
 
-Underperforming Individual Models: If the individual models (first_model and second_model) are not performing well or have biases, averaging their predictions might not improve performance. In some cases, it can even exacerbate weaknesses if the models are making similar errors.
+It could be that the two submodels are underperforming or have biases. If this is the case, averaging the two submodels' predictions would not necessarily improve performance. It's also possible that averaging the submodels' predictions is exacerbating weaknesses in the two models if the models are making similar errors. 
 
-Ensemble Averaging/Equal Weighting: Simple averaging assumes equal importance for both models. If one model is significantly better than the other, averaging might dilute its effectiveness. You could try weighted averaging if you suspect one model is performing better.
+Overfitting or underfitting could also be a factor. Averaging the predictions of models that overfit the training data could result in poor generalization to unseen data. Averaging predictions could also be problematic if the submodels are underfitting the training data because the averages could be failing to capture complex patterns. 
 
-Training and Evaluation Process:
-Training Data Mismatch: Ensure that ensemble_model is evaluated with the correct data and that the evaluation process aligns with how it was trained.
-Evaluation Metrics: Double-check that the evaluation metrics are correctly applied and interpreted.
-
-Ensemble Model Architecture: If the ensemble_model has a different architecture or loss function compared to the individual models, it might affect its performance. Ensure the ensemble model is properly configured for the task.
-
-Overfitting/Underfitting:
-Overfitting: If individual models are overfitting the training data, averaging their predictions might not generalize well to unseen data, including validation and testing sets.
-Underfitting: If the models are underfitting, averaging predictions might not capture complex patterns effectively.
-
-Misalignment of Labels/Incorrect Labels: Verify that the labels used for evaluating the ensemble_model are correct and consistent with the labels used for training.
-
-
-
-
-
+Alternatively, it might be the case that simple averaging is not appropriate when ensembling our two models. Averaging predictions when one model submodel is significantly better than the other can dilute the effectiveness of the stronger model. Using weighted averaging instead of simple averaging might be called for in this case, as first_model has significantly better accuracy scores than second_model. A possible next step could be ensembling first_model and second_model with weighted averages. 
 
 
 # Conclusions and Results
