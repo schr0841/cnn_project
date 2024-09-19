@@ -396,7 +396,30 @@ c) estimating ensemble loss and ensemble accuracy by requesting ensemble_model.e
 | ensemble_model | 1.4364 | 0.2120 | 1.4026 | 0.2777 | 1.4087 |  0.2444 |
 | chained_model  | 0.8707 | 0.6215 | 0.9116 | 0.5833 | 1.0094 |  0.5142 |
 
+We noted some unexpected results when combining the two models. Neither the ensemble_model nor the chained_model outperformed the first_model (the ResNet50-based classifier). The accuracy results for the ensemble_model were especially low, when compared with the two submodels.
 
+It is unusual for an ensemble model that combines its submodels' output to have lower accuracy than its individual submodels. Such results can indicate that there's an issue with prediction averaging, if the models' outputs are raw logits or probabilities. Because the two classification models are generating averageable probabilities, however, averaging errors are not at play.
+
+Likewise, we can rule out the possibility that the model was trained using pseudo-lables rather than true labels, since we explicitly specified the relevant true lables as the validation_data.
+
+Evaluation Methodology: Ensure that the evaluation of the ensemble model is consistent with how it was trained. For instance, if the ensemble model was trained on averaged predictions, it should be evaluated in a similar manner.
+The fact that ensemble_model is generating a lower accuracy value than the individual submodels, despite averaging probabilities, could be due to several reasons:
+
+Underperforming Individual Models: If the individual models (first_model and second_model) are not performing well or have biases, averaging their predictions might not improve performance. In some cases, it can even exacerbate weaknesses if the models are making similar errors.
+
+Ensemble Averaging/Equal Weighting: Simple averaging assumes equal importance for both models. If one model is significantly better than the other, averaging might dilute its effectiveness. You could try weighted averaging if you suspect one model is performing better.
+
+Training and Evaluation Process:
+Training Data Mismatch: Ensure that ensemble_model is evaluated with the correct data and that the evaluation process aligns with how it was trained.
+Evaluation Metrics: Double-check that the evaluation metrics are correctly applied and interpreted.
+
+Ensemble Model Architecture: If the ensemble_model has a different architecture or loss function compared to the individual models, it might affect its performance. Ensure the ensemble model is properly configured for the task.
+
+Overfitting/Underfitting:
+Overfitting: If individual models are overfitting the training data, averaging their predictions might not generalize well to unseen data, including validation and testing sets.
+Underfitting: If the models are underfitting, averaging predictions might not capture complex patterns effectively.
+
+Misalignment of Labels/Incorrect Labels: Verify that the labels used for evaluating the ensemble_model are correct and consistent with the labels used for training.
 
 
 
