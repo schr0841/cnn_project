@@ -2,7 +2,9 @@
 
 ## Executive Summary
 
-We defined, compiled, and trained two CNN submodels individually before ensembling and chaining them. We looked for a noticeable improvement in accuracy by combining first_model and second_model over each of the submodels.    
+We defined, compiled, and trained two CNN submodels - one custom and one pre-trained - individually before ensembling and chaining them. We looked for a noticeable improvement in accuracy by ensembling and chaining them over each of the individual submodels.    
+
+The data for this project was obtained here: https://www.kaggle.com/datasets/mohamedhanyyy/chest-ctscan-images  
   
 ## Overview and Purpose
   
