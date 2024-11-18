@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-We defined, compiled, and trained two CNN submodels - one custom and one pre-trained - individually before ensembling and chaining them. We looked for a noticeable improvement in accuracy by ensembling and chaining them over each of the individual submodels.    
+We defined, compiled, and trained two CNN submodels - one custom and one pre-trained - individually before ensembling and chaining them. We looked for a noticeable improvement in accuracy by combining the submodels over each of the submodels, individually.    
 
 The data for this project was obtained here: https://www.kaggle.com/datasets/mohamedhanyyy/chest-ctscan-images  
   
@@ -21,17 +21,15 @@ d) chaining model_one and model_two into model_four (transfer learning)
 Concepts:
 Convolutional Neural Networks  
 Pretained models  
-Transfer Learning/model chaining
 Model Ensembling  
+Transfer Learning/model chaining  
   
   
 ## Convolutional Neural Networks  
   
 CNNs use convolutional and pooling layers to automatically and hierarchically learn features from images, and use fully connected layers to classify those features into predefined categories. This process enables CNNs to effectively handle and classify complex visual data.  
-  
-The data for this project was obtained here: https://www.kaggle.com/datasets/mohamedhanyyy/chest-ctscan-images  
-  
-We built our custom CNN (model_two) with the following components:  
+    
+We built our custom CNN (model_two) and our ResNet50-based pre-trained model with the following components:  
   
 1. Input Layer: Our input images are represented as matrices of pixel values.   
 
@@ -41,14 +39,76 @@ We built our custom CNN (model_two) with the following components:
   
 4. Pooling Layers: We used max pooling to reduce the spatial dimensions of the feature maps by taking the maximum value from a subset of the feature map. This reduced the number of parameters and computations, helping the network become more robust to variations in image.  
   
-5. Flattening: Because the output from the convolutional and pooling layers was a multi-dimensional tensor, we need to flatten the tensor to a one-dimensional vector before feeding it into the fully connected layers.    
+5. Flattening (model_two only): Because the output from the convolutional and pooling layers was a multi-dimensional tensor, we needed to flatten the tensor to a one-dimensional vector before feeding it into the fully connected layers.    
   
 6. Fully Connected Layers: Similar to traditional neural networks, where each neuron is connected to every neuron in the previous layer, the fully connected layers combined the features learned by the convolutional and pooling layers to make a final prediction.  
   
-7. Output Layer: We chose a softmax function capable of outputting probabilities for each of the four classes, indicating the network's prediction of 
- Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells.   
+7. Output Layer: We chose a softmax function capable of outputting probabilities for each of the four classes, indicating the network's prediction of Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells.   
   
-### second_model, custom CNN
+
+
+
+## Pretrained Models
+
+Pre-training a neural network involves training a model on a large, broad, general-purpose dataset before fine-tuning it on a specific task (a new set of specific, likely previously unseen data). The ResNet50 model is a well-known model that was trained on the ImageNet database, a collection of millions of images classified across thousands of categories.   
+
+During pre-training, the model learns to identify and extract general features from the input data, such as images' edges, textures, and shapes. These features become broadly useful across new tasks and data domains, even if the new data was never part of the training data.
+
+The benefits of pre-training include improved performance, better generalization, and reduced training time. Pre-training allows the model to leverage knowledge learned from a large and diverse dataset. This accumulated knowledge can lead to better performance on the new task, especially when the new dataset is small or lacks diversity. Training a model from scratch can be computationally expensive and time-consuming. Pre-training on a large dataset and then fine-tuning it can significantly reduce the time required to achieve good performance.
+
+Pre-trained models often generalize better to new tasks because they start with a solid understanding of basic features and patterns, which can help improve accuracy on the new task. Pre-training can be a powerful technique, especially when data are scarce or where training a model from scratch would be impractical given resource constraints.  
+
+## Modifications for model compatibility
+  
+To make our custom CNN and the pre-trained CNN compatible with each other for direct ensembling and transfer learning puposes, we needed to make adjustments to the original ResNet50 model, and specify our custom CNN carefully. Note that we referred to our 'adjusted' ResNet50 model as our ResNet50-based model.   
+  
+A. To prepare the ResNet50-based model and the base CNN model to be direct ensembled, we defined them both to produce output tensors of identical shape. This required specifying Dense layers for the models' final output layers. We also set the number of units in the final output layers as equal to the class_count value, 4, to reflect the number of output classes in the data. We selected the Softmax activation functions for both models because it can return a probability distribution over 4 classes. This ensured the shape of the output tensors were (batch_size, class_count) or (None, 4).     
+
+B. To prevent errors related to ensembling a Functional API model (first_model) and a Sequential API model (second_model), we rebuilt the ResNet50-based (second_model) with the Functional API. The Functional API offered more control over inputs, outputs, and connections, and was better suited to handle the complexities involved in model ensembling. The Functional API also supports more flexibility than the Sequential API in cases of complex model architecture, particularly when combining pre-trained models with custom layers or sharing layers between models. Since the Functional API allows for explicit definition of the flow of data, it enables fine control over how layers connect and interact. It also supports freezing layers and chaining models, both of which were necessary in this project.
+
+C. The ResNet50 model was built to classify images across 1,000 classes, but likely not the four classes we were interested in. To define our own output layer suited for our four specific classes, we needed to freeze the ResNet50 model's top layer and replace it with our own. We accomplished the layer freezing by specifying "include_top=False," when building our ResNet50-based model. 
+  
+D. Similarly, we specified that we did not want the ResNet50 layers' pre-trained knowledge to be replaced or over-written in the course of analyzing our CT scan image dataset. We prevented this from happening by including "for layer in base_model.layers: layer.trainable = False" as we built second_model. 
+
+     
+## The two CNN sumb-models 
+  
+### first_model, the ResNet50-based model  
+from tensorflow.keras.layers import BatchNormalization  
+  
+img_size = (224, 224)                               # 224x224 what ResNet50 expects  
+channels = 3                                        # one channel each for Red, Blue, Green (color images)  
+img_shape = (img_size[0], img_size[1], channels)  
+class_count = len(training_set.class_names)         # class_names auto defined when image_dataset_from_directory creates dataset  
+  
+inputs = Input(shape=(224, 224, 3))                 # define input layer
+  
+data_augmentation = tf.keras.Sequential([RandomFlip("horizontal", RandomRotation(0.2), RandomZoom(0.2)])  # define data augmentation layers directly from tf.keras.layers  
+  
+augmented_inputs = data_augmentation(inputs) # define data augmentation layers directly from tf.keras.layers  
+  
+scaled_inputs = Rescaling(1./255)(augmented_inputs)  # to normalize pixel values, explicitly indicate rescaling to previous layer's inputs  
+  
+base_model = ResNet50(       # define ResNet50 base model  
+    weights='imagenet',      # use the weights resulting from training on ImageNet database
+    include_top=False,       # ignore top layer of original ResNet50; we'll define new top layer with only 4 classes
+    input_tensor=scaled_inputs,   # instantiate with scaled_inputs as input tensor  
+    pooling='max')                # base model to output tensor compatible with Dense layers, no need to flatten tensor  
+
+for layer in base_model.layers:   
+    layer.trainable = False  # freeze ResNet50 model layers to prevent pre-training from being re-trained    
+  
+x = base_model.output  # add custom layers on top of base_model
+x = BatchNormalization(axis=-1)(x)    # including BatchNormalization layer before Dense layer can yield better training and performance  
+x = Dense(256, activation='relu')(x)  
+x = Dropout(0.3)(x)  
+  
+outputs = Dense(class_count, activation='softmax')(x)  # define layer, output vector with 4 classes to enable direct ensembling models  
+
+first_model = Model(inputs=inputs, outputs=outputs)   # build by specifying inputs, outputs; outputs=outpus when definings with Model class  
+  
+  
+### second_model, custom CNN  
 from tensorflow.keras.layers import Input, RandomFlip, RandomRotation, RandomZoom, Dense  
 from tensorflow.keras.layers import Rescaling, Conv2D, MaxPooling2D, Dropout, Flatten  
 from tensorflow.keras.models import Model  
@@ -78,65 +138,17 @@ x = Flatten()(x)
 x = Dense(128, activation='relu')(x)  
 x = Dropout(0.25)(x)  
   
-output_tensor = Dense(class_count, activation='softmax')(x)  # define output layer
+output_tensor = Dense(class_count, activation='softmax')(x)  # define output layer capable of solving 4-class problem
   
-second_model = Model(inputs=input_tensor, outputs=output_tensor)  # define model
+second_model = Model(inputs=input_tensor, outputs=output_tensor)  # define model 
 
-
-## Pretrained Models
-
-Pre-training a neural network involves training a model on a large, broad, general-purpose dataset before fine-tuning it on a specific task (a new set of specific, likely previously unseen data). The ResNet50 model is a well-known model that was trained on the ImageNet database, a collection of millions of images classified across thousands of categories.   
-
-During pre-training, the model learns to identify and extract general features from the input data, such as images' edges, textures, and shapes. These features become broadly useful across new tasks and data domains, even if the new data was never part of the training data.
-
-To make our custom CNN and the pre-trained CNN compatible with each other for direct ensembling and transfer learning puposes, we needed to make adjustments to the original ResNet50 model, and specify our custom CNN carefully. Note that we referred to our 'adjusted' ResNet50 model as our ResNet50-based model.   
   
-A. To prepare the ResNet50-based model and the base CNN model to be direct ensembled, we defined them both to produce output tensors of identical shape. This required specifying Dense layers for the models' final output layers. We also set the number of units in the final output layers as equal to the class_count value, 4, to reflect the number of output classes in the data. We selected the Softmax activation functions for both models because it can return a probability distribution over 4 classes. This ensured the shape of the output tensors were (batch_size, class_count) or (None, 4).     
 
-B. We built the ResNet50-based model, first_model, using the Functional API because it supports more flexibility than the Sequential API in cases of complex model architecture. In particular, the Functional API affords more flexibility when combining pre-trained models with custom layers or sharing layers between models. Since the Functional API allows for explicit definition of the flow of data, it enables fine control over how layers connect and interact. It also supports freezing layers and chaining models.
-
-C. To prevent errors related to ensembling a Functional API model (first_model) and a Sequential API model (second_model), we rebuilt the ResNet50-based (second_model) with the Functional API. The Functional API offered more control over inputs, outputs, and connections, and was better suited to handle the complexities involved in model ensembling.
+## Model Ensembling  
   
 
 
 
-
-
-### first_model, pre-trained ResNet50-based model  
-from tensorflow.keras.layers import BatchNormalization  
-  
-img_size = (224, 224)                               # 224x224 what ResNet50 expects  
-channels = 3                                        # one channel each for Red, Blue, Green (color images)  
-img_shape = (img_size[0], img_size[1], channels)  
-class_count = len(training_set.class_names)         # class_names auto defined when image_dataset_from_directory creates dataset  
-  
-inputs = Input(shape=(224, 224, 3))                 # define input layer
-  
-data_augmentation = tf.keras.Sequential([RandomFlip("horizontal", RandomRotation(0.2), RandomZoom(0.2)])  # define data augmentation layers directly from tf.keras.layers  
-  
-augmented_inputs = data_augmentation(inputs) # define data augmentation layers directly from tf.keras.layers  
-  
-scaled_inputs = Rescaling(1./255)(augmented_inputs)  # to normalize pixel values, explicitly indicate rescaling to previous layer's inputs  
-  
-base_model = ResNet50(       # define ResNet50 base model  
-    weights='imagenet',  
-    include_top=False,  
-    input_tensor=scaled_inputs,   # instantiate with scaled_inputs as input tensor  
-    pooling='max')                # base model to output tensor compatible with Dense layers, no need to flatten tensor  
-
-
-for layer in base_model.layers:   
-    layer.trainable = False  # freeze ResNet50 model layers to prevent them from being retrained    
-  
-x = base_model.output  # add custom layers on top of base_model
-x = BatchNormalization(axis=-1)(x)    # including BatchNormalization layer before Dense layer can yield better training and performance  
-x = Dense(256, activation='relu')(x)  
-x = Dropout(0.3)(x)  
-  
-outputs = Dense(class_count, activation='softmax')(x)  # define layer, output vector with 4 classes to enable direct ensembling models  
-
-first_model = Model(inputs=inputs, outputs=outputs)   # build by specifying inputs, outputs; outputs=outpus when definings with Model class    
-  
 ## Transfer Learning   
 
 After pre-training, the model is applied to a new, specific dataset and classification task in a process known as transfer learning. The pre-trained model's weights, optimized during pre-training, become the starting point for training on a new, often smaller, dataset. The model learns the specifics of the new task while leveraging the general features it learned during pre-training. In our project, the smaller dataset consisted of the CT-Scan images with different types of chest cancer versus normal cells. The ResNet50 model (pre_trained
@@ -148,17 +160,6 @@ The process of combining a pre-trained model with a custom CNN is called transfe
 
 
 
-Benefits of Pre-Training:
-
-* **Improved Performance**: Pre-training allows the model to leverage knowledge learned from a large and diverse dataset, which can lead to better performance on the new task, especially when the new dataset is small or lacks diversity.
-
-* **Reduced Training Time**: Training a model from scratch can be computationally expensive and time-consuming. Pre-training on a large dataset and then fine-tuning can significantly reduce the time required to achieve good performance.
-
-* **Better Generalization**: Pre-trained models often generalize better to new tasks because they start with a solid understanding of basic features and patterns, which can help improve accuracy on the new task.
-
-Pre-training is a powerful technique, especially in scenarios where data is scarce or where training a model from scratch would be impractical due to resource constraints.
-
-In our specific case, we use models that are pre-trained on the EfficientNetB3, ResNet50 and InceptionV3 datasets. The InceptionV3 model is trained to classify 1000 different images in a wide range of categories, so that may be why the accuracy suffers, but the ResNet50 model also does this and has good accuracy for us. We need some further investigation as to why there are differences in these models. After pre-training, we then employ transfer learning by further training the models on our cancer image dataset.
 
 
 
@@ -215,17 +216,7 @@ Unfortunately, there is no good way to tell whether we are dealing with sparse o
 Therefore, we must carefully specify whether we are using sparse or categorical in the data generating functions to ensure that everything matches up with the specified loss function.
 
 
-Benefits of Pre-Training:
 
-* **Improved Performance**: Pre-training allows the model to leverage knowledge learned from a large and diverse dataset, which can lead to better performance on the new task, especially when the new dataset is small or lacks diversity.
-
-* **Reduced Training Time**: Training a model from scratch can be computationally expensive and time-consuming. Pre-training on a large dataset and then fine-tuning can significantly reduce the time required to achieve good performance.
-
-* **Better Generalization**: Pre-trained models often generalize better to new tasks because they start with a solid understanding of basic features and patterns, which can help improve accuracy on the new task.
-
-Pre-training is a powerful technique, especially in scenarios where data is scarce or where training a model from scratch would be impractical due to resource constraints.
-
-In our specific case, we use models that are pre-trained on the EfficientNetB3, ResNet50 and InceptionV3 datasets. The InceptionV3 model is trained to classify 1000 different images in a wide range of categories, so that may be why the accuracy suffers, but the ResNet50 model also does this and has good accuracy for us. We need some further investigation as to why there are differences in these models. After pre-training, we then employ transfer learning by further training the models on our cancer image dataset.
 
 
 
