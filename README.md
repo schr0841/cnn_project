@@ -82,7 +82,7 @@ second_model = Model(inputs=input_tensor, outputs=output_tensor)  # define model
 
 Pre-training a neural network involves training a model on a large, broad, general-purpose dataset before fine-tuning it on a specific task (a new set of specific, likely previously unseen data). The ResNet50 model is a well-known model that was trained on the ImageNet database, a collection of millions of images classified across thousands of categories.   
 
-During pre-training, the model learns to identify and extract general features from input data, such as images' edges, textures, and shapes. These features become broadly useful across new tasks and data domains, even if the new data was never part of the training data. 
+During pre-training, the model learns to identify and extract general features from the input data, such as images' edges, textures, and shapes. These features become broadly useful across new tasks and data domains, even if the new data was never part of the training data. 
 
 ### first_model, pre-trained ResNet50-based model  
 from tensorflow.keras.layers import BatchNormalization  
