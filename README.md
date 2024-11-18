@@ -55,7 +55,7 @@ class_count = len(training_set.class_names)  # class_names auto defined when ima
     
 input_tensor = Input(shape=img_shape)        # define input layer
     
-x = RandomFlip("horizontal")(input_tensor)   # apply 3 data augmentation layers
+x = RandomFlip("horizontal")(input_tensor)   # apply 3 data augmentation layers  
 x = RandomRotation(0.2)(x)  
 x = RandomZoom(0.2)(x)  
   
