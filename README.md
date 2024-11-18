@@ -43,7 +43,7 @@ We built our custom CNN (model_two) with the following components:
 7. Output Layer: We chose a softmax function capable of outputting probabilities for each of the four classes, indicating the network's prediction of 
  Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells. 
 
-# second_model
+### second_model
 from tensorflow.keras.layers import Input, RandomFlip, RandomRotation, RandomZoom, Dense  
 from tensorflow.keras.layers import Rescaling, Conv2D, MaxPooling2D, Dropout, Flatten  
 from tensorflow.keras.models import Model  
@@ -51,10 +51,10 @@ from tensorflow.keras.models import Model
 img_size = (224, 224)       # Resize to 224x224, what ResNet50 expects  
 channels = 3                # One channel each for Red, Blue, Green (color images) 
 img_shape = (img_size[0], img_size[1], channels)  
-class_count = len(training_set.class_names)  
-  
+class_count = len(training_set.class_names)  ## class_names auto defined when image_dataset_from_directory creates dataset  
+    
 input_tensor = Input(shape=img_shape)  
-  
+    
 x = RandomFlip("horizontal")(input_tensor)  
 x = RandomRotation(0.2)(x)  
 x = RandomZoom(0.2)(x)  
@@ -76,13 +76,71 @@ output_tensor = Dense(class_count, activation='softmax')(x)
 second_model = Model(inputs=input_tensor, outputs=output_tensor)  
 
 
-
-
 ## Pretrained Models
 
 Pre-training a neural network involves training a model on a large, broad, general-purpose dataset before fine-tuning it on a specific task (a new set of specific, likely previously unseen data). The ResNet50 model is a well-known model that was trained on the ImageNet database, a collection of millions of images classified across thousands of categories.   
 
 During pre-training, the model learns to identify and extract general features from input data, such as images' edges, textures, and shapes. These features become broadly useful across new tasks and data domains, even if the new data was never part of the training data. 
+
+### Build first_model, pre-trained ResNet50-based model  
+from tensorflow.keras.layers import BatchNormalization  
+  
+img_size = (224, 224)    
+channels = 3  
+img_shape = (img_size[0], img_size[1], channels)  
+class_count = len(training_set.class_names)     
+  
+# Define input tensor -- create necessary input tensor for Keras model
+# crucial for defining shape and type of input data in Keras Functional API model
+inputs = Input(shape=(224, 224, 3))
+
+# Define data augmentation layers directly from tf.keras.layers
+data_augmentation = tf.keras.Sequential([
+    RandomFlip("horizontal"),
+    RandomRotation(0.2),
+    RandomZoom(0.2)
+])
+
+# Apply data augmentation to input tensor
+# data augmentation layers applied to inputs; output stored in 'augmented_inputs'
+augmented_inputs = data_augmentation(inputs)
+
+# Apply rescaling, to normalize images' pixel values
+# Including (augmented_inputs) as part of Rescaling layer necessary
+# in Functional API, we explicitly define data flow between layers by passing output of one layer as input to next
+# (augmented_inputs) part of statement explicitly indicates rescaling to be applied to previous layer's output
+# Without passing (augmented_inputs) as input, model wouldn't know where to apply rescaling
+scaled_inputs = Rescaling(1./255)(augmented_inputs)
+
+# Define ResNet50 base model
+# Instantiated with scaled_inputs as input tensor
+# pooling='max': base model will output tensor with shape (batch_size, channels), compatible with
+# subsequent Dense layers without needing to first flatten tensor
+base_model = ResNet50(
+    weights='imagenet',
+    include_top=False,
+    input_tensor=scaled_inputs,
+    pooling='max')
+
+# Freeze layers of ResNet50 model to prevent them from being retrained
+for layer in base_model.layers:
+    layer.trainable = False
+
+# Add custom layers on top of base_model
+x = base_model.output
+x = BatchNormalization(axis=-1)(x)    #Including BatchNormalization layer before Dense layer not strictly necessary for compatibility but
+                                      #can be advantageous for better training and performance
+x = Dense(256, activation='relu')(x)
+x = Dropout(0.3)(x)
+
+# Define output layer with number of classes (assuming 4 classes here)
+# Because models to be Direct Ensembled, both should have Dense layer with softmax activation function as output
+# output will be vector representing class probabilities for 4-class problem
+outputs = Dense(class_count, activation='softmax')(x)
+
+# Build first_model by specifying inputs and outputs
+first_model = Model(inputs=inputs, outputs=outputs)
+# Because outputs variable represents model final output, when defining model using Model class, use outputs = outputs
 
 ## Transfer Learning   
 
