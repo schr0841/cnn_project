@@ -6,7 +6,7 @@
 Can we train a convolutional neural network (CNN) model from scratch to classify CT chest scan images as indicating one of the following four categories (classe) Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells? What happens if we add to our model a pre-trained CNN model by employing transfer learning and model ensembling? Will we see improved accuracy scores with either method?
 
 
-## Convolutional Neural Network: General Overview
+## Convolutional Neural Networks
 
 CNNs use convolutional and pooling layers to automatically and hierarchically learn features from images, and use fully connected layers to classify those features into predefined categories. This process enables CNNs to effectively handle and classify complex visual data.
 
@@ -29,11 +29,43 @@ We built our CNN with the following components:
 7. Output Layer: We chose a softmax function capable of outputting probabilities for each of the four classes, indicating the network's prediction of 
  Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells.
 
+## Pretrained Models
+
+Pre-training a neural network involves training a model on a large, broad, general-purpose dataset before fine-tuning it on a specific task (a new set of specific data). The process of combining a pre-trained model with a custom CNN is called transfer learning.   
+
+In our project, we compared the accuracy values obtained with our dataset of chest CT images in the following four model scenarios:  
+a) our pre-trained ResNet50 model(model_one) 
+b) our custom CNN (model_two)  
+c) ensembling the output of model_one and model_two (model_three)
+d) chaining model_one and model_two into model_four (transfer learning)
+
+1. **Initial Training on a Large Dataset**: Pre-training typically involves training a neural network on a broad, general-purpose dataset. For example, in the case of image classification, a model might be pre-trained on a large and diverse dataset like ImageNet, which contains millions of labeled images across thousands of categories.
+
+2. **Learning General Features**: During pre-training, the model learns to identify and extract general features from the data, such as edges, textures, and shapes in images, or basic linguistic patterns in text. These features are broadly useful across different tasks and domains.
+
+3. **Transfer Learning**: After pre-training, the model is adapted to a specific task or dataset in a process known as transfer learning. Here, the model's weights, which have been optimized during pre-training, are used as the starting point for training on a new, often smaller, dataset. The model is fine-tuned to learn the specifics of the new task while leveraging the general features it has already learned. In our specific case, the smaller dataset consists of CT-Scan images with different types of chest cancer.
+
+4. **Fine-Tuning**: Fine-tuning involves adjusting the pre-trained model's weights to better fit the new task. This can involve retraining some or all of the network's layers, depending on how similar the new task is to the original one.
+
+Benefits of Pre-Training:
+
+* **Improved Performance**: Pre-training allows the model to leverage knowledge learned from a large and diverse dataset, which can lead to better performance on the new task, especially when the new dataset is small or lacks diversity.
+
+* **Reduced Training Time**: Training a model from scratch can be computationally expensive and time-consuming. Pre-training on a large dataset and then fine-tuning can significantly reduce the time required to achieve good performance.
+
+* **Better Generalization**: Pre-trained models often generalize better to new tasks because they start with a solid understanding of basic features and patterns, which can help improve accuracy on the new task.
+
+Pre-training is a powerful technique, especially in scenarios where data is scarce or where training a model from scratch would be impractical due to resource constraints.
+
+In our specific case, we use models that are pre-trained on the EfficientNetB3, ResNet50 and InceptionV3 datasets. The InceptionV3 model is trained to classify 1000 different images in a wide range of categories, so that may be why the accuracy suffers, but the ResNet50 model also does this and has good accuracy for us. We need some further investigation as to why there are differences in these models. After pre-training, we then employ transfer learning by further training the models on our cancer image dataset.
 
 
 
+## Exploration Process
 
-From the Kaggle notebook available here: https://www.kaggle.com/code/prthmgoyl/ensemblemodel-ctscan  we have some code to work with for pre-trained models. We evaluate each model on test loss, test accuracy, validation loss and validation accuracy. Below are two tables, each populated using a different type of loss function:
+we defined our 
+
+We evaluated each model on test loss, test accuracy, validation loss and validation accuracy. Below are two tables, each populated using a different type of loss function:
 
 
 
