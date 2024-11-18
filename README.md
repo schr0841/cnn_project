@@ -48,8 +48,8 @@ from tensorflow.keras.layers import Input, RandomFlip, RandomRotation, RandomZoo
 from tensorflow.keras.layers import Rescaling, Conv2D, MaxPooling2D, Dropout, Flatten  
 from tensorflow.keras.models import Model  
   
-img_size = (224, 224)       # Resize to 224x224, what ResNet50 expects    
-channels = 3                # One channel each for Red, Blue, Green (color images)   
+img_size = (224, 224)       # resize to 224x224, what ResNet50 expects -- needed for chaining models    
+channels = 3                # one channel each for Red, Blue, Green (color images)   
 img_shape = (img_size[0], img_size[1], channels)     
 class_count = len(training_set.class_names)  # class_names auto defined when image_dataset_from_directory creates dataset    
     
@@ -87,55 +87,38 @@ During pre-training, the model learns to identify and extract general features f
 ### first_model, pre-trained ResNet50-based model  
 from tensorflow.keras.layers import BatchNormalization  
   
-img_size = (224, 224)                               # 224x224 is what ResNet50 expects  
-channels = 3                                        # One channel each for Red, Blue, Green (color images)  
+img_size = (224, 224)                               # 224x224 what ResNet50 expects  
+channels = 3                                        # one channel each for Red, Blue, Green (color images)  
 img_shape = (img_size[0], img_size[1], channels)  
 class_count = len(training_set.class_names)         # class_names auto defined when image_dataset_from_directory creates dataset  
   
 inputs = Input(shape=(224, 224, 3))                 # define input layer
   
-data_augmentation = tf.keras.Sequential( [RandomFlip("horizontal", RandomRotation(0.2), RandomZoom(0.2)] )  
+data_augmentation = tf.keras.Sequential([RandomFlip("horizontal", RandomRotation(0.2), RandomZoom(0.2)])  # define data augmentation layers directly from tf.keras.layers  
   
-augmented_inputs = data_augmentation(inputs)
- # Apply data augmentation to input tensor: apply augmentation layers applied to inputs; store ourput in 'augmented_inputs'
+augmented_inputs = data_augmentation(inputs) # define data augmentation layers directly from tf.keras.layers  
+  
+scaled_inputs = Rescaling(1./255)(augmented_inputs)  # to normalize pixel values, explicitly indicate rescaling to previous layer's inputs  
+  
+base_model = ResNet50(       # define ResNet50 base model  
+    weights='imagenet',  
+    include_top=False,  
+    input_tensor=scaled_inputs,   # instantiate with scaled_inputs as input tensor  
+    pooling='max')                # base model to output tensor compatible with Dense layers, no need to flatten tensor  
 
-# Apply rescaling, to normalize images' pixel values
-# Including (augmented_inputs) as part of Rescaling layer necessary
-# in Functional API, we explicitly define data flow between layers by passing output of one layer as input to next
-# (augmented_inputs) part of statement explicitly indicates rescaling to be applied to previous layer's output
-# Without passing (augmented_inputs) as input, model wouldn't know where to apply rescaling
-scaled_inputs = Rescaling(1./255)(augmented_inputs)
 
-# Define ResNet50 base model
-# Instantiated with scaled_inputs as input tensor
-# pooling='max': base model will output tensor with shape (batch_size, channels), compatible with
-# subsequent Dense layers without needing to first flatten tensor
-base_model = ResNet50(
-    weights='imagenet',
-    include_top=False,
-    input_tensor=scaled_inputs,
-    pooling='max')
+for layer in base_model.layers:   
+    layer.trainable = False  # freeze ResNet50 model layers to prevent them from being retrained    
+  
+x = base_model.output  # add custom layers on top of base_model
+x = BatchNormalization(axis=-1)(x)    # including BatchNormalization layer before Dense layer can yield better training and performance  
+x = Dense(256, activation='relu')(x)  
+x = Dropout(0.3)(x)  
+  
+outputs = Dense(class_count, activation='softmax')(x)  # define layer, output vector with 4 classes to enable direct ensembling models  
 
-# Freeze layers of ResNet50 model to prevent them from being retrained
-for layer in base_model.layers:
-    layer.trainable = False
-
-# Add custom layers on top of base_model
-x = base_model.output
-x = BatchNormalization(axis=-1)(x)    #Including BatchNormalization layer before Dense layer not strictly necessary for compatibility but
-                                      #can be advantageous for better training and performance
-x = Dense(256, activation='relu')(x)
-x = Dropout(0.3)(x)
-
-# Define output layer with number of classes (assuming 4 classes here)
-# Because models to be Direct Ensembled, both should have Dense layer with softmax activation function as output
-# output will be vector representing class probabilities for 4-class problem
-outputs = Dense(class_count, activation='softmax')(x)
-
-# Build first_model by specifying inputs and outputs
-first_model = Model(inputs=inputs, outputs=outputs)
-# Because outputs variable represents model final output, when defining model using Model class, use outputs = outputs
-
+first_model = Model(inputs=inputs, outputs=outputs)   # build by specifying inputs, outputs; outputs=outpus when definings with Model class    
+  
 ## Transfer Learning   
 
 After pre-training, the model is applied to a new, specific dataset and classification task in a process known as transfer learning. The pre-trained model's weights, optimized during pre-training, become the starting point for training on a new, often smaller, dataset. The model learns the specifics of the new task while leveraging the general features it learned during pre-training. In our project, the smaller dataset consisted of the CT-Scan images with different types of chest cancer versus normal cells. The ResNet50 model (pre_trained
