@@ -31,7 +31,9 @@ We built our CNN with the following components:
 
 ## Pretrained Models
 
-Pre-training a neural network involves training a model on a large, broad, general-purpose dataset before fine-tuning it on a specific task (a new set of specific data). The process of combining a pre-trained model with a custom CNN is called transfer learning.   
+Pre-training a neural network involves training a model on a large, broad, general-purpose dataset before fine-tuning it on a specific task (a new set of specific data). The ResNet50 model is a well-known model that was trained on the ImageNet database, a collection of millions of images classified across thousands of categories. 
+
+The process of combining a pre-trained model with a custom CNN is called transfer learning.   
 
 In our project, we compared the accuracy values obtained with our dataset of chest CT images in the following four model scenarios:  
 a) our pre-trained ResNet50 model(model_one) 
