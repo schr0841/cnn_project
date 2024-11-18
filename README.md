@@ -14,51 +14,53 @@ c) ensembling the output of model_one and model_two (model_three)
 d) chaining model_one and model_two into model_four (transfer learning)  
   
 Concepts:
-Convolutional Neural Networks
-Pretained models
-Transfer Learning
-Model Ensembling
-
-
-## Convolutional Neural Networks
-
-CNNs use convolutional and pooling layers to automatically and hierarchically learn features from images, and use fully connected layers to classify those features into predefined categories. This process enables CNNs to effectively handle and classify complex visual data.
-
-The data for this project was obtained here: https://www.kaggle.com/datasets/mohamedhanyyy/chest-ctscan-images
-
-We built our custom CNN (model_two) with the following components:
-
-1. Input Layer: Our input images are represented as matrices of pixel values. 
+Convolutional Neural Networks  
+Pretained models  
+Transfer Learning  
+Model Ensembling  
+  
+  
+## Convolutional Neural Networks  
+  
+CNNs use convolutional and pooling layers to automatically and hierarchically learn features from images, and use fully connected layers to classify those features into predefined categories. This process enables CNNs to effectively handle and classify complex visual data.  
+  
+The data for this project was obtained here: https://www.kaggle.com/datasets/mohamedhanyyy/chest-ctscan-images  
+  
+We built our custom CNN (model_two) with the following components:  
+  
+1. Input Layer: Our input images are represented as matrices of pixel values.   
 
 2. Convolutional Layers: These layers applied convolutional filters (or kernels) to the inputs. Each filter scanned the images and performed a convolution operation involving element-wise multiplication and results summing. These layers extracted features like edges, textures, and patterns from each image and produced a feature map highlighting the presence of specific features in different parts of the image.  
-
+  
 3. Activation Function: We applied activation function ReLU (Rectified Linear Unit) to introduce non-linearity into the model, which helped the network learn more complex patterns.  
-
+  
 4. Pooling Layers: We used max pooling to reduce the spatial dimensions of the feature maps by taking the maximum value from a subset of the feature map. This reduced the number of parameters and computations, helping the network become more robust to variations in image.  
-
-5. Flattening: Because the output from the convolutional and pooling layers was a multi-dimensional tensor, we need to flatten the tensor to a one-dimensional vector before feeding it into the fully connected layers.  
-
+  
+5. Flattening: Because the output from the convolutional and pooling layers was a multi-dimensional tensor, we need to flatten the tensor to a one-dimensional vector before feeding it into the fully connected layers.    
+  
 6. Fully Connected Layers: Similar to traditional neural networks, where each neuron is connected to every neuron in the previous layer, the fully connected layers combined the features learned by the convolutional and pooling layers to make a final prediction.  
-
+  
 7. Output Layer: We chose a softmax function capable of outputting probabilities for each of the four classes, indicating the network's prediction of 
- Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells. 
-
-### second_model
+ Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells.   
+  
+### second_model, custom CNN
 from tensorflow.keras.layers import Input, RandomFlip, RandomRotation, RandomZoom, Dense  
 from tensorflow.keras.layers import Rescaling, Conv2D, MaxPooling2D, Dropout, Flatten  
 from tensorflow.keras.models import Model  
   
-img_size = (224, 224)       # Resize to 224x224, what ResNet50 expects  
-channels = 3                # One channel each for Red, Blue, Green (color images) 
-img_shape = (img_size[0], img_size[1], channels)  
-class_count = len(training_set.class_names)  ## class_names auto defined when image_dataset_from_directory creates dataset  
+img_size = (224, 224)       # Resize to 224x224, what ResNet50 expects    
+channels = 3                # One channel each for Red, Blue, Green (color images)   
+img_shape = (img_size[0], img_size[1], channels)     
+class_count = len(training_set.class_names)  # class_names auto defined when image_dataset_from_directory creates dataset    
     
-input_tensor = Input(shape=img_shape)  
+input_tensor = Input(shape=img_shape)        # define input layer
     
-x = RandomFlip("horizontal")(input_tensor)  
+x = RandomFlip("horizontal")(input_tensor)   # apply 3 data augmentation layers
 x = RandomRotation(0.2)(x)  
 x = RandomZoom(0.2)(x)  
-x = Rescaling(1./255)(x)
+  
+x = Rescaling(1./255)(x)                     #apply rescalling
+  
 x = Conv2D(filters=32, kernel_size=(3, 3), activation='relu')(x)  
 x = MaxPooling2D(pool_size=(2, 2))(x)  
 x = Conv2D(filters=32, kernel_size=(3, 3), activation='relu')(x)  
@@ -71,9 +73,9 @@ x = Flatten()(x)
 x = Dense(128, activation='relu')(x)  
 x = Dropout(0.25)(x)  
   
-output_tensor = Dense(class_count, activation='softmax')(x)  
+output_tensor = Dense(class_count, activation='softmax')(x)  # define output layer
   
-second_model = Model(inputs=input_tensor, outputs=output_tensor)  
+second_model = Model(inputs=input_tensor, outputs=output_tensor)  # define model
 
 
 ## Pretrained Models
@@ -82,28 +84,24 @@ Pre-training a neural network involves training a model on a large, broad, gener
 
 During pre-training, the model learns to identify and extract general features from input data, such as images' edges, textures, and shapes. These features become broadly useful across new tasks and data domains, even if the new data was never part of the training data. 
 
-### Build first_model, pre-trained ResNet50-based model  
+### first_model, pre-trained ResNet50-based model  
 from tensorflow.keras.layers import BatchNormalization  
   
-img_size = (224, 224)    
-channels = 3  
+img_size = (224, 224)                               # 224x224 is what ResNet50 expects  
+channels = 3                                        # One channel each for Red, Blue, Green (color images)  
 img_shape = (img_size[0], img_size[1], channels)  
-class_count = len(training_set.class_names)     
+class_count = len(training_set.class_names)         # class_names auto defined when image_dataset_from_directory creates dataset  
   
-# Define input tensor -- create necessary input tensor for Keras model
-# crucial for defining shape and type of input data in Keras Functional API model
-inputs = Input(shape=(224, 224, 3))
-
-# Define data augmentation layers directly from tf.keras.layers
-data_augmentation = tf.keras.Sequential([
+inputs = Input(shape=(224, 224, 3))                 # define input layer
+  
+data_augmentation = tf.keras.Sequential([           # apply data augmentation 1 one layer
     RandomFlip("horizontal"),
     RandomRotation(0.2),
     RandomZoom(0.2)
-])
-
-# Apply data augmentation to input tensor
-# data augmentation layers applied to inputs; output stored in 'augmented_inputs'
+])  
+  
 augmented_inputs = data_augmentation(inputs)
+ # Apply data augmentation to input tensor: apply augmentation layers applied to inputs; store ourput in 'augmented_inputs'
 
 # Apply rescaling, to normalize images' pixel values
 # Including (augmented_inputs) as part of Rescaling layer necessary
