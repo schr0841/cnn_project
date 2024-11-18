@@ -1,9 +1,23 @@
 # Medical Image Classification with Convolutional Neural Networks
-
-
+  
+  
 # Overview and Purpose
-
-Can we train a convolutional neural network (CNN) model from scratch to classify CT chest scan images as indicating one of the following four categories (classe) Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells? What happens if we add to our model a pre-trained CNN model by employing transfer learning and model ensembling? Will we see improved accuracy scores with either method?
+  
+Can we train a convolutional neural network (CNN) model from scratch to classify CT chest scan images as indicating one of the following four categories (classes): Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells? How well does the model perform?
+  
+What happens if we add to our model a pre-trained CNN model by employing transfer learning and model ensembling? Will we see improved accuracy scores with either of these methods?
+  
+In our project, we compared the accuracy values obtained with our dataset of chest CT images in the following four model scenarios:  
+a) the pre-trained ResNet50 model(model_one) 
+b) our custom CNN (model_two)  
+c) ensembling the output of model_one and model_two (model_three)
+d) chaining model_one and model_two into model_four (transfer learning)  
+  
+Concepts:
+Convolutional Neural Networks
+Pretained models
+Transfer Learning
+Model Ensembling
 
 
 ## Convolutional Neural Networks
@@ -12,42 +26,82 @@ CNNs use convolutional and pooling layers to automatically and hierarchically le
 
 The data for this project was obtained here: https://www.kaggle.com/datasets/mohamedhanyyy/chest-ctscan-images
 
-We built our CNN with the following components:
+We built our custom CNN (model_two) with the following components:
 
 1. Input Layer: Our input images are represented as matrices of pixel values. 
 
-2. Convolutional Layers: These layers applied convolutional filters (or kernels) to the inputs. Each filter scanned the images and performed a convolution operation involving element-wise multiplication and results summing. These layers extracted features like edges, textures, and patterns from each image and produced a feature map highlighting the presence of specific features in different parts of the image.
+2. Convolutional Layers: These layers applied convolutional filters (or kernels) to the inputs. Each filter scanned the images and performed a convolution operation involving element-wise multiplication and results summing. These layers extracted features like edges, textures, and patterns from each image and produced a feature map highlighting the presence of specific features in different parts of the image.  
 
-3. Activation Function: We applied activation function ReLU (Rectified Linear Unit) to introduce non-linearity into the model, which helped the network learn more complex patterns.
+3. Activation Function: We applied activation function ReLU (Rectified Linear Unit) to introduce non-linearity into the model, which helped the network learn more complex patterns.  
 
-4. Pooling Layers: We used max pooling to reduce the spatial dimensions of the feature maps by taking the maximum value from a subset of the feature map. This reduced the number of parameters and computations, helping the network become more robust to variations in image.
+4. Pooling Layers: We used max pooling to reduce the spatial dimensions of the feature maps by taking the maximum value from a subset of the feature map. This reduced the number of parameters and computations, helping the network become more robust to variations in image.  
 
-5. Flattening: Because the output from the convolutional and pooling layers was a multi-dimensional tensor, we need to flatten the tensor to a one-dimensional vector before feeding it into the fully connected layers.
+5. Flattening: Because the output from the convolutional and pooling layers was a multi-dimensional tensor, we need to flatten the tensor to a one-dimensional vector before feeding it into the fully connected layers.  
 
-6. Fully Connected Layers: Similar to traditional neural networks, where each neuron is connected to every neuron in the previous layer, the fully connected layers combined the features learned by the convolutional and pooling layers to make a final prediction.
+6. Fully Connected Layers: Similar to traditional neural networks, where each neuron is connected to every neuron in the previous layer, the fully connected layers combined the features learned by the convolutional and pooling layers to make a final prediction.  
 
 7. Output Layer: We chose a softmax function capable of outputting probabilities for each of the four classes, indicating the network's prediction of 
- Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells.
+ Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells. 
+
+# second_model
+from tensorflow.keras.layers import Input, RandomFlip, RandomRotation, RandomZoom, Dense  
+from tensorflow.keras.layers import Rescaling, Conv2D, MaxPooling2D, Dropout, Flatten  
+from tensorflow.keras.models import Model  
+  
+img_size = (224, 224)       # Resize to 224x224, what ResNet50 expects  
+channels = 3  
+img_shape = (img_size[0], img_size[1], channels)  
+class_count = len(training_set.class_names)  
+  
+input_tensor = Input(shape=img_shape)  
+  
+x = RandomFlip("horizontal")(input_tensor)  
+x = RandomRotation(0.2)(x)  
+x = RandomZoom(0.2)(x)  
+  
+x = Rescaling(1./255)(x)
+  
+x = Conv2D(filters=32, kernel_size=(3, 3), activation='relu')(x)  
+x = MaxPooling2D(pool_size=(2, 2))(x)  
+  
+x = Conv2D(filters=32, kernel_size=(3, 3), activation='relu')(x)  
+x = MaxPooling2D(pool_size=(2, 2))(x)  
+  
+x = Dropout(0.25)(x)  
+  
+x = Conv2D(filters=64, kernel_size=(3, 3), activation='relu')(x)  
+x = MaxPooling2D(pool_size=(2, 2))(x)  
+  
+x = Dropout(0.25)(x)  
+
+x = Flatten()(x)  
+  
+x = Dense(128, activation='relu')(x)  
+x = Dropout(0.25)(x)  
+  
+output_tensor = Dense(class_count, activation='softmax')(x)  
+  
+second_model = Model(inputs=input_tensor, outputs=output_tensor)  
+
+
+
 
 ## Pretrained Models
 
-Pre-training a neural network involves training a model on a large, broad, general-purpose dataset before fine-tuning it on a specific task (a new set of specific data). The ResNet50 model is a well-known model that was trained on the ImageNet database, a collection of millions of images classified across thousands of categories. 
+Pre-training a neural network involves training a model on a large, broad, general-purpose dataset before fine-tuning it on a specific task (a new set of specific, likely previously unseen data). The ResNet50 model is a well-known model that was trained on the ImageNet database, a collection of millions of images classified across thousands of categories.   
+
+During pre-training, the model learns to identify and extract general features from input data, such as images' edges, textures, and shapes. These features become broadly useful across new tasks and data domains, even if the new data was never part of the training data. 
+
+## Transfer Learning   
+
+After pre-training, the model is applied to a new, specific dataset and classification task in a process known as transfer learning. The pre-trained model's weights, optimized during pre-training, become the starting point for training on a new, often smaller, dataset. The model learns the specifics of the new task while leveraging the general features it learned during pre-training. In our project, the smaller dataset consisted of the CT-Scan images with different types of chest cancer versus normal cells. The ResNet50 model (pre_trained
 
 The process of combining a pre-trained model with a custom CNN is called transfer learning.   
 
-In our project, we compared the accuracy values obtained with our dataset of chest CT images in the following four model scenarios:  
-a) our pre-trained ResNet50 model(model_one) 
-b) our custom CNN (model_two)  
-c) ensembling the output of model_one and model_two (model_three)
-d) chaining model_one and model_two into model_four (transfer learning)
 
-1. **Initial Training on a Large Dataset**: Pre-training typically involves training a neural network on a broad, general-purpose dataset. For example, in the case of image classification, a model might be pre-trained on a large and diverse dataset like ImageNet, which contains millions of labeled images across thousands of categories.
 
-2. **Learning General Features**: During pre-training, the model learns to identify and extract general features from the data, such as edges, textures, and shapes in images, or basic linguistic patterns in text. These features are broadly useful across different tasks and domains.
 
-3. **Transfer Learning**: After pre-training, the model is adapted to a specific task or dataset in a process known as transfer learning. Here, the model's weights, which have been optimized during pre-training, are used as the starting point for training on a new, often smaller, dataset. The model is fine-tuned to learn the specifics of the new task while leveraging the general features it has already learned. In our specific case, the smaller dataset consists of CT-Scan images with different types of chest cancer.
 
-4. **Fine-Tuning**: Fine-tuning involves adjusting the pre-trained model's weights to better fit the new task. This can involve retraining some or all of the network's layers, depending on how similar the new task is to the original one.
 
 Benefits of Pre-Training:
 
