@@ -1,5 +1,8 @@
 # Medical Image Classification with Convolutional Neural Networks
-  
+
+## Executive Summary
+
+We defined, compiled, and trained two CNN submodels individually before ensembling and chaining them. We looked for a noticeable improvement in accuracy by combining first_model and second_model over each of the submodels.    
   
 ## Overview and Purpose
   
@@ -8,15 +11,15 @@ Can we train a convolutional neural network (CNN) model from scratch to classify
 What happens if we add to our model a pre-trained CNN model by employing transfer learning and model ensembling? Will we see improved accuracy scores with either of these methods?
   
 In our project, we compared the accuracy values obtained with our dataset of chest CT images in the following four model scenarios:  
-a) the pre-trained ResNet50 model(model_one) 
+a) the pre-trained ResNet50 model (model_one)   
 b) our custom CNN (model_two)  
 c) ensembling the output of model_one and model_two (model_three)
 d) chaining model_one and model_two into model_four (transfer learning)  
-  
+
 Concepts:
 Convolutional Neural Networks  
 Pretained models  
-Transfer Learning  
+Transfer Learning/model chaining
 Model Ensembling  
   
   
@@ -82,7 +85,20 @@ second_model = Model(inputs=input_tensor, outputs=output_tensor)  # define model
 
 Pre-training a neural network involves training a model on a large, broad, general-purpose dataset before fine-tuning it on a specific task (a new set of specific, likely previously unseen data). The ResNet50 model is a well-known model that was trained on the ImageNet database, a collection of millions of images classified across thousands of categories.   
 
-During pre-training, the model learns to identify and extract general features from the input data, such as images' edges, textures, and shapes. These features become broadly useful across new tasks and data domains, even if the new data was never part of the training data. 
+During pre-training, the model learns to identify and extract general features from the input data, such as images' edges, textures, and shapes. These features become broadly useful across new tasks and data domains, even if the new data was never part of the training data.
+
+To make our custom CNN and the pre-trained CNN compatible with each other for direct ensembling and transfer learning puposes, we needed to make adjustments to the original ResNet50 model, and specify our custom CNN carefully. Note that we referred to our 'adjusted' ResNet50 model as our ResNet50-based model.   
+  
+A. To prepare the ResNet50-based model and the base CNN model to be direct ensembled, we defined them both to produce output tensors of identical shape. This required specifying Dense layers for the models' final output layers. We also set the number of units in the final output layers as equal to the class_count value, 4, to reflect the number of output classes in the data. We selected the Softmax activation functions for both models because it can return a probability distribution over 4 classes. This ensured the shape of the output tensors were (batch_size, class_count) or (None, 4).     
+
+B. We built the ResNet50-based model, first_model, using the Functional API because it supports more flexibility than the Sequential API in cases of complex model architecture. In particular, the Functional API affords more flexibility when combining pre-trained models with custom layers or sharing layers between models. Since the Functional API allows for explicit definition of the flow of data, it enables fine control over how layers connect and interact. It also supports freezing layers and chaining models.
+
+C. To prevent errors related to ensembling a Functional API model (first_model) and a Sequential API model (second_model), we rebuilt the ResNet50-based (second_model) with the Functional API. The Functional API offered more control over inputs, outputs, and connections, and was better suited to handle the complexities involved in model ensembling.
+  
+
+
+
+
 
 ### first_model, pre-trained ResNet50-based model  
 from tensorflow.keras.layers import BatchNormalization  
@@ -196,17 +212,6 @@ Unfortunately, there is no good way to tell whether we are dealing with sparse o
 
 Therefore, we must carefully specify whether we are using sparse or categorical in the data generating functions to ensure that everything matches up with the specified loss function.
 
-## Pre-training a model: General Overview
-
-Pre-training a model in the context of neural networks involves training a model on a large dataset before fine-tuning it on a specific task (the end result is known as **transfer learning**). Here’s a breakdown of what pre-training means and why it’s beneficial:
-
-1. **Initial Training on a Large Dataset**: Pre-training typically involves training a neural network on a broad, general-purpose dataset. For example, in the case of image classification, a model might be pre-trained on a large and diverse dataset like ImageNet, which contains millions of labeled images across thousands of categories.
-
-2. **Learning General Features**: During pre-training, the model learns to identify and extract general features from the data, such as edges, textures, and shapes in images, or basic linguistic patterns in text. These features are broadly useful across different tasks and domains.
-
-3. **Transfer Learning**: After pre-training, the model is adapted to a specific task or dataset in a process known as transfer learning. Here, the model's weights, which have been optimized during pre-training, are used as the starting point for training on a new, often smaller, dataset. The model is fine-tuned to learn the specifics of the new task while leveraging the general features it has already learned. In our specific case, the smaller dataset consists of CT-Scan images with different types of chest cancer.
-
-4. **Fine-Tuning**: Fine-tuning involves adjusting the pre-trained model's weights to better fit the new task. This can involve retraining some or all of the network's layers, depending on how similar the new task is to the original one.
 
 Benefits of Pre-Training:
 
