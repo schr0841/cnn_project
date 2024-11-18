@@ -12,19 +12,19 @@ CNNs use convolutional and pooling layers to automatically and hierarchically le
 
 The data for this project was obtained here: https://www.kaggle.com/datasets/mohamedhanyyy/chest-ctscan-images
 
-We build our CNN with the following features:
+We built our CNN with the following components:
 
 1. Input Layer: Our input images are represented as matrices of pixel values. 
 
-2. Convolutional Layers: These layers apply convolutional filters (or kernels) to the inputs. Each filter scans the image and performs a convolution operation involving element-wise multiplication and results summing. These layers extract features like edges, textures, and patterns from each image and produce a feature map that highlights the presence of specific features in different parts of the image.
+2. Convolutional Layers: These layers applied convolutional filters (or kernels) to the inputs. Each filter scanned the images and performed a convolution operation involving element-wise multiplication and results summing. These layers extracted features like edges, textures, and patterns from each image and produced a feature map highlighting the presence of specific features in different parts of the image.
 
-3. Activation Function: We apply activation function ReLU (Rectified Linear Unit) to introduce non-linearity into the model, which helps the network learn more complex patterns.
+3. Activation Function: We applied activation function ReLU (Rectified Linear Unit) to introduce non-linearity into the model, which helped the network learn more complex patterns.
 
-4. Pooling Layers: We use max pooling to reduce the spatial dimensions of the feature maps by taking the maximum value from a subset of the feature map, to reduce the number of parameters and computations. This process helps the network become more robust to variations in image.
+4. Pooling Layers: We used max pooling to reduce the spatial dimensions of the feature maps by taking the maximum value from a subset of the feature map. This reduced the number of parameters and computations, helping the network become more robust to variations in image.
 
-5. Flattening: Because the output from the convolutional and pooling layers is a multi-dimensional tensor, we need to flatten the tensor to a one-dimensional vector before feeding it into the fully connected layers.
+5. Flattening: Because the output from the convolutional and pooling layers was a multi-dimensional tensor, we need to flatten the tensor to a one-dimensional vector before feeding it into the fully connected layers.
 
-6. Fully Connected Layers: Similar to traditional neural networks, where each neuron is connected to every neuron in the previous layer, fully connected layers combine the features learned by the convolutional and pooling layers to make a final prediction.
+6. Fully Connected Layers: Similar to traditional neural networks, where each neuron is connected to every neuron in the previous layer, the fully connected layers combined the features learned by the convolutional and pooling layers to make a final prediction.
 
 7. Output Layer: We chose a softmax function capable of outputting probabilities for each of the four classes, indicating the network's prediction of 
  Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells.
