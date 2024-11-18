@@ -1,7 +1,7 @@
 # Medical Image Classification with Convolutional Neural Networks
   
   
-# Overview and Purpose
+## Overview and Purpose
   
 Can we train a convolutional neural network (CNN) model from scratch to classify CT chest scan images as indicating one of the following four categories (classes): Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells? How well does the model perform?
   
@@ -94,11 +94,7 @@ class_count = len(training_set.class_names)         # class_names auto defined w
   
 inputs = Input(shape=(224, 224, 3))                 # define input layer
   
-data_augmentation = tf.keras.Sequential([           # apply data augmentation 1 one layer
-    RandomFlip("horizontal"),
-    RandomRotation(0.2),
-    RandomZoom(0.2)
-])  
+data_augmentation = tf.keras.Sequential( [RandomFlip("horizontal", RandomRotation(0.2), RandomZoom(0.2)] )  
   
 augmented_inputs = data_augmentation(inputs)
  # Apply data augmentation to input tensor: apply augmentation layers applied to inputs; store ourput in 'augmented_inputs'
