@@ -49,7 +49,7 @@ from tensorflow.keras.layers import Rescaling, Conv2D, MaxPooling2D, Dropout, Fl
 from tensorflow.keras.models import Model  
   
 img_size = (224, 224)       # Resize to 224x224, what ResNet50 expects  
-channels = 3  
+channels = 3                # One channel each for Red, Blue, Green (color images) 
 img_shape = (img_size[0], img_size[1], channels)  
 class_count = len(training_set.class_names)  
   
@@ -58,24 +58,16 @@ input_tensor = Input(shape=img_shape)
 x = RandomFlip("horizontal")(input_tensor)  
 x = RandomRotation(0.2)(x)  
 x = RandomZoom(0.2)(x)  
-  
 x = Rescaling(1./255)(x)
-  
 x = Conv2D(filters=32, kernel_size=(3, 3), activation='relu')(x)  
 x = MaxPooling2D(pool_size=(2, 2))(x)  
-  
 x = Conv2D(filters=32, kernel_size=(3, 3), activation='relu')(x)  
 x = MaxPooling2D(pool_size=(2, 2))(x)  
-  
 x = Dropout(0.25)(x)  
-  
 x = Conv2D(filters=64, kernel_size=(3, 3), activation='relu')(x)  
 x = MaxPooling2D(pool_size=(2, 2))(x)  
-  
 x = Dropout(0.25)(x)  
-
 x = Flatten()(x)  
-  
 x = Dense(128, activation='relu')(x)  
 x = Dropout(0.25)(x)  
   
