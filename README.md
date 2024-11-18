@@ -3,25 +3,26 @@
 
 # Overview and Purpose
 
-In this document, we train a convolutional neural network (CNN) model from scratch to classify CT chest scan images as either cancerous or normal, and then investigate the added benefit of using pre-trained CNN models on the same dataset by employing transfer learning. Furthermore, we investigate model ensembling in general and its potential benefits and drawbacks. 
+Can we train a convolutional neural network (CNN) model from scratch to classify CT chest scan images as indicating either Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells? What happens if we add to our model a pre-trained CNN model by employing transfer learning and model ensembling? Will we see improved accuracy scores with either method?
 
 
 ## Convolutional Neural Network: General Overview
 
+We build our CNN with the following features:
 
-1. Input Layer: The process starts with an image input, which is typically represented as a matrix of pixel values. For a color image, this matrix would have three channels (Red, Green, Blue).
+1. Input Layer: image input, represented as a matrix of pixel values. With color images, this matrix would have three channels (Red, Green, Blue).
 
-2. Convolutional Layers: These layers apply convolutional filters (or kernels) to the input image. Each filter scans through the image and performs a convolution operation, which involves element-wise multiplication and summing up the results. This process extracts features like edges, textures, and patterns. The result is a feature map that highlights the presence of specific features in different parts of the image.
+2. Convolutional Layers: These layers apply convolutional filters (or kernels) to the input image. Each filter scans through the image and performs a convolution operation involving element-wise multiplication and summing up of results. These layers extract features like edges, textures, and patterns from each image and produce a feature map that highlights the presence of specific features in different parts of the image.
 
-3. Activation Function: After convolution, an activation function (often ReLU, or Rectified Linear Unit) is applied to introduce non-linearity into the model. This helps the network learn more complex patterns.
+3. Activation Function: We apply activation function ReLU (Rectified Linear Unit) to introduce non-linearity into the model, which helps the network learn more complex patterns.
 
-4. Pooling Layers: Pooling (often max pooling) is used to reduce the spatial dimensions of the feature maps. It involves taking the maximum or average value from a subset of the feature map, which reduces the number of parameters and computations, and helps the network become more robust to variations in the image.
+4. Pooling Layers: We use max pooling to reduce the spatial dimensions of the feature maps by taking the maximum value from a subset of the feature map, to reduce the number of parameters and computations. This process helps the network become more robust to variations in image.
 
-5. Flattening: The output from the convolutional and pooling layers is a multi-dimensional tensor. This tensor is flattened into a one-dimensional vector to feed into fully connected layers.
+5. Flattening: Because the output from the convolutional and pooling layers is a multi-dimensional tensor, we need to flatten the tensor to a one-dimensional vector before feeding it into fully connected layers.
 
-6. Fully Connected Layers: These layers are similar to traditional neural networks where each neuron is connected to every neuron in the previous layer. They combine the features learned by the convolutional and pooling layers to make a final prediction.
+6. Fully Connected Layers: Similar to traditional neural networks, where each neuron is connected to every neuron in the previous layer, fully connected layers combine the features learned by the convolutional and pooling layers to make a final prediction.
 
-7. Output Layer: The final layer is a softmax (or sigmoid) function that outputs probabilities for each class, indicating the network's prediction for the image category.
+7. Output Layer: We chose a softmax function capable of outputting probabilities for each class, indicating the network's prediction for the image category.
 
 In summary, CNNs use convolutional and pooling layers to automatically and hierarchically learn features from images, followed by fully connected layers to classify those features into predefined categories. This process enables CNNs to effectively handle and classify complex visual data.
 
