@@ -8,7 +8,7 @@ The data for this project was obtained here: https://www.kaggle.com/datasets/moh
   
 ## Overview and Purpose
   
-Can we train a convolutional neural network (CNN) model from scratch to classify CT chest scan images as indicating one of the following four categories (classes): Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells? How well does the model perform?
+Can we train a custom convolutional neural network (CNN) model from scratch to classify CT chest scan images as indicating one of the following four categories (classes): Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells? How well does the model perform?
   
 What happens if we add to our model a pre-trained CNN model by employing transfer learning and model ensembling? Will we see improved accuracy scores with either of these methods?
   
@@ -79,31 +79,34 @@ channels = 3                                        # one channel each for Red, 
 img_shape = (img_size[0], img_size[1], channels)  
 class_count = len(training_set.class_names)         # class_names auto defined when image_dataset_from_directory creates dataset  
   
-inputs = Input(shape=(224, 224, 3))                 # define input layer
+inputs = Input(shape=(224, 224, 3))                 # define input tensor
   
 data_augmentation = tf.keras.Sequential([RandomFlip("horizontal", RandomRotation(0.2), RandomZoom(0.2)])  # define data augmentation layers directly from tf.keras.layers  
   
-augmented_inputs = data_augmentation(inputs) # define data augmentation layers directly from tf.keras.layers  
+augmented_inputs = data_augmentation(inputs)  #apply augmentation to input tensor, store results in 'augmented_inputs'
   
-scaled_inputs = Rescaling(1./255)(augmented_inputs)  # to normalize pixel values, explicitly indicate rescaling to previous layer's inputs  
+scaled_inputs = Rescaling(1./255)(augmented_inputs)  # normalize pixel values; explicitly indicate rescaling to previous layer's inputs  
   
-base_model = ResNet50(       # define ResNet50 base model  
+base_model = ResNet50(       # define ResNet50-based model as base model for first_model  
     weights='imagenet',      # use the weights resulting from training on ImageNet database
     include_top=False,       # ignore top layer of original ResNet50; we'll define new top layer with only 4 classes
     input_tensor=scaled_inputs,   # instantiate with scaled_inputs as input tensor  
-    pooling='max')                # base model to output tensor compatible with Dense layers, no need to flatten tensor  
+    pooling='max')                # base model outputs tensor compatible with Dense layers, no need to flatten tensor  
 
 for layer in base_model.layers:   
-    layer.trainable = False  # freeze ResNet50 model layers to prevent pre-training from being re-trained    
+    layer.trainable = False  # freeze ResNet50 layers to prevent re-training pre-training    
   
-x = base_model.output  # add custom layers on top of base_model
-x = BatchNormalization(axis=-1)(x)    # including BatchNormalization layer before Dense layer can yield better training and performance  
+x = base_model.output  # base_model's output to get custom layers on top of it
+x = BatchNormalization(axis=-1)(x)    # including BatchNormalization before Dense can yield better training and performance  
 x = Dense(256, activation='relu')(x)  
 x = Dropout(0.3)(x)  
   
-outputs = Dense(class_count, activation='softmax')(x)  # define layer, output vector with 4 classes to enable direct ensembling models  
+outputs = Dense(class_count, activation='softmax')(x)  # define layer, output vector with 4 classes to allow ensembling 
 
-first_model = Model(inputs=inputs, outputs=outputs)   # build by specifying inputs, outputs; outputs=outpus when definings with Model class  
+first_model = Model(   # because outputs variable represents model final output, 
+inputs=inputs,         # when defining model using Model class,
+outputs=outputs        # use outputs = outputs
+)    
   
   
 ### second_model, custom CNN  
