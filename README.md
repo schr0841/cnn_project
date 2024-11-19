@@ -163,7 +163,7 @@ There are additional techniques for combining submodel predictions. In bootstrap
 
 Ensemble models can yield improved accuracy over their individual submodels by reducing overfitting. They may exhibit more robustness to changes in input data than their submodels. On the other hand, ensemble models can entail increased complexity, reduced ease of interpretability, and greater computational costs than their submodels individually.    
   
-### Ensembling first_model and second_model
+### Ensembling first_model and second_model: ensemble_model
 
 First, we defined the full file paths to our best saved models for first_model and second_model, and loaded them from saved. keras.
 
@@ -193,15 +193,65 @@ def get_labels(dataset):
 y_train = get_labels(training_set)           # y_train will contain all labels from training_set
 y_test = get_labels(testing_set)             # y_test will contain all labels from testing_set
 y_val = get_labels(validation_set)           # y_val will contain all labels from validation_set
-
-
-Step 1: Generate Submodel Predictions for Training Dataset and Validation Dataset
+  
+Third, we generated submodel predictions for the training and validation datasets. 
+  
 preds_first_model_train = first_model.predict(training_set)
 preds_second_model_train = second_model.predict(training_set)
 preds_first_model_val = first_model.predict(validation_set)
 preds_second_model_val = second_model.predict(validation_set)
 
-Step 2:   
+Fourth, we built and trained the ensemble_model to process the combined predictions. When averaging outputs, input shape to ensemble_model will reflect how outputs get combined; resulting shape remains (None, 4), combining 2 predictions per class
+
+from tensorflow.keras import Model, Input
+from tensorflow.keras.layers import Average, Dense
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+
+
+
+# 1. Average Predictions:
+    # a. Average predictions from both models for 'training set'
+ensemble_input_train = (preds_first_model_train + preds_second_model_train) / 2
+
+    # b. Average predictions from both models for 'validation set'
+ensemble_input_val = (preds_first_model_val + preds_second_model_val) / 2
+
+# 2. Build ensemble_model
+  # a. Define input layer for ensemble_model (shape corresponds to 4 classes)
+ensemble_input = Input(shape=(4,))
+
+  # b. Add dense layer
+final_output = Dense(4, activation='softmax')(ensemble_input)  # 4 classes
+
+  # c. Define ensemble model
+ensemble_model = Model(inputs=ensemble_input, outputs=final_output)
+
+# 3. Compile ensemble model
+ensemble_model.compile(optimizer='adam',
+                       loss='sparse_categorical_crossentropy',
+                       metrics=['accuracy'])
+
+# 4. Train ensemble model on averaged predictions
+
+history = ensemble_model.fit(                           #initiates training for ensemble_model; Keras fit method trains model for fixed number of epochs using
+                                                        #provided training data and labels. Returns history object with loss & accuracy values at each epoch
+
+    x=ensemble_input_train,                             #specifies input data to train ensemble_model; averaged predictions from submodels with shape (None, 4)
+
+    y=y_train,                                          #Use same labels from original dataset to specify labels for training data; y_train represents true labels
+                                                        #corresponding to ensemble_input_train predictions; labels required to calculate loss during training
+
+    validation_data=(ensemble_input_val, y_val),        #specifies validation data to be used to evaluate model after each epoch
+                                                        #ensemble_input_val contains averaged predictions from submodels on validation set; y_val contains true labels
+
+    epochs=100,                                         #Specifies # of epochs for which model will train; epoch = one complete pass through entire training dataset
+                                                        #Model will train for 100 epochs, updating weights after each batch of data within an epoch
+
+    callbacks=[early_stopping, checkpoint],             #early_stopping stops training early if val loss or accuracy doesn't improve for specified # of epochs, helps
+                                                        #prevent overfitting; checkpoint saves model’s weights at certain points to ensure restoration of best model
+
+    verbose=1                                           #detailed progress of each epoch, loss, accuracy, validation metrics displayed in output
+) 
 
 
   
