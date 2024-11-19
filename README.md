@@ -131,9 +131,7 @@ input_tensor = Input(shape=img_shape)        # define input layer
 x = RandomFlip("horizontal")(input_tensor)   # apply 3 data augmentation layers  
 x = RandomRotation(0.2)(x)  
 x = RandomZoom(0.2)(x)  
-  
 x = Rescaling(1./255)(x)                     #apply rescalling
-  
 x = Conv2D(filters=32, kernel_size=(3, 3), activation='relu')(x)  
 x = MaxPooling2D(pool_size=(2, 2))(x)  
 x = Conv2D(filters=32, kernel_size=(3, 3), activation='relu')(x)  
@@ -146,7 +144,7 @@ x = Flatten()(x)
 x = Dense(128, activation='relu')(x)  
 x = Dropout(0.25)(x)  
   
-output_tensor = Dense(class_count, activation='softmax')(x)  # define output layer capable of solving 4-class problem
+output_tensor = Dense(class_count, activation='softmax')(x)  # define output layer for 4-class problem
   
 second_model = Model(inputs=input_tensor, outputs=output_tensor)  # define model 
 
@@ -162,7 +160,8 @@ In this project, we chose to combine our two submodels' predictions in an ensemb
 There are additional techniques for combining submodel predictions. In bootstrap aggregating, multiple models are trained on different subsets of the same training data and then ensembled. Boosting models occurs when models are trained sequentially, allowing later models to correct the errors made by earlier models. The voting technique makes a final prediction by taking a majority vote of the predictions made by the various submodels. 
 
 Ensemble models can yield improved accuracy over their individual submodels by reducing overfitting. They may exhibit more robustness to changes in input data than their submodels. On the other hand, ensemble models can entail increased complexity, reduced ease of interpretability, and greater computational costs than their submodels individually.    
-  
+
+    
 ### Ensembling first_model and second_model: ensemble_model
 
 First, we defined the full file paths to our best saved models for first_model and second_model, and loaded them from saved. keras.
@@ -180,7 +179,7 @@ second_model = load_model(second_filepath)
 
 Second, we extracted labels from the TensorFlow datasets (training_set, testing_set, validation_set) we had created before building first_model and second_model, using the tf.keras.preprocessing.image_dataset_from_directory method. Ensemble models need labels in order to compute loss (by comparing predictions to true lables) and update models during training. 
 
-Because training_set and validation_set are tf.data.Dataset objects that return batches of (images, labels), we could loop through the datasets to extract images and lables and use tf.concat to combined batch-wise labels in single tensors. 
+Because training_set and validation_set are tf.data.Dataset objects that return batches of (images, labels), we could loop through the datasets to extract images and lables and combine batch-wise labels in single tensors. 
 
 def get_labels(dataset):
     labels = []
@@ -201,11 +200,45 @@ preds_second_model_train = second_model.predict(training_set)
 preds_first_model_val = first_model.predict(validation_set)
 preds_second_model_val = second_model.predict(validation_set)
 
-Fourth, we built and trained the ensemble_model to process the combined predictions. When averaging outputs, input shape to ensemble_model will reflect how outputs get combined; resulting shape remains (None, 4), combining 2 predictions per class
+Fourth, we built and trained the ensemble_model to process the combined predictions. The ensemble model's input shape reflected how outputs would get combined, two predictions per class, with an output shape of (None, 4). 
 
 from tensorflow.keras import Model, Input
 from tensorflow.keras.layers import Average, Dense
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+    
+ensemble_input_train = (preds_first_model_train + preds_second_model_train) / 2     # average both models' predictions for 'training set'
+ensemble_input_val = (preds_first_model_val + preds_second_model_val) / 2           # average both models' predictions for 'validation set'
+  
+ensemble_input = Input(shape=(4,))              # build ensemble_model, define input layer with shape corresponding to four classe
+final_output = Dense(4, activation='softmax')(ensemble_input)     # add dense layer, suited for 4-class problem
+ensemble_model = Model(inputs=ensemble_input, outputs=final_output)   # define ensemble model
+  
+ensemble_model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])   # compile ensemble model
+  
+history = ensemble_model.fit(                           # Keras fit method trains model for fixed number of epochs using provided training data and labels,
+                                                        # returns history object with loss & accuracy values at each epoch
+    x=ensemble_input_train,                             # specifies input data as averaged predictions from submodels
+    y=y_train,                                          # use labels from original dataset to specify training data labels; y_train represents true labels
+                                                        # corresponding to ensemble_input_train predictions
+    validation_data=(ensemble_input_val, y_val),        # specify validation data to be used to evaluate model after each epoch
+                                                        # ensemble_input_val contains averaged predictions from submodels on validation set
+                                                        # y_val contains true labels
+
+    epochs=100,                                         #Specifies # of epochs for which model will train; epoch = one complete pass through entire training dataset
+                                                        #Model will train for 100 epochs, updating weights after each batch of data within an epoch
+
+    callbacks=[early_stopping, checkpoint],             #early_stopping stops training early if val loss or accuracy doesn't improve for specified # of epochs, helps
+                                                        #prevent overfitting; checkpoint saves model’s weights at certain points to ensure restoration of best model
+
+    verbose=1                                           #detailed progress of each epoch, loss, accuracy, validation metrics displayed in output
+)
+
+
+
+
+
+
+
 
 
 
