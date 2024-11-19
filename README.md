@@ -165,6 +165,36 @@ Ensemble models can yield improved accuracy over their individual submodels by r
   
 ### Ensembling first_model and second_model
 
+First, we defined the full file paths to our best saved models for first_model and second_model, and loaded them from saved. keras.
+
+import tensorflow as tf
+from tensorflow.keras.models import load_model
+from tensorflow.keras.layers import Input, Average
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import BatchNormalization
+
+first_filepath = os.path.join(base_dir, 'first_model.keras')     
+second_filepath = os.path.join(base_dir, 'second_model.keras')   
+first_model = load_model(first_filepath)                         
+second_model = load_model(second_filepath)
+
+Second, we extracted labels from the TensorFlow datasets (training_set, testing_set, validation_set) we had created before building first_model and second_model, using the tf.keras.preprocessing.image_dataset_from_directory method. Ensemble models need labels in order to compute loss (by comparing predictions to true lables) and update models during training. 
+
+Because training_set and validation_set are tf.data.Dataset objects that return batches of (images, labels), we could loop through the datasets to extract images and lables and use tf.concat to combined batch-wise labels in single tensors. 
+
+def get_labels(dataset):
+    labels = []
+    for _, batch_labels in dataset:          # loop iterates over dataset, where batch_labels contains labels for batch of images
+                                             # _ ignores image data; we're only interested in labels
+        labels.append(batch_labels.numpy())  # convert TensorFlow tensors (which hold labels) into NumPy arrays
+                                             # convert label arrays for each batch appended to labels list
+    return np.concatenate(labels, axis=0)    # after iterating through all batches, merge all label arrays from list into
+                                             # single NumPy array, resulting in single array containing all labels from dataset
+y_train = get_labels(training_set)           # y_train will contain all labels from training_set
+y_test = get_labels(testing_set)             # y_test will contain all labels from testing_set
+y_val = get_labels(validation_set)           # y_val will contain all labels from validation_set
+
+
 Step 1: Generate Submodel Predictions for Training Dataset and Validation Dataset
 preds_first_model_train = first_model.predict(training_set)
 preds_second_model_train = second_model.predict(training_set)
