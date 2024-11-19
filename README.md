@@ -125,7 +125,6 @@ img_size = (224, 224)       # resize to 224x224, what ResNet50 expects -- needed
 channels = 3                # one channel each for Red, Blue, Green (color images)   
 img_shape = (img_size[0], img_size[1], channels)     
 class_count = len(training_set.class_names)  # class_names auto defined when image_dataset_from_directory creates dataset    
-    
 input_tensor = Input(shape=img_shape)        # define input layer
     
 x = RandomFlip("horizontal")(input_tensor)   # apply 3 data augmentation layers  
@@ -145,7 +144,6 @@ x = Dense(128, activation='relu')(x)
 x = Dropout(0.25)(x)  
   
 output_tensor = Dense(class_count, activation='softmax')(x)  # define output layer for 4-class problem
-  
 second_model = Model(inputs=input_tensor, outputs=output_tensor)  # define model 
 
   
@@ -189,18 +187,25 @@ def get_labels(dataset):
                                              # convert label arrays for each batch appended to labels list
     return np.concatenate(labels, axis=0)    # after iterating through all batches, merge all label arrays from list into
                                              # single NumPy array, resulting in single array containing all labels from dataset
-y_train = get_labels(training_set)           # y_train will contain all labels from training_set
-y_test = get_labels(testing_set)             # y_test will contain all labels from testing_set
-y_val = get_labels(validation_set)           # y_val will contain all labels from validation_set
+y_train = get_labels(training_set)           # y_train will contain all extracted labels from training_set
+y_test = get_labels(testing_set)             # y_test will contain all extracted labels from testing_set
+y_val = get_labels(validation_set)           # y_val will contain all extacted labels from validation_set
   
 Third, we generated submodel predictions for the training and validation datasets. 
-  
+    
 preds_first_model_train = first_model.predict(training_set)
 preds_second_model_train = second_model.predict(training_set)
 preds_first_model_val = first_model.predict(validation_set)
 preds_second_model_val = second_model.predict(validation_set)
 
-Fourth, we built and trained the ensemble_model to process the combined predictions. The ensemble model's input shape reflected how outputs would get combined, two predictions per class, with an output shape of (None, 4). 
+Fourth, we define EarlyStopping and ModelCheckpoint callbacks and a file to save the ensemble_model. 
+
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+early_stopping = EarlyStopping(monitor='val_accuracy', patience=20, restore_best_weights=True, verbose=1)
+ensemble_filepath = os.path.join(base_dir, 'ensemble_model.keras')     # define new file path to save ensemble_model
+checkpoint = ModelCheckpoint(ensemble_filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')   # save max best ensemble_model
+
+Fifth, we built and trained the ensemble_model to process the combined predictions. The ensemble model's input shape reflected how outputs would get combined, two predictions per class, with an output shape of (None, 4). 
 
 from tensorflow.keras import Model, Input
 from tensorflow.keras.layers import Average, Dense
@@ -220,17 +225,12 @@ history = ensemble_model.fit(                           # Keras fit method train
     x=ensemble_input_train,                             # specifies input data as averaged predictions from submodels
     y=y_train,                                          # use labels from original dataset to specify training data labels; y_train represents true labels
                                                         # corresponding to ensemble_input_train predictions
-    validation_data=(ensemble_input_val, y_val),        # specify validation data to be used to evaluate model after each epoch
-                                                        # ensemble_input_val contains averaged predictions from submodels on validation set
-                                                        # y_val contains true labels
-
-    epochs=100,                                         #Specifies # of epochs for which model will train; epoch = one complete pass through entire training dataset
-                                                        #Model will train for 100 epochs, updating weights after each batch of data within an epoch
-
-    callbacks=[early_stopping, checkpoint],             #early_stopping stops training early if val loss or accuracy doesn't improve for specified # of epochs, helps
-                                                        #prevent overfitting; checkpoint saves model’s weights at certain points to ensure restoration of best model
-
-    verbose=1                                           #detailed progress of each epoch, loss, accuracy, validation metrics displayed in output
+    validation_data=(ensemble_input_val, y_val),        # specify validation data to be used to evaluate model after each epoch: ensemble_input_val contains  
+                                                        # averaged predictions from submodels on validation set; y_val contains true labels
+    epochs=100,                                         # model trains for 100 epochs, updating weights after each batch of data within epoch
+    callbacks=[early_stopping, checkpoint],             # stop training early if val loss or accuracy doesn't improve, helps prevent overfitting;
+                                                        # checkpoint saves model’s weights at certain points to ensure restoration of best model
+    verbose=1                                           # detailed progress of each epoch: loss, accuracy, validation metrics displayed in output
 )
 
 
