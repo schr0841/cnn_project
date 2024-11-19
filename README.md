@@ -60,18 +60,23 @@ Pre-trained models often generalize better to new tasks because they start with 
   
 To make our custom CNN and the pre-trained CNN compatible with each other for direct ensembling and transfer learning puposes, we needed to make adjustments to the original ResNet50 model, and specify our custom CNN carefully. Note that we referred to our 'adjusted' ResNet50 model as our ResNet50-based model.   
   
-A. To prepare the ResNet50-based model and the custom CNN model to be direct ensembled, we defined them to produce output tensors of identical shape. This required specifying Dense layers with four units (for each possible class) for the models' final output layers. We selected the Softmax activation functions for both models because it can return a probability distribution over 4 classes. This ensured the shape of the output tensors were (batch_size, class_count) or (None, 4).     
+For our pre-trained model, we built a ResNet50-based model called first_model. It's base (base_model) was the original ResNet50 model with weights reflecting the ImageNet database of images on which it was trained. To this base we made the following modifications:
+  * Specified the img_size, channels, img_shape, and class_count to be identical's to those in the custom CNN
+  * Defined the same data augmentation layers as in our custom CNN
+  * Applied data augmentation to the input tensor
+  * Applied the same rescaling defined in our custom CNN
+  * Specified the input tensor as the scaled inputs
+  * Avoided outputting the 1,000-class predictions for which ResNet50 was originally trained by removing its top layer
+  * Avoided re-training ResNet50s pre-trained knowledge by making the base_model's layers untrainable
+  * Added custom layers to the base_model to produce first_model, which was capable of outputting predictions as similarly to second_model as possible, including
+    *  BatchNormalization layer
+    *  0.3 Dropout layer
+    *  Dense output layer capable of producing predictions for a four-class problem
   
-B. The ResNet50 model was built to classify images across 1,000 classes, but likely not the four classes we were interested in. To define our own output layer suited for our four specific classes, we 'froze' the ResNet50 model's top layer to replace with our own by specifying "include_top=False," in our ResNet50-based model. 
-  
-C. Similarly, we specified that we did not want the ResNet50 layers' pre-trained knowledge to be replaced or over-written in the course of analyzing our CT scan image dataset. We prevented this from happening by including "for layer in base_model.layers: layer.trainable = False" as we built second_model. 
-  
-D. To prevent errors related to ensembling a Functional API model and a Sequential API model, we built first_model and second_model with the Functional API. The Functional API offered more control over inputs, outputs, and connections, and was better suited to handle the complexities involved in model ensembling than the Sequential. The Functional API supports more flexibility than the Sequential API in cases of complex model architecture, particularly when combining pre-trained models with custom layers. Because Functional API allows data flow to be explicitly defined, it enables fine control over layer connection and interaction, which supports freezing layers and chaining models.
-
-
+To prevent errors related to ensembling a Functional API model and a Sequential API model, we built both first_model and second_model with the Functional API. The Functional API offered more control over inputs, outputs, and connections, and was better suited to handle the complexities involved in model ensembling than the Sequential. The Functional API supported more flexibility in complex model architecture than the Sequential API, including combining pre-trained models with custom layers. Because Functional API allowed data flow to be explicitly defined, it supported freezing layers and chaining models.
 
      
-## The two CNN sumb-models 
+## The two CNN sub-models 
   
 ### first_model, the ResNet50-based model  
 from tensorflow.keras.layers import BatchNormalization  
