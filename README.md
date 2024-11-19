@@ -44,10 +44,8 @@ We built our custom CNN (model_two) and our ResNet50-based pre-trained model wit
 6. Fully Connected Layers: Similar to traditional neural networks, where each neuron is connected to every neuron in the previous layer, the fully connected layers combined the features learned by the convolutional and pooling layers to make a final prediction.  
   
 7. Output Layer: We chose a softmax function capable of outputting probabilities for each of the four classes, indicating the network's prediction of Adenocarcinoma, Large cell carcinoma, Squamous cell carcinoma, or normal cells.   
-  
-
-
-
+    
+ 
 ## Pretrained Models
 
 Pre-training a neural network involves training a model on a large, broad, general-purpose dataset before fine-tuning it on a specific task (a new set of specific, likely previously unseen data). The ResNet50 model is a well-known model that was trained on the ImageNet database, a collection of millions of images classified across thousands of categories.   
@@ -146,126 +144,13 @@ second_model = Model(inputs=input_tensor, outputs=output_tensor)  # define model
 
 ## Model Ensembling  
   
+## Ensembling models
 
+Ensembling models entails combining the individual predictions of multiple models on the same dataset to try to make better predictions on that dataset. Ensemble models can improve upon the predictive performance of individual models. The idea behind ensembling models is that if different models make different types of errors, we may reduce the overall error rate by combining their predictions. 
 
+In this project, we chose to combine our two submodels' predictions in an ensemble model, model_three, by averaging their individual output. Here, each model contributing to model_three is weighted equally in the ensemmble model. It is possible, however, to configure a weighted average ensemble in which better-performing submodels contribute more to the ensemble than poorer-performing submodels. 
 
-## Transfer Learning   
-
-After pre-training, the model is applied to a new, specific dataset and classification task in a process known as transfer learning. The pre-trained model's weights, optimized during pre-training, become the starting point for training on a new, often smaller, dataset. The model learns the specifics of the new task while leveraging the general features it learned during pre-training. In our project, the smaller dataset consisted of the CT-Scan images with different types of chest cancer versus normal cells. The ResNet50 model (pre_trained
-
-The process of combining a pre-trained model with a custom CNN is called transfer learning.   
-
-
-
-
-
-
-
-
-
-## Exploration Process
-
-we defined our 
-
-We evaluated each model on test loss, test accuracy, validation loss and validation accuracy. Below are two tables, each populated using a different type of loss function:
-
-
-
-## Table of results using CategoricalCrossEntropy loss function and class_mode='categorical' in data generator functions
-
-| model | loss | accuracy | val_loss | val_accuracy |
-|-------|------|----------|----------|--------------|
-| Base cnn  | 9.0188  | 0.1876  | 8.0590 | 0.2917 |
-| EfficientNetB3  | 0.0544 | 0.9804 | 0.8051 | 0.8444 |
-| ResNet50 | 0.0118 | 0.9951 | 2.0054 | 0.7587 |
-| InceptionV3 | 0.0439 | 0.9886 | 2.8829 | 0.5016 |
-| Ensemble | 0.3994 | 0.8750 | 0.2605 | 0.9750 |
-
-
-
-
-
-## Table of results using SparseCategoricalCrossEntropy loss function and class_mode='sparse' in data generator functions
-
-| model | loss | accuracy | val_loss | val_accuracy |
-|-------|------|----------|----------|--------------|
-| Base cnn  | 0.0112  | 0.9984  | 2.0032 | 0.6111 |
-| EfficientNetB3  | 0.0536 | 0.9837 | 0.6506 | 0.8317 |
-| ResNet50 | 0.0682 | 0.9886 | 2.0240 | 0.7365 |
-| InceptionV3 | 0.0615 | 0.9902 | 2.9775 | 0.5111 |
-| Ensemble | 0.9132 | 0.8889 | 0.9594 | 0.8999 |
-
-
-
-## Sparse categorical vs categorical loss functions / sparse vs non-sparse class mode generators
-
-Use the Sparse categorical crossentropy loss function when there are two or more label classes. In our data generating code, we can specify class_mode='sparse' to get the correct format in the generated data. We expect labels to be provided as integers. If one wants to provide labels using one-hot representation, please use CategoricalCrossentropy loss (with class_mode='categorical' in the data generating code instead). There should be # classes floating point values per feature for y_pred and a single floating point value per feature for y_true. In our instance above, we do not discern a noticable difference in the accuracies for the two approaches, though we do obtain the highest validation accuracy when using categorical cross entropy / categorical data generation.
-
-Unfortunately, there is no good way to tell whether we are dealing with sparse or categorical data generation just by looking at the data vectors themselves. The two are basically indistinguishable:
-
-### Sparse:
-
-![image](https://github.com/schr0841/cnn_project/blob/main/images/labels_sparse.png)
-
-
-
-### Categorical:
-
-![image](https://github.com/schr0841/cnn_project/blob/main/images/labels_categorical.png)
-
-Therefore, we must carefully specify whether we are using sparse or categorical in the data generating functions to ensure that everything matches up with the specified loss function.
-
-
-
-
-
-
-
-## Base CNN architecture:
-
-![image](https://github.com/schr0841/cnn_project/blob/main/images/base1.png)
-
-![image](https://github.com/schr0841/cnn_project/blob/main/images/base3.png)
-
-![image](https://github.com/schr0841/cnn_project/blob/main/images/base2.png)
-
-
-## EfficientNet architecture:
-
-![image](https://github.com/schr0841/cnn_project/blob/main/images/EfficientNet.png)
-
-
-
-## ResNet50 architecture:
-
-![image](https://github.com/schr0841/cnn_project/blob/main/images/ResNet.png)
-
-
-## InceptionV3 architecture:
-
-![image](https://github.com/schr0841/cnn_project/blob/main/images/Inception.png)
-
-
-
-
-## Ensemble models: General Overview
-
-
-Ensemble learning uses multiple machine learning models to try to make better predictions on a dataset. An ensemble model works by training different models on a dataset and having each model make predictions individually. The predictions of these models are then combined in the ensemble model to make a final prediction.
-
-Every model has its strengths and weaknesses. Ensemble models can be beneficial by combining individual models to help improve upon the predictive performance of each individual model. 
-
-Ensemble models are a way to improve the performance of machine learning algorithms by combining the predictions of multiple models. The main idea is that different models might make different kinds of errors, so combining them can reduce the overall error rate. Here’s a breakdown of how ensemble models work and some common techniques:
-
-### How Ensembles Work
-
-1. **Training Multiple Models**: First, you train multiple base models (often called “learners”) on the same problem. These models could be of the same type (e.g., multiple decision trees) or different types (e.g., decision trees, support vector machines, and neural networks).
-
-2. **Combining Predictions**: Once trained, the ensemble combines the predictions of the base models to make a final prediction. The combination can be done in various ways, such as averaging the predictions or using a majority vote.
-
-3. **Reducing Overfitting**: By combining models, ensembles can reduce the risk of overfitting to the training data, as errors made by individual models might be corrected by others in the ensemble.
-
-### Common Techniques
+There are additional techniques for combining submodel predictions. Multiple models can be trained on different subsets of the same training data and then ensembled. Boosting models occurs when models are trained sequentially, allowing later models to correct the errors made by earlier models. The voting technique makes a final prediction by taking a majority vote of the predictions made by the various submodels. 
 
 1. **Bagging (Bootstrap Aggregating)**:
    - **Process**: Multiple versions of a model are trained on different subsets of the training data, typically created by sampling with replacement (bootstrap samples). 
@@ -299,6 +184,44 @@ Ensemble models are a way to improve the performance of machine learning algorit
 - **Computational Cost**: Training multiple models can be computationally expensive and require more resources.
 
 Ensemble methods are a powerful tool in machine learning, often used in practice to achieve higher performance and more reliable predictions. In our specific scenario, the ensemble model uses averaging to select the mode, or the most common predicted class, from the three pre-trained models. By doing this, it allows for further generalization accuracy improvements on the unseen validation data. 
+
+
+## Transfer Learning   
+
+After pre-training, the model is applied to a new, specific dataset and classification task in a process known as transfer learning. The pre-trained model's weights, optimized during pre-training, become the starting point for training on a new, often smaller, dataset. The model learns the specifics of the new task while leveraging the general features it learned during pre-training. In our project, the smaller dataset consisted of the CT-Scan images with different types of chest cancer versus normal cells. The ResNet50 model (pre_trained
+
+The process of combining a pre-trained model with a custom CNN is called transfer learning.   
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Table of results using CategoricalCrossEntropy loss function and class_mode='categorical' in data generator functions
+
+| model | loss | accuracy | val_loss | val_accuracy |
+|-------|------|----------|----------|--------------|
+| Base cnn  | 9.0188  | 0.1876  | 8.0590 | 0.2917 |
+| EfficientNetB3  | 0.0544 | 0.9804 | 0.8051 | 0.8444 |
+| ResNet50 | 0.0118 | 0.9951 | 2.0054 | 0.7587 |
+| InceptionV3 | 0.0439 | 0.9886 | 2.8829 | 0.5016 |
+| Ensemble | 0.3994 | 0.8750 | 0.2605 | 0.9750 |
+
+
+
+
+
+
+
+
+
 
 
 
