@@ -150,42 +150,22 @@ Ensembling models entails combining the individual predictions of multiple model
 
 In this project, we chose to combine our two submodels' predictions in an ensemble model, model_three, by averaging their individual output. Here, each model contributing to model_three is weighted equally in the ensemmble model. It is possible, however, to configure a weighted average ensemble in which better-performing submodels contribute more to the ensemble than poorer-performing submodels. 
 
-There are additional techniques for combining submodel predictions. Multiple models can be trained on different subsets of the same training data and then ensembled. Boosting models occurs when models are trained sequentially, allowing later models to correct the errors made by earlier models. The voting technique makes a final prediction by taking a majority vote of the predictions made by the various submodels. 
+There are additional techniques for combining submodel predictions. In bootstrap aggregating, multiple models are trained on different subsets of the same training data and then ensembled. Boosting models occurs when models are trained sequentially, allowing later models to correct the errors made by earlier models. The voting technique makes a final prediction by taking a majority vote of the predictions made by the various submodels. 
 
-1. **Bagging (Bootstrap Aggregating)**:
-   - **Process**: Multiple versions of a model are trained on different subsets of the training data, typically created by sampling with replacement (bootstrap samples). 
-   - **Example**: Random Forests, which are ensembles of decision trees.
-   - **How it Helps**: Reduces variance by averaging predictions or using majority voting, leading to more stable predictions.
+Ensemble models can yield improved accuracy over their individual submodels by reducing overfitting. They may exhibit more robustness to changes in input data than their submodels. On the other hand, ensemble models can entail increased complexity, reduced ease of interpretability, and greater computational costs than their submodels individually.    
+  
+### Ensembling first_model and second_model
 
-2. **Boosting**:
-   - **Process**: Models are trained sequentially. Each new model tries to correct the errors made by the previous models. Weights are adjusted to pay more attention to the misclassified examples.
-   - **Example**: AdaBoost, Gradient Boosting Machines (GBM), XGBoost.
-   - **How it Helps**: Reduces bias and can convert weak learners into strong learners by focusing on errors of previous models.
+Step 1: Generate Submodel Predictions for Training Dataset and Validation Dataset
+preds_first_model_train = first_model.predict(training_set)
+preds_second_model_train = second_model.predict(training_set)
+preds_first_model_val = first_model.predict(validation_set)
+preds_second_model_val = second_model.predict(validation_set)
 
-3. **Stacking (Stacked Generalization)**:
-   - **Process**: Different models are trained on the same data, and their predictions are used as inputs to a final model (meta-model) that makes the ultimate prediction.
-   - **Example**: Combining logistic regression, decision trees, and neural networks as base models, with a meta-model like a logistic regression model that combines their predictions.
-   - **How it Helps**: Leverages the strengths of different models and combines their predictions to potentially achieve better performance than any individual model.
-
-4. **Voting**:
-   - **Process**: Each model in the ensemble makes a prediction, and the final prediction is made by taking a majority vote (for classification) or averaging (for regression).
-   - **Example**: Simple majority vote among different classifiers.
-   - **How it Helps**: Simple to implement and can improve robustness by reducing the likelihood of errors from any single model.
-
-### Advantages of Ensemble Models
-
-- **Improved Accuracy**: By combining models, ensembles often achieve better accuracy than individual models.
-- **Reduced Overfitting**: Ensembles can mitigate overfitting by smoothing out errors and variances.
-- **Robustness**: They are more robust to changes in the input data and can handle noisy data better.
-
-### Disadvantages of Ensemble Models
-
-- **Increased Complexity**: Ensembles can be more complex to implement and interpret compared to individual models.
-- **Computational Cost**: Training multiple models can be computationally expensive and require more resources.
-
-Ensemble methods are a powerful tool in machine learning, often used in practice to achieve higher performance and more reliable predictions. In our specific scenario, the ensemble model uses averaging to select the mode, or the most common predicted class, from the three pre-trained models. By doing this, it allows for further generalization accuracy improvements on the unseen validation data. 
+Step 2:   
 
 
+  
 ## Transfer Learning   
 
 After pre-training, the model is applied to a new, specific dataset and classification task in a process known as transfer learning. The pre-trained model's weights, optimized during pre-training, become the starting point for training on a new, often smaller, dataset. The model learns the specifics of the new task while leveraging the general features it learned during pre-training. In our project, the smaller dataset consisted of the CT-Scan images with different types of chest cancer versus normal cells. The ResNet50 model (pre_trained
