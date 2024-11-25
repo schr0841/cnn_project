@@ -74,15 +74,6 @@ Unfortunately, there is no good way to tell whether we are dealing with sparse o
 ![image](https://github.com/schr0841/cnn_project/blob/main/images/labels_categorical.png)
 
 Therefore, we must carefully specify whether we are using sparse or categorical in the data generating functions to ensure that everything matches up with the specified loss function.
-
-
-# Conclusions and Results
-
-## Confusion Matrix of Results for Ensemble Model using Categorical cross entropy loss function
-
-![image](https://github.com/schr0841/cnn_project/blob/main/images/cm_categorical.png)
-
-Above we see the confusion matrix of the ensemble model using the categorical cross entropy loss function as well as the accuracy of 88% on the test set. On the validation set this accuracy increases further to be 97.5%, which is significantly better than each of the constituent pretrained models (84.4%, 75.9%, and 50.6% respectively) or the base CNN model at 29.2%. This is tangible evidence that shows the true benefit of ensembling applied to the unseen validation data. We also showed how using pre-trained models represents a significant boost in model performance over vanilla CNNs, and how this strategy could be fruitful for a wide range of medical imaging problems.
   
   
 ## Pre-training a model: General Overview
@@ -210,7 +201,16 @@ We attempt to train 2 models sequentially, where the second model learns from th
 
 We asked Claude AI if it could come up with an implementation of simple boosted ensemble models and it was able to do that, but the code it provided assumed we have a clear split among the features $X$ and target $y$, whereas here we do not. We have included it as an extra supplementary notebook titled "gemini_boosted_ensemble.ipynb" to look at for further development.
 
+# Conclusions and Results
 
+## Confusion Matrix of Results for Ensemble Model using Categorical cross entropy loss function
+
+![image](https://github.com/schr0841/cnn_project/blob/main/images/cm_categorical.png)
+
+Above we see the confusion matrix of the ensemble model using the categorical cross entropy loss function as well as the accuracy of 88% on the test set. On the validation set this accuracy increases further to be 97.5%, which is significantly better than each of the constituent pretrained models (84.4%, 75.9%, and 50.6% respectively) or the base CNN model at 29.2%. This is tangible evidence that shows the true benefit of ensembling applied to the unseen validation data. We also showed how using pre-trained models represents a significant boost in model performance over vanilla CNNs, and how this strategy could be fruitful for a wide range of medical imaging problems.
+  
+
+    
 # Ensembling and Chaining Models
 
 We defined, compiled, and trained the ResNet50-based (first_model) and the base CNN model (second_model) individually before ensembling and chaining the two models. We wanted to see if a noticeable improvement in accuracy was possible by combining first_model and second_model over each of the submodels, and whether the method used to combine models (ensembling versus chaining) made a difference in accuracy scores.
@@ -436,18 +436,6 @@ Alternatively, it might be the case that simple averaging is not appropriate whe
 "Building an Ensemble Learning Model Using Scikit-learn" (Nov. 18 2018) Retrieved from https://towardsdatascience.com/ensemble-learning-using-scikit-learn-85c4531ff86a
 
 "Transfer Learning using EfficientNet PyTorch" (January 17, 2022) https://debuggercafe.com/transfer-learning-using-efficientnet-pytorch/
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
